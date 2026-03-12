@@ -17,7 +17,7 @@ on:
 
 jobs:
   test:
-    name: "${{ matrix.project }} — ${{ github.event.inputs.suite || 'all suites' }}"
+    name: "${{ matrix.project }} — Shard ${{ matrix.shard }}/${{ strategy.job-total }} — ${{ github.event.inputs.suite || 'all suites' }}"
     runs-on: ubuntu-latest
     timeout-minutes: 45
 
@@ -25,6 +25,7 @@ jobs:
       fail-fast: false
       matrix:
         project: [chromium] ##[firefox, webkit] # Excluded for now due to test stability issues, will be re-enabled in future iterations
+        shard: [1, 2, 3, 4] # Shard tests across 4 parallel jobs for faster execution
 
     steps:
       - name: Checkout repository
@@ -39,6 +40,22 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Setup test environment variables
+        run: |
+          cat > .env << EOF
+          BASE_URL=https://www.demoblaze.com
+          API_URL=https://api.demoblaze.com
+          TEST_USERNAME=${{ secrets.TEST_USERNAME }}
+          TEST_PASSWORD=${{ secrets.TEST_PASSWORD }}
+          CHECKOUT_NAME=${{ secrets.CHECKOUT_NAME }}
+          CHECKOUT_COUNTRY=${{ secrets.CHECKOUT_COUNTRY }}
+          CHECKOUT_CITY=${{ secrets.CHECKOUT_CITY }}
+          CHECKOUT_CARD=${{ secrets.CHECKOUT_CARD }}
+          CHECKOUT_MONTH=${{ secrets.CHECKOUT_MONTH }}
+          CHECKOUT_YEAR=${{ secrets.CHECKOUT_YEAR }}
+          EOF
+          echo "✓ Environment file created with $(wc -l < .env) variables"
+
       - name: Install Playwright browsers
         run: npx playwright install --with-deps ${{ matrix.project }}
 
@@ -47,10 +64,12 @@ jobs:
           if [ -n "${{ github.event.inputs.suite }}" ]; then
             npx playwright test tests/${{ github.event.inputs.suite }}/ \
               --project=${{ matrix.project }} \
+              --shard=${{ matrix.shard }}/4 \
               --reporter=github,html
           else
             npx playwright test \
               --project=${{ matrix.project }} \
+              --shard=${{ matrix.shard }}/4 \
               --reporter=github,html
           fi
         env:
@@ -68,7 +87,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: playwright-report-${{ matrix.project }}
+          name: playwright-report-${{ matrix.project }}-shard-${{ matrix.shard }}
           path: reports/
           retention-days: 14
 

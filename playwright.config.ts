@@ -18,15 +18,15 @@ export default defineConfig({
   timeout: 60_000,
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 1 : 0,
-  workers: process.env.CI ? 2 : undefined,
+  retries: process.env.CI ? 2 : 0,
+  workers: process.env.CI ? 4 : undefined,
 
   reporter: [["list"], ["html", { open: "never", outputFolder: "reports/html" }]],
 
   use: {
     baseURL: "https://www.demoblaze.com",
     screenshot: "only-on-failure",
-    video: "retain-on-failure",
+    video: "off",
     trace: "retain-on-failure",
     actionTimeout: 10_000,
     navigationTimeout: 15_000,

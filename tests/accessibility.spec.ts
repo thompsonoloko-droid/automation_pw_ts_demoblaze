@@ -140,9 +140,7 @@ test.describe("Accessibility (WCAG 2.1 AA)", () => {
       .isVisible()
       .catch(() => false);
 
-    if (!isLoggedIn) {
-      test.skip();
-    }
+    test.skip(!isLoggedIn, "Test requires user to be logged in");
 
     await page.goto("/");
 
