@@ -17,7 +17,7 @@ on:
 
 jobs:
   test:
-    name: "${{ matrix.project }} — Shard ${{ matrix.shard }}/${{ strategy.job-total }} — ${{ github.event.inputs.suite || 'all suites' }}"
+    name: "${{ matrix.project }} — Shard ${{ matrix.shard }}/4 — ${{ github.event.inputs.suite || 'all suites' }}"
     runs-on: ubuntu-latest
     timeout-minutes: 45
 
@@ -54,7 +54,7 @@ jobs:
           CHECKOUT_MONTH=${{ secrets.CHECKOUT_MONTH }}
           CHECKOUT_YEAR=${{ secrets.CHECKOUT_YEAR }}
           EOF
-          echo "✓ Environment file created with $(wc -l < .env) variables"
+          echo "✓ Environment file created (11 variables)"
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps ${{ matrix.project }}
@@ -65,12 +65,12 @@ jobs:
             npx playwright test tests/${{ github.event.inputs.suite }}/ \
               --project=${{ matrix.project }} \
               --shard=${{ matrix.shard }}/4 \
-              --reporter=github,html
+              --reporter=json,github,html
           else
             npx playwright test \
               --project=${{ matrix.project }} \
               --shard=${{ matrix.shard }}/4 \
-              --reporter=github,html
+              --reporter=json,github,html
           fi
         env:
           CI: true
@@ -105,8 +105,17 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
 
+      - name: Setup test environment for API tests
+        run: |
+          cat > .env << EOF
+          BASE_URL=https://www.demoblaze.com
+          API_URL=https://api.demoblaze.com
+          TEST_USERNAME=${{ secrets.TEST_USERNAME }}
+          TEST_PASSWORD=${{ secrets.TEST_PASSWORD }}
+          EOF
+
       - name: Run API tests
-        run: npx playwright test tests/api/ --project=chromium --reporter=github,html
+        run: npx playwright test tests/api/ --project=chromium --reporter=json,github,html
         env:
           CI: true
           TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
@@ -118,3 +127,31 @@ jobs:
           name: api-test-report
           path: reports/
           retention-days: 14
+
+  merge-reports:
+    name: "Merge Test Reports"
+    if: always()
+    needs: [test]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: all-reports
+          pattern: playwright-report-*
+
+      - name: Merge Playwright results
+        run: |
+          npm init -y
+          npm install -D @playwright/test
+          npx playwright merge-reports --output-folder merged-results all-reports
+
+      - name: Upload merged report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-merged-report
+          path: merged-results/
+          retention-days: 30
