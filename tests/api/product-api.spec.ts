@@ -118,17 +118,24 @@ test.describe("Product API — View @api @products", () => {
 });
 
 test.describe("Product API — Performance @api @performance", () => {
+  test("/entries responds within 3000ms", async ({ request }) => {
+    const start = Date.now();
+    const response = await request.get(`${API_BASE_URL}/entries`);
+    const elapsed = Date.now() - start;
+
+    expect(response.status()).toBe(200);
+    expect(elapsed).toBeLessThan(PERF.api_response_ms);
+  });
+
   const endpoints = [
-    { name: "/entries", body: {} },
     { name: "/bycat phone", path: "/bycat", body: { cat: "phone" } },
     { name: "/bycat notebook", path: "/bycat", body: { cat: "notebook" } },
   ];
 
   for (const ep of endpoints) {
     test(`${ep.name} responds within ${PERF.api_response_ms}ms`, async ({ request }) => {
-      const path = "path" in ep ? ep.path : "/entries";
       const start = Date.now();
-      const response = await request.post(`${API_BASE_URL}${path}`, { data: ep.body });
+      const response = await request.post(`${API_BASE_URL}${ep.path}`, { data: ep.body });
       const elapsed = Date.now() - start;
 
       expect(response.status()).toBe(200);
