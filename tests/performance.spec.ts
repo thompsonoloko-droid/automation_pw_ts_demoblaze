@@ -41,7 +41,10 @@ test.describe("Performance", () => {
   });
 
   // ---------[ PERF-004 ] Largest Contentful Paint (LCP) --------
-  test("PERF-004: LCP should occur within 2.5 seconds (Google Web Vitals)", async ({ page, perfUtils }) => {
+  test("PERF-004: LCP should occur within 2.5 seconds (Google Web Vitals)", async ({
+    page,
+    perfUtils,
+  }) => {
     await page.goto("/");
     const metrics = await perfUtils.getPageMetrics();
 
@@ -49,7 +52,7 @@ test.describe("Performance", () => {
   });
 
   // ---------[ PERF-005 ] Product Page Load Time --------
-  test("PERF-005: Product detail page should load within 4 seconds", async ({ page, perfUtils }) => {
+  test("PERF-005: Product detail page should load within 4 seconds", async ({ page }) => {
     await page.goto("/");
 
     const start = Date.now();
@@ -61,7 +64,7 @@ test.describe("Performance", () => {
   });
 
   // ---------[ PERF-006 ] Shopping Cart Load Time --------
-  test("PERF-006: Cart page should load within 3 seconds", async ({ page, perfUtils }) => {
+  test("PERF-006: Cart page should load within 3 seconds", async ({ page }) => {
     await page.goto("/");
 
     const start = Date.now();
@@ -90,7 +93,10 @@ test.describe("Performance", () => {
   });
 
   // ---------[ PERF-009 ] Slowest Resources --------
-  test("PERF-009: No single resource should take more than 2 seconds", async ({ page, perfUtils }) => {
+  test("PERF-009: No single resource should take more than 2 seconds", async ({
+    page,
+    perfUtils,
+  }) => {
     await page.goto("/");
     const slowest = await perfUtils.getSlowestResources(5);
 
@@ -130,7 +136,7 @@ test.describe("Performance", () => {
     // Measure click latency
     const latency = await perfUtils.measureActionLatency(
       () => page.click("//button[contains(text(), 'Add to cart')]"),
-      ".alert-success"
+      ".alert-success",
     );
 
     // Allow up to 1 second for response
@@ -140,7 +146,7 @@ test.describe("Performance", () => {
 
 // Performance benchmark suite (optional, run separately with --grep @benchmark)
 test.describe("Performance Benchmarking (@benchmark)", () => {
-  let baselineMetrics: any = {};
+  const baselineMetrics: Record<string, any> = {};
 
   test("PERF-BENCH: Collect homepage baseline", async ({ page, perfUtils }) => {
     await page.goto("/");

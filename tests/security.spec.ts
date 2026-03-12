@@ -23,9 +23,7 @@ import { test, expect } from "../fixtures";
 
 test.describe("Security", () => {
   // ---------[ SEC-001 ] XSS Prevention - JavaScript injection --------
-  test("SEC-001: Input fields should escape JavaScript injection attempts", async ({
-    page,
-  }) => {
+  test("SEC-001: Input fields should escape JavaScript injection attempts", async ({ page }) => {
     await page.goto("/");
     await page.click("#login2");
 
@@ -117,7 +115,7 @@ test.describe("Security", () => {
     await page.waitForLoadState("networkidle");
 
     // Page should still load and not show error
-    const products = await page.locator(".product-item").count();
+    // const _products = await page.locator(".product-item").count();
 
     // Either no results or error message, but not a crash
     expect(page.url()).not.toContain("error");
@@ -132,10 +130,10 @@ test.describe("Security", () => {
     const htmlContent = await page.content();
 
     // Look for common CSRF mitigation patterns
-    const hasCsrfProtection =
-      htmlContent.includes("csrf") ||
-      htmlContent.includes("_token") ||
-      htmlContent.includes("authenticity");
+    // const _hasCsrfProtection =
+    //   htmlContent.includes("csrf") ||
+    //   htmlContent.includes("_token") ||
+    //   htmlContent.includes("authenticity");
 
     // Modern SPAs often use token or session-based protection
     expect(true).toBe(true); // This is a SPA test, CSRF handled via SameSite cookies
@@ -154,9 +152,7 @@ test.describe("Security", () => {
   });
 
   // ---------[ SEC-009 ] Rate Limiting - Multiple Failed Logins --------
-  test("SEC-009: Repeated failed login attempts should trigger rate limiting", async ({
-    page,
-  }) => {
+  test("SEC-009: Repeated failed login attempts should trigger rate limiting", async ({ page }) => {
     const maxAttempts = 5;
     let blockedAfter = 0;
 
@@ -191,17 +187,14 @@ test.describe("Security", () => {
   });
 
   // ---------[ SEC-010 ] NoSQL Injection Prevention --------
-  test("SEC-010: API calls should sanitize parameters", async ({ page, apiUtils }) => {
-    // Attempt NoSQL injection through API
-    const maliciousQuery = { username: { $ne: null }, password: { $ne: null } };
-
+  test("SEC-010: API calls should sanitize parameters", async ({ page }) => {
     try {
       // This would normally be an API call, but we test via UI
       await page.goto("/");
 
       // The application should handle the request safely
       expect(page.url()).toContain("demoblaze");
-    } catch (error) {
+    } catch (_error) {
       // If error occurs, it's better than successful injection
       expect(true).toBe(true);
     }

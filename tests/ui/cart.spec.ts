@@ -150,7 +150,6 @@ test.describe("Cart Management @cart @regression", () => {
     homePage,
     productPage,
     cartPage,
-    page,
   }) => {
     await homePage.navigateToHome();
     await homePage.clickProduct(phone.name);
@@ -187,7 +186,6 @@ test.describe("Cart Management @cart @regression", () => {
     // Laptop should still be there
     await cartPage.verifyItemInCart(laptop.name);
   });
-
 
   test("CART-009 | adding the same product twice creates two rows", async ({
     homePage,

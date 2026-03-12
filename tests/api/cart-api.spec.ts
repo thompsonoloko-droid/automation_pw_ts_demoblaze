@@ -10,7 +10,7 @@
 
 import { test, expect } from "@playwright/test";
 
-import { API_BASE_URL, PERF, getTestUser, getCheckoutData, uniqueUsername } from "./helpers";
+import { API_BASE_URL, PERF, getTestUser, getCheckoutData } from "./helpers";
 
 const user = getTestUser();
 

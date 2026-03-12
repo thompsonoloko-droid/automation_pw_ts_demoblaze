@@ -21,9 +21,9 @@ test.describe("Accessibility (WCAG 2.1 AA)", () => {
 
     const results = await a11yUtils.checkPage();
 
-    expect(results.violations.filter((v) => v.impact === "critical" || v.impact === "serious")).toHaveLength(
-      0
-    );
+    expect(
+      results.violations.filter((v) => v.impact === "critical" || v.impact === "serious"),
+    ).toHaveLength(0);
     expect(results.url).toBe("https://www.demoblaze.com/");
   });
 
@@ -43,9 +43,7 @@ test.describe("Accessibility (WCAG 2.1 AA)", () => {
 
     const altResults = await a11yUtils.checkImageAltText();
 
-    const missingAltImages = altResults.images.filter(
-      (img) => !img.alt || img.alt.trim() === ""
-    );
+    const missingAltImages = altResults.images.filter((img) => !img.alt || img.alt.trim() === "");
 
     // Allow decorative images but flag product images
     expect(missingAltImages.length).toBeLessThanOrEqual(2);
@@ -76,7 +74,10 @@ test.describe("Accessibility (WCAG 2.1 AA)", () => {
   });
 
   // ---------[ A11Y-006 ] Keyboard Navigation --------
-  test("A11Y-006: All interactive elements should be keyboard accessible", async ({ page, a11yUtils }) => {
+  test("A11Y-006: All interactive elements should be keyboard accessible", async ({
+    page,
+    a11yUtils,
+  }) => {
     await page.goto("/");
 
     const focusableElements = await a11yUtils.checkKeyboardNavigation();
@@ -86,7 +87,10 @@ test.describe("Accessibility (WCAG 2.1 AA)", () => {
   });
 
   // ---------[ A11Y-007 ] Product Page Accessibility --------
-  test("A11Y-007: Product detail page should be WCAG 2.1 AA compliant", async ({ page, a11yUtils }) => {
+  test("A11Y-007: Product detail page should be WCAG 2.1 AA compliant", async ({
+    page,
+    a11yUtils,
+  }) => {
     await page.goto("/");
 
     // Open a product
@@ -112,7 +116,7 @@ test.describe("Accessibility (WCAG 2.1 AA)", () => {
   });
 
   // ---------[ A11Y-009 ] Signup Modal Accessibility --------
-  test("A11Y-009: Signup modal should be accessible with keyboard", async ({ page, a11yUtils }) => {
+  test("A11Y-009: Signup modal should be accessible with keyboard", async ({ page }) => {
     await page.goto("/");
     await page.click("#signin2");
 
@@ -131,7 +135,10 @@ test.describe("Accessibility (WCAG 2.1 AA)", () => {
   test("A11Y-010: Checkout form should have labeled inputs", async ({ page, a11yUtils }) => {
     // This test requires being logged in and having items in cart
     // Checking form structure for accessibility
-    const isLoggedIn = await page.locator("#nameofuser").isVisible().catch(() => false);
+    const isLoggedIn = await page
+      .locator("#nameofuser")
+      .isVisible()
+      .catch(() => false);
 
     if (!isLoggedIn) {
       test.skip();

@@ -62,7 +62,7 @@ export function logError(message: string, error?: Error | unknown): void {
 export async function retryWithBackoff<T>(
   fn: () => Promise<T>,
   maxAttempts: number = 3,
-  baseDelayMs: number = 100
+  baseDelayMs: number = 100,
 ): Promise<T> {
   let lastError: Error | null = null;
 
@@ -93,7 +93,7 @@ export async function retryWithBackoff<T>(
 export async function waitForCondition(
   condition: () => Promise<boolean>,
   timeoutMs: number = 10_000,
-  pollIntervalMs: number = 500
+  pollIntervalMs: number = 500,
 ): Promise<void> {
   const startTime = Date.now();
 
@@ -173,7 +173,7 @@ export function generateTestPassword(): string {
 export async function takeScreenshot(
   page: Page,
   testName: string,
-  screenshotDir: string = "./reports/screenshots"
+  screenshotDir: string = "./reports/screenshots",
 ): Promise<string> {
   const timestamp = new Date().toISOString().replace(/:/g, "-").split(".")[0];
   const filename = `${screenshotDir}/${testName}_${timestamp}.png`;
@@ -250,7 +250,7 @@ export function assertSuccessStatus(status: number): void {
 export function assertWithinTolerance(
   actual: number,
   expected: number,
-  tolerancePercent: number = 10
+  tolerancePercent: number = 10,
 ): void {
   const tolerance = (expected * tolerancePercent) / 100;
   const min = expected - tolerance;
@@ -258,7 +258,7 @@ export function assertWithinTolerance(
 
   if (actual < min || actual > max) {
     throw new Error(
-      `Value ${actual} outside tolerance ${tolerancePercent}% of ${expected} (expected ${min}-${max})`
+      `Value ${actual} outside tolerance ${tolerancePercent}% of ${expected} (expected ${min}-${max})`,
     );
   }
 }
@@ -309,30 +309,20 @@ export function formatTable(data: Record<string, unknown>[]): string {
     headers.map((h) => {
       const value = row[h];
       return typeof value === "number" ? value.toFixed(2) : String(value || "-");
-    })
+    }),
   );
 
   // Calculate column widths
-  const widths = headers.map((h, i) =>
-    Math.max(h.length, ...rows.map((r) => r[i].length))
-  );
+  const widths = headers.map((h, i) => Math.max(h.length, ...rows.map((r) => r[i].length)));
 
   // Format header
-  let table = headers
-    .map((h, i) => h.padEnd(widths[i]))
-    .join(" | ");
+  let table = headers.map((h, i) => h.padEnd(widths[i])).join(" | ");
   table += "\n";
   table += widths.map((w) => "-".repeat(w)).join("-+-");
   table += "\n";
 
   // Format rows
-  table += rows
-    .map((r) =>
-      r
-        .map((cell, i) => cell.padEnd(widths[i]))
-        .join(" | ")
-    )
-    .join("\n");
+  table += rows.map((r) => r.map((cell, i) => cell.padEnd(widths[i])).join(" | ")).join("\n");
 
   return table;
 }

@@ -52,7 +52,7 @@ export class AccessibilityUtils {
     });
 
     // Run axe-core scan
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     const violations = await this.page.evaluate(async () => {
       const axe = (window as any).axe;
       if (!axe) {
@@ -95,7 +95,6 @@ export class AccessibilityUtils {
       url: "https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.9.1/axe.min.js",
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const violations = await this.page.evaluate(async (sel: string) => {
       const axe = (window as any).axe;
       if (!axe) {
@@ -132,7 +131,9 @@ export class AccessibilityUtils {
   /**
    * Assert no accessibility violations found.
    */
-  async assertNoViolations(maxLevel: "critical" | "serious" | "moderate" = "serious"): Promise<void> {
+  async assertNoViolations(
+    maxLevel: "critical" | "serious" | "moderate" = "serious",
+  ): Promise<void> {
     const results = await this.checkPage();
 
     const violationSeverities: ("critical" | "serious" | "moderate" | "minor")[] = [
@@ -143,7 +144,7 @@ export class AccessibilityUtils {
     ];
     const maxLevelIndex = violationSeverities.indexOf(maxLevel);
     const relevantViolations = results.violations.filter(
-      (v) => violationSeverities.indexOf(v.impact) <= maxLevelIndex
+      (v) => violationSeverities.indexOf(v.impact) <= maxLevelIndex,
     );
 
     if (relevantViolations.length > 0) {
@@ -159,7 +160,7 @@ export class AccessibilityUtils {
    */
   async checkKeyboardNavigation(): Promise<string[]> {
     const focusable = await this.page.locator(
-      "button, a, input, select, textarea, [tabindex]:not([tabindex='-1'])"
+      "button, a, input, select, textarea, [tabindex]:not([tabindex='-1'])",
     );
 
     const count = await focusable.count();
@@ -185,7 +186,7 @@ export class AccessibilityUtils {
     missing: string[];
   }> {
     const unlabeled = await this.page.locator(
-      "button:not([aria-label]):has-text(''), input:not([aria-label]):not([type=hidden]):not([type=button])"
+      "button:not([aria-label]):has-text(''), input:not([aria-label]):not([type=hidden]):not([type=button])",
     );
 
     const count = await unlabeled.count();

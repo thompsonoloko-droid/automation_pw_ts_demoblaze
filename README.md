@@ -121,16 +121,16 @@ npm run report
 
 ## Test coverage
 
-| Suite | File | Tests |
-|-------|------|-------|
-| Auth UI | `tests/ui/auth.spec.ts` | AUTH-001 → AUTH-015 |
-| Product UI | `tests/ui/product.spec.ts` | PROD-001 → PROD-014 |
-| Cart UI | `tests/ui/cart.spec.ts` | CART-001 → CART-010 |
-| Checkout UI | `tests/ui/checkout.spec.ts` | CHK-001 → CHK-010 |
-| Auth API | `tests/api/auth-api.spec.ts` | /login, /signup, /check |
-| Product API | `tests/api/product-api.spec.ts` | /entries, /bycat, /view |
-| Cart API | `tests/api/cart-api.spec.ts` | /addtocart, /viewcart, /deletecart, /placeorder |
-| E2E | `tests/e2e/purchase-flow.spec.ts` | E2E-001 → E2E-006 |
+| Suite       | File                              | Tests                                           |
+| ----------- | --------------------------------- | ----------------------------------------------- |
+| Auth UI     | `tests/ui/auth.spec.ts`           | AUTH-001 → AUTH-015                             |
+| Product UI  | `tests/ui/product.spec.ts`        | PROD-001 → PROD-014                             |
+| Cart UI     | `tests/ui/cart.spec.ts`           | CART-001 → CART-010                             |
+| Checkout UI | `tests/ui/checkout.spec.ts`       | CHK-001 → CHK-010                               |
+| Auth API    | `tests/api/auth-api.spec.ts`      | /login, /signup, /check                         |
+| Product API | `tests/api/product-api.spec.ts`   | /entries, /bycat, /view                         |
+| Cart API    | `tests/api/cart-api.spec.ts`      | /addtocart, /viewcart, /deletecart, /placeorder |
+| E2E         | `tests/e2e/purchase-flow.spec.ts` | E2E-001 → E2E-006                               |
 
 ---
 
@@ -139,18 +139,18 @@ npm run report
 All endpoints are at `https://api.demoblaze.com` and use `POST` with a JSON body.
 The API always returns HTTP `200` — errors are signalled in the response body.
 
-| Endpoint | Purpose |
-|----------|---------|
-| `/signup` | Register a new user |
-| `/login` | Authenticate → returns `"Auth_token: <token>"` |
-| `/check` | Validate a session token |
-| `/entries` | List all products |
-| `/bycat` | Filter products by category (`phone`, `notebook`, `monitor`) |
-| `/view` | Get a single product by `id` |
-| `/addtocart` | Add an item to the user's cart |
-| `/viewcart` | Get cart contents for a user |
-| `/deletecart` | Remove a cart entry by entry `id` |
-| `/placeorder` | Submit an order |
+| Endpoint      | Purpose                                                      |
+| ------------- | ------------------------------------------------------------ |
+| `/signup`     | Register a new user                                          |
+| `/login`      | Authenticate → returns `"Auth_token: <token>"`               |
+| `/check`      | Validate a session token                                     |
+| `/entries`    | List all products                                            |
+| `/bycat`      | Filter products by category (`phone`, `notebook`, `monitor`) |
+| `/view`       | Get a single product by `id`                                 |
+| `/addtocart`  | Add an item to the user's cart                               |
+| `/viewcart`   | Get cart contents for a user                                 |
+| `/deletecart` | Remove a cart entry by entry `id`                            |
+| `/placeorder` | Submit an order                                              |
 
 ---
 

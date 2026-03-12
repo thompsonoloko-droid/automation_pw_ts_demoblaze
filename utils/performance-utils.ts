@@ -64,8 +64,7 @@ export class PerformanceUtils {
       const lcpEntries = performance.getEntriesByType("largest-contentful-paint");
 
       // Calculate Core Web Vitals
-      const firstPaint =
-        paintEntries.find((e) => e.name === "first-paint")?.startTime || 0;
+      const firstPaint = paintEntries.find((e) => e.name === "first-paint")?.startTime || 0;
       const largestContentfulPaint =
         lcpEntries.length > 0 ? lcpEntries[lcpEntries.length - 1].startTime : 0;
 
@@ -169,10 +168,7 @@ export class PerformanceUtils {
    *
    * Useful for testing button click response time.
    */
-  async measureActionLatency(
-    action: () => Promise<void>,
-    waitSelector?: string
-  ): Promise<number> {
+  async measureActionLatency(action: () => Promise<void>, waitSelector?: string): Promise<number> {
     const startTime = Date.now();
 
     await action();
@@ -190,7 +186,7 @@ export class PerformanceUtils {
   assertPageLoadTime(metrics: PageMetrics, thresholdMs: number): void {
     if (metrics.pageLoadTime > thresholdMs) {
       throw new Error(
-        `Page load time ${metrics.pageLoadTime}ms exceeds threshold ${thresholdMs}ms`
+        `Page load time ${metrics.pageLoadTime}ms exceeds threshold ${thresholdMs}ms`,
       );
     }
   }
@@ -201,7 +197,7 @@ export class PerformanceUtils {
   assertDomContentLoaded(metrics: PageMetrics, thresholdMs: number): void {
     if (metrics.domContentLoaded > thresholdMs) {
       throw new Error(
-        `DOM content loaded ${metrics.domContentLoaded}ms exceeds threshold ${thresholdMs}ms`
+        `DOM content loaded ${metrics.domContentLoaded}ms exceeds threshold ${thresholdMs}ms`,
       );
     }
   }
@@ -211,9 +207,7 @@ export class PerformanceUtils {
    */
   assertLargestContentfulPaint(metrics: PageMetrics, thresholdMs: number): void {
     if (metrics.largestContentfulPaint > thresholdMs) {
-      throw new Error(
-        `LCP ${metrics.largestContentfulPaint}ms exceeds threshold ${thresholdMs}ms`
-      );
+      throw new Error(`LCP ${metrics.largestContentfulPaint}ms exceeds threshold ${thresholdMs}ms`);
     }
   }
 
@@ -223,7 +217,7 @@ export class PerformanceUtils {
   assertFirstInputDelay(metrics: PageMetrics, thresholdMs: number): void {
     if (metrics.firstInputDelay > thresholdMs) {
       throw new Error(
-        `First input delay ${metrics.firstInputDelay}ms exceeds threshold ${thresholdMs}ms`
+        `First input delay ${metrics.firstInputDelay}ms exceeds threshold ${thresholdMs}ms`,
       );
     }
   }
@@ -235,9 +229,7 @@ export class PerformanceUtils {
    */
   assertTimeToFirstByte(metrics: PageMetrics, thresholdMs: number = 600): void {
     if (metrics.timeToFirstByte > thresholdMs) {
-      throw new Error(
-        `TTFB ${metrics.timeToFirstByte}ms exceeds threshold ${thresholdMs}ms`
-      );
+      throw new Error(`TTFB ${metrics.timeToFirstByte}ms exceeds threshold ${thresholdMs}ms`);
     }
   }
 
@@ -264,7 +256,7 @@ Performance Metrics:
   compareWithBaseline(
     current: PageMetrics,
     baseline: PageMetrics,
-    threshold: number = 20
+    threshold: number = 20,
   ): { passed: boolean; changes: Record<string, string> } {
     const changes: Record<string, string> = {};
     let passed = true;

@@ -43,6 +43,7 @@ git checkout -b fix/your-bug-fix
 ```
 
 Use descriptive branch names:
+
 - `feature/`: New features or enhancements
 - `fix/`: Bug fixes
 - `test/`: New tests or test improvements
@@ -91,16 +92,16 @@ npm test -- --project=webkit
 
 Organize tests using the following markers:
 
-| Marker | Purpose | Example |
-|--------|---------|---------|
-| `@smoke` | Critical path tests | `test("@smoke", async () => { ... })` |
+| Marker        | Purpose               | Example                                    |
+| ------------- | --------------------- | ------------------------------------------ |
+| `@smoke`      | Critical path tests   | `test("@smoke", async () => { ... })`      |
 | `@regression` | Full regression suite | `test("@regression", async () => { ... })` |
-| `@ui` | UI/visual tests | `test.describe("@ui", () => { ... })` |
-| `@api` | API endpoint tests | Within `api/` directory |
-| `@e2e` | End-to-end workflows | Full user journeys |
-| `@mobile` | Mobile device tests | Device-specific scenarios |
-| `@slow` | Long-running tests | Performance/load tests |
-| `@skip_ci` | Skip in CI/CD | Local debugging only |
+| `@ui`         | UI/visual tests       | `test.describe("@ui", () => { ... })`      |
+| `@api`        | API endpoint tests    | Within `api/` directory                    |
+| `@e2e`        | End-to-end workflows  | Full user journeys                         |
+| `@mobile`     | Mobile device tests   | Device-specific scenarios                  |
+| `@slow`       | Long-running tests    | Performance/load tests                     |
+| `@skip_ci`    | Skip in CI/CD         | Local debugging only                       |
 
 ### 4. Page Objects & Test Patterns
 
@@ -155,13 +156,13 @@ test.describe("Feature Group @smoke", () => {
 
   test("TEST-001 | Should do something specific", async ({ page }) => {
     const myPage = new MyPage(page);
-    
+
     // Arrange
     await myPage.fillEmail("test@example.com");
-    
+
     // Act
     await myPage.clickSave();
-    
+
     // Assert - one primary assertion per test
     const message = await myPage.getErrorMessage();
     expect(message).toContain("Success");
@@ -169,10 +170,10 @@ test.describe("Feature Group @smoke", () => {
 
   test("TEST-002 | Should handle error states", async ({ page }) => {
     const myPage = new MyPage(page);
-    
+
     await myPage.fillEmail("invalid-email");
     await myPage.clickSave();
-    
+
     const error = await myPage.getErrorMessage();
     expect(error).toContain("Invalid email");
   });
@@ -188,6 +189,7 @@ Test-ID | Clear description of what is being tested
 ```
 
 Examples:
+
 - `AUTH-001 | User can login with valid credentials`
 - `CART-005 | Product quantity updates correctly in checkout`
 - `CHK-009 | Invalid card number shows validation error`
@@ -197,6 +199,7 @@ Examples:
 **Never hardcode test data!** Add to `test_data/test-data.json` or `.env`:
 
 **Non-sensitive data** (`test_data/test-data.json`):
+
 ```json
 {
   "products": {
@@ -209,6 +212,7 @@ Examples:
 ```
 
 **Sensitive data** (`.env` - git-ignored):
+
 ```bash
 TEST_USERNAME=your_test_username
 TEST_PASSWORD=your_secure_password
@@ -224,7 +228,7 @@ Use the `ApiUtils` fixture for API tests:
 test("POST /login returns auth token", async ({ apiUtils }) => {
   const response = await apiUtils.post("/login", {
     username: "testuser",
-    password: "password123"
+    password: "password123",
   });
 
   expect(response.status).toBe(200);
@@ -249,6 +253,7 @@ npx playwright test --debug
 #### View Traces & Screenshots
 
 Traces and screenshots are saved in `reports/` on failures:
+
 - `reports/screenshots/` - Failure screenshots
 - `test-results/` - Playwright traces and videos
 
@@ -293,6 +298,7 @@ git commit -m "docs: add TypeScript path alias configuration"
 ## Submitting a Pull Request
 
 1. **Push your branch** to GitHub
+
    ```bash
    git push origin feature/your-feature-name
    ```
@@ -375,7 +381,7 @@ Use the `a11yUtils` fixture:
 ```typescript
 test("homepage should be WCAG 2.1 AA compliant", async ({ a11yUtils }) => {
   const results = await a11yUtils.checkPage();
-  
+
   expect(results.criticalViolations).toBe(0);
   expect(results.seriousViolations).toBe(0);
 });

@@ -3,7 +3,12 @@
  */
 
 export { AccessibilityUtils, type A11yViolation, type A11yResults } from "./accessibility-utils";
-export { PerformanceUtils, type PageMetrics, type ResourceTiming, type NavigationTiming } from "./performance-utils";
+export {
+  PerformanceUtils,
+  type PageMetrics,
+  type ResourceTiming,
+  type NavigationTiming,
+} from "./performance-utils";
 export { ApiUtils, DEMOBLAZE_API_BASE } from "./api-utils";
 
 export {

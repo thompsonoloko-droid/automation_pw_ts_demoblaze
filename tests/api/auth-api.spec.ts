@@ -12,7 +12,14 @@
 
 import { test, expect } from "@playwright/test";
 
-import { API_BASE_URL, PERF, getTestUser, loadTestData, uniqueUsername, resolveEnv } from "./helpers";
+import {
+  API_BASE_URL,
+  PERF,
+  getTestUser,
+  loadTestData,
+  uniqueUsername,
+  resolveEnv,
+} from "./helpers";
 
 const testData = loadTestData();
 const user = getTestUser();
