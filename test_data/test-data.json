@@ -1,0 +1,82 @@
+{
+  "api": {
+    "base_url": "https://api.demoblaze.com",
+    "timeout_ms": 5000,
+    "perf_thresholds": {
+      "page_load_ms": 5000,
+      "api_response_ms": 3000,
+      "cart_update_ms": 2000
+    }
+  },
+  "users": {
+    "existing": {
+      "username": "$TEST_USERNAME",
+      "password": "$TEST_PASSWORD"
+    },
+    "invalid": {
+      "username": "nonexistent_xyz_99999",
+      "password": "definitelyWrongPassword"
+    }
+  },
+  "products": {
+    "phone": {
+      "name": "Samsung galaxy s6",
+      "category": "phone",
+      "price": 360
+    },
+    "laptop": {
+      "name": "Sony vaio i5",
+      "category": "notebook",
+      "price": 790
+    },
+    "monitor": {
+      "name": "Apple monitor 24",
+      "category": "monitor",
+      "price": 400
+    }
+  },
+  "checkout": {
+    "valid": {
+      "name": "$CHECKOUT_NAME",
+      "country": "$CHECKOUT_COUNTRY",
+      "city": "$CHECKOUT_CITY",
+      "card": "$CHECKOUT_CARD",
+      "month": "$CHECKOUT_MONTH",
+      "year": "$CHECKOUT_YEAR"
+    }
+  },
+  "signup": {
+    "duplicate_error": "This user already exist.",
+    "success_message": "sign up successfully",
+    "empty_field_error": "Please fill out"
+  },
+  "login": {
+    "wrong_password_error": "Wrong password.",
+    "no_user_error": "User does not exist."
+  },
+  "invalid_login_attempts": [
+    {
+      "id": "wrong-password",
+      "username": "$TEST_USERNAME",
+      "password": "completelyWrong99",
+      "expected_message": "Wrong password."
+    },
+    {
+      "id": "unknown-user",
+      "username": "ghost_user_xyz_001",
+      "password": "anything",
+      "expected_message": "User does not exist."
+    }
+  ],
+  "api_endpoints": [
+    { "name": "entries", "path": "/entries", "method": "POST" },
+    { "name": "bycat-phone", "path": "/bycat", "method": "POST", "body": { "cat": "phone" } },
+    { "name": "bycat-laptop", "path": "/bycat", "method": "POST", "body": { "cat": "notebook" } },
+    { "name": "login", "path": "/login", "method": "POST" },
+    { "name": "signup", "path": "/signup", "method": "POST" },
+    { "name": "viewcart", "path": "/viewcart", "method": "POST" },
+    { "name": "addtocart", "path": "/addtocart", "method": "POST" },
+    { "name": "deletecart", "path": "/deletecart", "method": "POST" },
+    { "name": "placeorder", "path": "/placeorder", "method": "POST" }
+  ]
+}

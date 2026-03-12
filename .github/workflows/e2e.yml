@@ -1,0 +1,101 @@
+name: Demoblaze E2E Tests
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Daily smoke run at 06:00 UTC
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+    inputs:
+      suite:
+        description: "Test suite folder to run (ui | api | e2e — blank = all)"
+        required: false
+        default: ""
+
+jobs:
+  test:
+    name: "${{ matrix.project }} — ${{ github.event.inputs.suite || 'all suites' }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [chromium, firefox, webkit]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps ${{ matrix.project }}
+
+      - name: Run tests
+        run: |
+          if [ -n "${{ github.event.inputs.suite }}" ]; then
+            npx playwright test tests/${{ github.event.inputs.suite }}/ \
+              --project=${{ matrix.project }} \
+              --reporter=github,html
+          else
+            npx playwright test \
+              --project=${{ matrix.project }} \
+              --reporter=github,html
+          fi
+        env:
+          CI: true
+          TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
+          TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+          CHECKOUT_NAME: ${{ secrets.CHECKOUT_NAME }}
+          CHECKOUT_COUNTRY: ${{ secrets.CHECKOUT_COUNTRY }}
+          CHECKOUT_CITY: ${{ secrets.CHECKOUT_CITY }}
+          CHECKOUT_CARD: ${{ secrets.CHECKOUT_CARD }}
+          CHECKOUT_MONTH: ${{ secrets.CHECKOUT_MONTH }}
+          CHECKOUT_YEAR: ${{ secrets.CHECKOUT_YEAR }}
+
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-${{ matrix.project }}
+          path: reports/
+          retention-days: 14
+
+  api-tests:
+    name: "API Tests (chromium)"
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+
+      - name: Run API tests
+        run: npx playwright test tests/api/ --project=chromium --reporter=github,html
+        env:
+          CI: true
+          TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
+          TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: api-test-report
+          path: reports/
+          retention-days: 14
