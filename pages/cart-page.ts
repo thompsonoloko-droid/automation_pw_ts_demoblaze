@@ -44,7 +44,17 @@ export class CartPage extends BasePage {
    * delay is needed before counting rows.
    */
   async waitForCartLoad(): Promise<void> {
-    await this.page.waitForTimeout(1_500);
+    await this.page.waitForLoadState("domcontentloaded", { timeout: 8_000 }).catch(() => {});
+    // Wait for the table to have the right structure
+    let rowCount = 0;
+    let attempts = 0;
+    while (rowCount === 0 && attempts < 10) {
+      rowCount = await this.page.locator(this.TABLE_ROWS).count();
+      if (rowCount === 0) {
+        await this.page.waitForTimeout(300);
+      }
+      attempts++;
+    }
   }
 
   // ---------------------------------------------------------------------------

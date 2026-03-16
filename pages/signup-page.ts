@@ -51,7 +51,7 @@ export class SignupPage extends BasePage {
   /**
    * Fill and submit the signup form, then capture and return the alert message.
    *
-   * Demoblaze shows a browser alert on both success ("sign up successfully")
+   * Demoblaze shows a browser alert on both success ("sign up successful")
    * and failure ("This user already exist.").
    *
    * @param username - Desired username.
@@ -59,8 +59,18 @@ export class SignupPage extends BasePage {
    * @returns The alert dialog message text.
    */
   async signup(username: string, password: string): Promise<string> {
+    // Ensure inputs are visible and ready
+    await this.page.waitForTimeout(200);
     await this.fill(this.USERNAME_INPUT, username);
+    await this.page.waitForTimeout(100);
     await this.fill(this.PASSWORD_INPUT, password);
+    await this.page.waitForTimeout(100);
+    // Verify fields were filled before clicking
+    const usernameValue = await this.page.locator(this.USERNAME_INPUT).inputValue();
+    const passwordValue = await this.page.locator(this.PASSWORD_INPUT).inputValue();
+    if (!usernameValue || !passwordValue) {
+      throw new Error(`Form fields not filled: username="${usernameValue}", password="${passwordValue}"`);
+    }
 
     const alertPromise = new Promise<string>((resolve) => {
       this.page.once("dialog", async (dialog) => {

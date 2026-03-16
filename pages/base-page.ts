@@ -69,7 +69,12 @@ export class BasePage {
       } catch (error) {
         lastError = error;
         console.warn(`Click attempt ${attempt} failed for '${selector}': ${error}`);
-        await this.page.waitForTimeout(retryDelay);
+        try {
+          await this.page.waitForTimeout(retryDelay);
+        } catch {
+          // Page may have closed, abort retry loop
+          throw error;
+        }
       }
     }
     throw new Error(

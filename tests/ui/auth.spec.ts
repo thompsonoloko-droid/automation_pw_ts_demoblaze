@@ -196,7 +196,7 @@ test.describe("Logout @auth @regression", () => {
     await loginPage.loginExpectSuccess(existingUser.username, existingUser.password);
 
     await page.goto("https://www.demoblaze.com/cart.html");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded", { timeout: 8_000 }).catch(() => {});
     await homePage.navigateToHome();
 
     await loginPage.verifyLoggedIn(existingUser.username);

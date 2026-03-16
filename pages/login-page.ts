@@ -69,8 +69,18 @@ export class LoginPage extends BasePage {
    * @param password - Demoblaze password.
    */
   async login(username: string, password: string): Promise<void> {
+    // Ensure inputs are visible and ready
+    await this.page.waitForTimeout(200);
     await this.fill(this.USERNAME_INPUT, username);
+    await this.page.waitForTimeout(100);
     await this.fill(this.PASSWORD_INPUT, password);
+    await this.page.waitForTimeout(100);
+    // Verify fields were filled before clicking
+    const usernameValue = await this.page.locator(this.USERNAME_INPUT).inputValue();
+    const passwordValue = await this.page.locator(this.PASSWORD_INPUT).inputValue();
+    if (!usernameValue || !passwordValue) {
+      throw new Error(`Form fields not filled: username="${usernameValue}", password="${passwordValue}"`);
+    }
     await this.click(this.LOGIN_BTN);
   }
 
@@ -95,8 +105,9 @@ export class LoginPage extends BasePage {
     }
     
     // Wait for username to appear and have text content
+    // API prepends "Welcome " to the username
     const usernameDisplay = this.page.locator(this.NAV_USERNAME_DISPLAY);
-    await expect(usernameDisplay).toHaveText(username, { timeout: 10_000 });
+    await expect(usernameDisplay).toContainText(username, { timeout: 10_000 });
   }
 
   /**
