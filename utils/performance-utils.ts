@@ -158,7 +158,10 @@ export class PerformanceUtils {
   async measureElementVisibility(selector: string): Promise<number> {
     const startTime = Date.now();
 
-    await this.page.locator(selector).waitFor({ state: "visible", timeout: 30000 });
+    // Use first() to avoid strict mode violation when selector matches multiple elements.
+    // Strict mode requires a selector to match at most one element, but '#tbodyid .card'
+    // matches all product cards. .first() safely selects the first visible card.
+    await this.page.locator(selector).first().waitFor({ state: "visible", timeout: 30000 });
 
     return Date.now() - startTime;
   }

@@ -8,6 +8,7 @@
 import { expect } from "@playwright/test";
 
 import { BasePage } from "./base-page";
+import { TIMEOUTS } from "../tests/shared/constants";
 
 export class SignupPage extends BasePage {
   // Navigation
@@ -33,7 +34,7 @@ export class SignupPage extends BasePage {
     await this.page.locator(this.NAV_SIGNUP_LINK).click({ force: true }).catch(() => {});
     // Wait for the input field — clearest signal that modal animation is done.
     try {
-      await this.page.locator(this.USERNAME_INPUT).waitFor({ state: "visible", timeout: 10_000 });
+      await this.page.locator(this.USERNAME_INPUT).waitFor({ state: "visible", timeout: TIMEOUTS.MODAL_OPEN_WAIT });
     } catch {
       // Proceed anyway; signup() will handle input readiness.
     }
@@ -44,7 +45,7 @@ export class SignupPage extends BasePage {
    */
   async closeModal(): Promise<void> {
     await this.click(this.CLOSE_BTN);
-    await this.page.waitForTimeout(400);
+    await this.page.waitForTimeout(TIMEOUTS.MODAL_ANIMATION);
     await expect(this.page.locator(this.SIGNUP_MODAL)).not.toBeVisible();
   }
 
@@ -63,10 +64,27 @@ export class SignupPage extends BasePage {
    * @returns The alert dialog message text.
    */
   async signup(username: string, password: string): Promise<string> {
-    await this.page.locator(this.USERNAME_INPUT).waitFor({ state: "visible", timeout: 10_000 });
+    await this.page.locator(this.USERNAME_INPUT).waitFor({ state: "visible", timeout: TIMEOUTS.MODAL_OPEN_WAIT });
 
-    // Register the dialog handler before the click so it's ready for either
-    // a synchronous alert (empty-field validation) or an async AJAX alert.
+    // Fill via Playwright to fire focus/input events.
+    await this.page.locator(this.USERNAME_INPUT).fill(username);
+    await this.page.locator(this.PASSWORD_INPUT).fill(password);
+
+    // Dispatch input events to notify any frameworks watching the inputs.
+    await this.page.evaluate(
+      ([uSel, pSel]: [string, string]) => {
+        const u = document.querySelector(uSel) as HTMLInputElement | null;
+        const p = document.querySelector(pSel) as HTMLInputElement | null;
+        if (u) u.dispatchEvent(new Event("input", { bubbles: true }));
+        if (p) p.dispatchEvent(new Event("input", { bubbles: true }));
+      },
+      [this.USERNAME_INPUT, this.PASSWORD_INPUT],
+    );
+
+    // Brief delay to allow framework state to update.
+    await this.page.waitForTimeout(TIMEOUTS.INPUT_DISPATCH_DELAY);
+
+    // Register the dialog handler before clicking (needs to be synchronous).
     const alertPromise = new Promise<string>((resolve) => {
       this.page.once("dialog", async (dialog) => {
         const message = dialog.message();
@@ -75,26 +93,8 @@ export class SignupPage extends BasePage {
       });
     });
 
-    // Set both field values and trigger the button in one synchronous JS execution,
-    // preventing Bootstrap from clearing inputs between fill and click.
-    await this.page.evaluate(
-      ([uSel, pSel, btnSel, uVal, pVal]: [string, string, string, string, string]) => {
-        const u = document.querySelector(uSel) as HTMLInputElement | null;
-        const p = document.querySelector(pSel) as HTMLInputElement | null;
-        const btn = document.querySelector(btnSel) as HTMLElement | null;
-        if (u) u.value = uVal;
-        if (p) p.value = pVal;
-        if (btn) btn.click();
-      },
-      [this.USERNAME_INPUT, this.PASSWORD_INPUT, this.SIGNUP_BTN, username, password] as [
-        string,
-        string,
-        string,
-        string,
-        string,
-      ],
-    );
-
+    // Click via normal Playwright click.
+    await this.click(this.SIGNUP_BTN);
     return alertPromise;
   }
 

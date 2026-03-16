@@ -123,11 +123,12 @@ test.describe("Accessibility (WCAG 2.1 AA)", () => {
   }) => {
     await page.goto("/");
 
-    // Wait for the async product grid before clicking — Demoblaze populates
-    // #tbodyid via XHR after page load, so the link may not exist yet.
-    await page.waitForSelector("#tbodyid .card", { timeout: 30_000 }).catch(() => {});
+    // Wait for the async product grid to load before clicking.
+    // Use a more specific wait: wait for the actual link to be visible, not just the cards.
+    const productLink = page.locator("//a[contains(text(), 'Samsung galaxy s6')]").first();
+    await productLink.waitFor({ state: "visible", timeout: 30_000 });
     // Open a product
-    await page.click("//a[contains(text(), 'Samsung galaxy s6')]");
+    await productLink.click();
 
     // Use shorter timeout and handle gracefully
     await page.waitForLoadState("domcontentloaded", { timeout: 8_000 }).catch(() => {});

@@ -9,6 +9,7 @@
 import { expect } from "@playwright/test";
 
 import { BasePage } from "./base-page";
+import { TIMEOUTS } from "../tests/shared/constants";
 
 export class LoginPage extends BasePage {
   // Navigation
@@ -37,7 +38,7 @@ export class LoginPage extends BasePage {
     // Wait for the input field — clearest signal that modal animation is done.
     // Avoids fixed timeouts and Bootstrap event race conditions.
     try {
-      await this.page.locator(this.USERNAME_INPUT).waitFor({ state: "visible", timeout: 10_000 });
+      await this.page.locator(this.USERNAME_INPUT).waitFor({ state: "visible", timeout: TIMEOUTS.MODAL_OPEN_WAIT });
     } catch {
       // Proceed anyway; login() will handle input readiness.
     }
@@ -48,7 +49,7 @@ export class LoginPage extends BasePage {
    */
   async closeModal(): Promise<void> {
     await this.click(this.CLOSE_BTN);
-    await this.page.waitForTimeout(400);
+    await this.page.waitForTimeout(TIMEOUTS.MODAL_ANIMATION);
     await expect(this.page.locator(this.LOGIN_MODAL)).not.toBeVisible();
   }
 
@@ -63,28 +64,29 @@ export class LoginPage extends BasePage {
    * @param password - Demoblaze password.
    */
   async login(username: string, password: string): Promise<void> {
-    await this.page.locator(this.USERNAME_INPUT).waitFor({ state: "visible", timeout: 10_000 });
+    await this.page.locator(this.USERNAME_INPUT).waitFor({ state: "visible", timeout: TIMEOUTS.MODAL_OPEN_WAIT });
 
-    // Set both field values and trigger the button in one synchronous JS execution.
-    // This eliminates the window where Bootstrap animation events could clear inputs
-    // between our fill and the Playwright click dispatch — a race seen in CI.
+    // Fill via Playwright to fire focus/input events and populate DOM.
+    await this.page.locator(this.USERNAME_INPUT).fill(username);
+    await this.page.locator(this.PASSWORD_INPUT).fill(password);
+
+    // Dispatch input events to notify any frameworks (React, Vue, etc.)
+    // watching the inputs.
     await this.page.evaluate(
-      ([uSel, pSel, btnSel, uVal, pVal]: [string, string, string, string, string]) => {
+      ([uSel, pSel]: [string, string]) => {
         const u = document.querySelector(uSel) as HTMLInputElement | null;
         const p = document.querySelector(pSel) as HTMLInputElement | null;
-        const btn = document.querySelector(btnSel) as HTMLElement | null;
-        if (u) u.value = uVal;
-        if (p) p.value = pVal;
-        if (btn) btn.click();
+        if (u) u.dispatchEvent(new Event("input", { bubbles: true }));
+        if (p) p.dispatchEvent(new Event("input", { bubbles: true }));
       },
-      [this.USERNAME_INPUT, this.PASSWORD_INPUT, this.LOGIN_BTN, username, password] as [
-        string,
-        string,
-        string,
-        string,
-        string,
-      ],
+      [this.USERNAME_INPUT, this.PASSWORD_INPUT],
     );
+
+    // Brief delay to allow framework state to update.
+    await this.page.waitForTimeout(TIMEOUTS.INPUT_DISPATCH_DELAY);
+
+    // Click via normal Playwright click (more reliable than direct dispatchEvent).
+    await this.click(this.LOGIN_BTN);
   }
 
   /**
@@ -98,11 +100,11 @@ export class LoginPage extends BasePage {
     await this.login(username, password);
     
     // Wait for a response to the login request
-    await this.page.waitForLoadState("domcontentloaded", { timeout: 8_000 }).catch(() => {});
+    await this.page.waitForLoadState("domcontentloaded", { timeout: TIMEOUTS.DOM_CONTENT_LOADED }).catch(() => {});
     
     // Wait for the modal to close by checking the overlay is gone
     try {
-      await this.page.waitForSelector(`${this.LOGIN_MODAL}.show`, { state: "hidden", timeout: 5_000 });
+      await this.page.waitForSelector(`${this.LOGIN_MODAL}.show`, { state: "hidden", timeout: TIMEOUTS.DIALOG_ACCEPT_WAIT });
     } catch {
       // If modal doesn't have show class, it's already closed
     }
@@ -110,7 +112,7 @@ export class LoginPage extends BasePage {
     // Wait for username to appear and have text content
     // API prepends "Welcome " to the username
     const usernameDisplay = this.page.locator(this.NAV_USERNAME_DISPLAY);
-    await expect(usernameDisplay).toContainText(username, { timeout: 10_000 });
+    await expect(usernameDisplay).toContainText(username, { timeout: TIMEOUTS.MODAL_OPEN_WAIT });
   }
 
   /**
@@ -145,7 +147,7 @@ export class LoginPage extends BasePage {
    */
   async verifyLoggedIn(username: string): Promise<void> {
     await expect(this.page.locator(this.NAV_USERNAME_DISPLAY)).toContainText(username, {
-      timeout: 10_000,
+      timeout: TIMEOUTS.MODAL_OPEN_WAIT,
     });
   }
 
@@ -153,7 +155,7 @@ export class LoginPage extends BasePage {
    * Assert that the nav has reverted to the logged-out state (Login link visible).
    */
   async verifyLoggedOut(): Promise<void> {
-    await expect(this.page.locator(this.NAV_LOGIN_LINK)).toBeVisible({ timeout: 6_000 });
+    await expect(this.page.locator(this.NAV_LOGIN_LINK)).toBeVisible({ timeout: TIMEOUTS.FORM_VALIDATION_WAIT });
     await expect(this.page.locator(this.NAV_USERNAME_DISPLAY)).not.toBeVisible();
   }
 
