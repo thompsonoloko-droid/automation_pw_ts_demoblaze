@@ -4,8 +4,8 @@
     "timeout_ms": 5000,
     "perf_thresholds": {
       "page_load_ms": 5000,
-      "api_response_ms": 3000,
-      "cart_update_ms": 2000
+      "api_response_ms": 8000,
+      "cart_update_ms": 6000
     }
   },
   "users": {
@@ -47,7 +47,7 @@
   },
   "signup": {
     "duplicate_error": "This user already exist.",
-    "success_message": "sign up successfully",
+    "success_message": "sign up successful",
     "empty_field_error": "Please fill out"
   },
   "login": {

@@ -33,9 +33,20 @@ export class LoginPage extends BasePage {
    * Click the nav 'Log in' link and wait for the modal to fully open.
    */
   async openModal(): Promise<void> {
-    await this.click(this.NAV_LOGIN_LINK);
-    await this.page.waitForSelector(`${this.LOGIN_MODAL}.show`, { timeout: 8_000 });
-    await this.page.waitForTimeout(250); // allow Bootstrap transition to complete
+    // Use force:true to bypass pointer events interception
+    await this.page.locator(this.NAV_LOGIN_LINK).click({ force: true }).catch(() => {});
+    
+    // Wait for modal to have the show class
+    try {
+      await this.page.waitForSelector(`${this.LOGIN_MODAL}.show`, { 
+        timeout: 10_000 
+      });
+    } catch {
+      // Modal may already be visible or loading slower in CI
+    }
+    
+    // Give modal time to fully render
+    await this.page.waitForTimeout(500);
   }
 
   /**

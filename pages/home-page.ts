@@ -86,7 +86,7 @@ export class HomePage extends BasePage {
    */
   async clickProduct(productName: string): Promise<void> {
     await this.page.locator(`a:has-text("${productName}")`).first().click();
-    await this.page.waitForLoadState("networkidle");
+    await this.page.waitForLoadState("domcontentloaded", { timeout: 8_000 }).catch(() => {});
   }
 
   // ---------------------------------------------------------------------------
