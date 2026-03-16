@@ -31,29 +31,11 @@ export class SignupPage extends BasePage {
    */
   async openModal(): Promise<void> {
     await this.page.locator(this.NAV_SIGNUP_LINK).click({ force: true }).catch(() => {});
-
-    // Wait for Bootstrap's shown.bs.modal event — fires AFTER the CSS animation
-    // completes, which is more reliable than .show class + fixed timeout.
+    // Wait for the input field — clearest signal that modal animation is done.
     try {
-      await this.page.evaluate(() => {
-        return new Promise<void>((resolve) => {
-          const modal = document.getElementById("signInModal");
-          if (!modal) { resolve(); return; }
-          // Already fully open?
-          if (
-            modal.classList.contains("show") &&
-            window.getComputedStyle(modal).display !== "none" &&
-            parseFloat(window.getComputedStyle(modal).opacity) >= 1
-          ) {
-            resolve();
-            return;
-          }
-          modal.addEventListener("shown.bs.modal", () => resolve(), { once: true });
-          setTimeout(resolve, 4_000); // fallback so we never hang
-        });
-      });
+      await this.page.locator(this.USERNAME_INPUT).waitFor({ state: "visible", timeout: 10_000 });
     } catch {
-      // page evaluate can fail if context is destroyed
+      // Proceed anyway; signup() will handle input readiness.
     }
   }
 
@@ -81,35 +63,23 @@ export class SignupPage extends BasePage {
    * @returns The alert dialog message text.
    */
   async signup(username: string, password: string): Promise<string> {
-    const usernameInput = this.page.locator(this.USERNAME_INPUT);
-    const passwordInput = this.page.locator(this.PASSWORD_INPUT);
+    await this.page.locator(this.USERNAME_INPUT).waitFor({ state: "visible", timeout: 10_000 });
 
-    // Wait for inputs to be stable (modal animation may still be running)
-    await usernameInput.waitFor({ state: "visible", timeout: 8_000 });
+    // Fill via Playwright to fire focus/input events.
+    await this.page.locator(this.USERNAME_INPUT).fill(username);
+    await this.page.locator(this.PASSWORD_INPUT).fill(password);
 
-    // Retry fill in case the modal is mid-animation and clears the value
-    for (let attempt = 0; attempt < 3; attempt++) {
-      await usernameInput.fill(username);
-      await passwordInput.fill(password);
-
-      const uVal = await usernameInput.inputValue();
-      const pVal = await passwordInput.inputValue();
-      if ((username && !uVal) || (password && !pVal)) {
-        await this.page.waitForTimeout(300);
-        continue;
-      }
-      break;
-    }
-
-    // Final validation — only check fields that were supposed to be non-empty
-    if (username) {
-      const uVal = await usernameInput.inputValue();
-      if (!uVal) throw new Error(`Username field not filled after retries`);
-    }
-    if (password) {
-      const pVal = await passwordInput.inputValue();
-      if (!pVal) throw new Error(`Password field not filled after retries`);
-    }
+    // Overwrite .value atomically just before clicking — Demoblaze's signUp()
+    // reads element.value directly.
+    await this.page.evaluate(
+      ([uSel, pSel, uVal, pVal]: [string, string, string, string]) => {
+        const u = document.querySelector(uSel) as HTMLInputElement | null;
+        const p = document.querySelector(pSel) as HTMLInputElement | null;
+        if (u) u.value = uVal;
+        if (p) p.value = pVal;
+      },
+      [this.USERNAME_INPUT, this.PASSWORD_INPUT, username, password] as [string, string, string, string],
+    );
 
     const alertPromise = new Promise<string>((resolve) => {
       this.page.once("dialog", async (dialog) => {

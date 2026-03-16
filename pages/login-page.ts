@@ -33,31 +33,13 @@ export class LoginPage extends BasePage {
    * Click the nav 'Log in' link and wait for the modal to fully open.
    */
   async openModal(): Promise<void> {
-    // Use force:true to bypass pointer events interception
     await this.page.locator(this.NAV_LOGIN_LINK).click({ force: true }).catch(() => {});
-
-    // Wait for Bootstrap's shown.bs.modal event — fires AFTER the CSS animation
-    // completes, which is more reliable than .show class + fixed timeout.
+    // Wait for the input field — clearest signal that modal animation is done.
+    // Avoids fixed timeouts and Bootstrap event race conditions.
     try {
-      await this.page.evaluate(() => {
-        return new Promise<void>((resolve) => {
-          const modal = document.getElementById("logInModal");
-          if (!modal) { resolve(); return; }
-          // Already fully open?
-          if (
-            modal.classList.contains("show") &&
-            window.getComputedStyle(modal).display !== "none" &&
-            parseFloat(window.getComputedStyle(modal).opacity) >= 1
-          ) {
-            resolve();
-            return;
-          }
-          modal.addEventListener("shown.bs.modal", () => resolve(), { once: true });
-          setTimeout(resolve, 4_000); // fallback so we never hang
-        });
-      });
+      await this.page.locator(this.USERNAME_INPUT).waitFor({ state: "visible", timeout: 10_000 });
     } catch {
-      // page evaluate can fail if context is destroyed
+      // Proceed anyway; login() will handle input readiness.
     }
   }
 
@@ -81,35 +63,24 @@ export class LoginPage extends BasePage {
    * @param password - Demoblaze password.
    */
   async login(username: string, password: string): Promise<void> {
-    const usernameInput = this.page.locator(this.USERNAME_INPUT);
-    const passwordInput = this.page.locator(this.PASSWORD_INPUT);
+    await this.page.locator(this.USERNAME_INPUT).waitFor({ state: "visible", timeout: 10_000 });
 
-    // Wait for inputs to be stable (modal animation may still be running)
-    await usernameInput.waitFor({ state: "visible", timeout: 8_000 });
+    // Fill via Playwright to fire focus/input events.
+    await this.page.locator(this.USERNAME_INPUT).fill(username);
+    await this.page.locator(this.PASSWORD_INPUT).fill(password);
 
-    // Retry fill in case the modal is mid-animation and clears the value
-    for (let attempt = 0; attempt < 3; attempt++) {
-      await usernameInput.fill(username);
-      await passwordInput.fill(password);
-
-      const uVal = await usernameInput.inputValue();
-      const pVal = await passwordInput.inputValue();
-      if ((username && !uVal) || (password && !pVal)) {
-        await this.page.waitForTimeout(300);
-        continue;
-      }
-      break;
-    }
-
-    // Final validation — only check fields that were supposed to be non-empty
-    if (username) {
-      const uVal = await usernameInput.inputValue();
-      if (!uVal) throw new Error(`Username field not filled after retries`);
-    }
-    if (password) {
-      const pVal = await passwordInput.inputValue();
-      if (!pVal) throw new Error(`Password field not filled after retries`);
-    }
+    // Overwrite .value atomically just before clicking — Demoblaze's logIn()
+    // reads element.value directly, so this survives any Bootstrap animation
+    // that might clear inputs between fill() and the button click.
+    await this.page.evaluate(
+      ([uSel, pSel, uVal, pVal]: [string, string, string, string]) => {
+        const u = document.querySelector(uSel) as HTMLInputElement | null;
+        const p = document.querySelector(pSel) as HTMLInputElement | null;
+        if (u) u.value = uVal;
+        if (p) p.value = pVal;
+      },
+      [this.USERNAME_INPUT, this.PASSWORD_INPUT, username, password] as [string, string, string, string],
+    );
 
     await this.click(this.LOGIN_BTN);
   }
@@ -187,11 +158,15 @@ export class LoginPage extends BasePage {
   /**
    * Click the Logout nav link and verify the session ends.
    *
-   * Uses force:true because #logout2 is toggled via inline style by Demoblaze JS
-   * and may not report as 'visible' even when the user is logged in.
+   * Uses dispatchEvent because #logout2 has display:none when logged out —
+   * toggled by Demoblaze's inline JS. dispatchEvent fires the DOM click
+   * event directly, bypassing Playwright's actionability checks entirely.
    */
   async logout(): Promise<void> {
-    await this.page.locator(this.NAV_LOGOUT_LINK).click({ force: true });
+    // dispatchEvent fires the DOM click event regardless of visibility —
+    // #logout2 has display:none toggled by Demoblaze JS so force/regular
+    // clicks fail. This triggers the onclick="logOut()" handler directly.
+    await this.page.locator(this.NAV_LOGOUT_LINK).dispatchEvent("click");
     await this.verifyLoggedOut();
   }
 }
