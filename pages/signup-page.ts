@@ -63,27 +63,49 @@ export class SignupPage extends BasePage {
    * @returns The alert dialog message text.
    */
   async signup(username: string, password: string): Promise<string> {
-    await this.page.locator(this.USERNAME_INPUT).waitFor({ state: "visible", timeout: 10000 });
+    const usernameLocator = this.page.locator(this.USERNAME_INPUT);
+    const passwordLocator = this.page.locator(this.PASSWORD_INPUT);
 
-    // Fill via Playwright to fire focus/input events.
-    await this.page.locator(this.USERNAME_INPUT).fill(username);
-    await this.page.locator(this.PASSWORD_INPUT).fill(password);
+    // Wait for both inputs to be visible and ready
+    await usernameLocator.waitFor({ state: "visible", timeout: 10000 });
+    await passwordLocator.waitFor({ state: "visible", timeout: 10000 });
 
-    // Dispatch input events to notify any frameworks watching the inputs.
+    // Clear any existing values first with keyboard shortcuts
+    await usernameLocator.click();
+    await this.page.keyboard.press("Control+A");
+    await this.page.keyboard.press("Delete");
+    await passwordLocator.click();
+    await this.page.keyboard.press("Control+A");
+    await this.page.keyboard.press("Delete");
+    await this.page.waitForTimeout(100);
+
+    // Fill using standard fill method
+    await usernameLocator.fill(username);
+    await passwordLocator.fill(password);
+
+    // Dispatch input and change events to notify any frameworks watching the inputs
     await this.page.evaluate(
-      ([uSel, pSel]: [string, string]) => {
+      ([uSel, pSel, uVal, pVal]: [string, string, string, string]) => {
         const u = document.querySelector(uSel) as HTMLInputElement | null;
         const p = document.querySelector(pSel) as HTMLInputElement | null;
-        if (u) u.dispatchEvent(new Event("input", { bubbles: true }));
-        if (p) p.dispatchEvent(new Event("input", { bubbles: true }));
+        if (u) {
+          u.value = uVal;
+          u.dispatchEvent(new Event("input", { bubbles: true }));
+          u.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+        if (p) {
+          p.value = pVal;
+          p.dispatchEvent(new Event("input", { bubbles: true }));
+          p.dispatchEvent(new Event("change", { bubbles: true }));
+        }
       },
-      [this.USERNAME_INPUT, this.PASSWORD_INPUT],
+      [this.USERNAME_INPUT, this.PASSWORD_INPUT, username, password],
     );
 
-    // Brief delay to allow framework state to update.
-    await this.page.waitForTimeout(200);
+    // Brief delay to allow framework state to update
+    await this.page.waitForTimeout(300);
 
-    // Register the dialog handler before clicking (needs to be synchronous).
+    // Register the dialog handler before clicking (needs to be synchronous)
     const alertPromise = new Promise<string>((resolve) => {
       this.page.once("dialog", async (dialog) => {
         const message = dialog.message();
@@ -92,7 +114,7 @@ export class SignupPage extends BasePage {
       });
     });
 
-    // Click via normal Playwright click.
+    // Click via normal Playwright click
     await this.click(this.SIGNUP_BTN);
     return alertPromise;
   }
