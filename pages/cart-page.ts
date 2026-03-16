@@ -47,12 +47,12 @@ export class CartPage extends BasePage {
    */
   async waitForCartLoad(): Promise<void> {
     await this.page.waitForLoadState("domcontentloaded", { timeout: 8000 }).catch(() => {});
-    // Reduced poll — used only in non-navigation contexts (e.g. deleteAllItems).
-    // navigateToCart() already waits for the viewcart XHR, so this is a lightweight
-    // fallback that avoids excessive looping on empty carts in CI.
+    // Poll for cart table rows with increased attempts for slow networks.
+    // navigateToCart() already waits for viewcart XHR, but this handles delayed rendering.
     let rowCount = 0;
     let attempts = 0;
-    while (rowCount === 0 && attempts < 5) {
+    const maxAttempts = 15; // 3 seconds total (15 * 200ms)
+    while (rowCount === 0 && attempts < maxAttempts) {
       rowCount = await this.page.locator(this.TABLE_ROWS).count();
       if (rowCount === 0) {
         await this.page.waitForTimeout(200);
@@ -98,10 +98,17 @@ export class CartPage extends BasePage {
    * Return the total price shown beneath the cart table.
    */
   async getTotalPrice(): Promise<number> {
-    // Read the total price text content directly.
-    // If empty or non-numeric, default to 0.
-    const text = (await this.page.locator(this.TOTAL_PRICE).textContent()) ?? "0";
-    return parseInt(text.replace(/[^0-9]/g, ""), 10) || 0;
+    // Ensure cart data is loaded before reading total.
+    await this.waitForCartLoad();
+    // Retry reading total with small delays to handle rendering delays.
+    for (let i = 0; i < 5; i++) {
+      const text = (await this.page.locator(this.TOTAL_PRICE).textContent()) ?? "";
+      const num = parseInt(text.replace(/[^0-9]/g, ""), 10);
+      if (!isNaN(num) && num > 0) return num;
+      if (i < 4) await this.page.waitForTimeout(200);
+    }
+    // Fallback: return 0 if total still can't be read
+    return 0;
   }
 
   /**
@@ -125,20 +132,30 @@ export class CartPage extends BasePage {
    */
   async deleteItem(productName: string): Promise<void> {
     const row = this.page.locator(this.TABLE_ROWS).filter({ hasText: productName });
-    await row.locator("a:has-text('Delete')").click();
-    await this.page.waitForTimeout(300);
+    const deleteLink = row.locator("a:has-text('Delete')");
+    await expect(deleteLink).toBeVisible({ timeout: 8000 });
+    await deleteLink.click();
+    // Wait for XHR to delete item and DOM to update
+    await this.page.waitForTimeout(1000); // Increased from 300ms for network
   }
 
   /**
    * Delete every item in the cart one by one until it is empty.
+   * Includes retry logic for network delays.
    */
   async deleteAllItems(): Promise<void> {
     await this.waitForCartLoad();
     let count = await this.page.locator(this.TABLE_ROWS).count();
-    while (count > 0) {
-      await this.page.locator(this.TABLE_ROWS).first().locator("a:has-text('Delete')").click();
-      await this.page.waitForTimeout(800); // 800ms = 4 * 200ms
+    let maxIterations = 20; // Prevent infinite loops
+    while (count > 0 && maxIterations > 0) {
+      const deleteLink = this.page.locator(this.TABLE_ROWS).first().locator("a:has-text('Delete')");
+      if (await deleteLink.isVisible()) {
+        await deleteLink.click();
+        // Wait for XHR response and DOM update
+        await this.page.waitForTimeout(1200); // Increased from 800ms for network
+      }
       count = await this.page.locator(this.TABLE_ROWS).count();
+      maxIterations--;
     }
   }
 

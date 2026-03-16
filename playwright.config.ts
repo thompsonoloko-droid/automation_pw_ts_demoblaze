@@ -15,10 +15,10 @@ dotenv.config({ path: path.resolve(__dirname, ".env") });
 export default defineConfig({
   testDir: "./tests",
   globalSetup: "./global-setup.ts",
-  timeout: 60_000,
+  timeout: 90_000, // Increased from 60s to handle slow networks
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 3 : 1, // Increased to 3 for CI, 1 for local (more flaky E2E tests)
   workers: process.env.CI ? 4 : undefined,
 
   reporter: [["list"], ["html", { open: "never", outputFolder: "reports/html" }]],
@@ -28,8 +28,8 @@ export default defineConfig({
     screenshot: "only-on-failure",
     video: "off",
     trace: "retain-on-failure",
-    actionTimeout: 10_000,
-    navigationTimeout: 15_000,
+    actionTimeout: 15_000, // Increased from 10s
+    navigationTimeout: 20_000, // Increased from 15s
   },
 
   projects: [

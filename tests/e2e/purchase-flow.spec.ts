@@ -156,8 +156,13 @@ test.describe("E2E Purchase Flows @e2e @smoke @regression", () => {
     productPage,
     cartPage,
     checkoutPage,
+    page,
   }) => {
     test.skip(!credentialsSet, "TEST_USERNAME not set in .env");
+    test.info().annotations.push({
+      type: "retry",
+      description: "Flaky: Multi-product order with network delays",
+    });
 
     await homePage.navigateToHome();
     await loginPage.loginExpectSuccess(existingUser.username, existingUser.password);
@@ -168,21 +173,25 @@ test.describe("E2E Purchase Flows @e2e @smoke @regression", () => {
     await homePage.navigateToHome();
     await homePage.clickProduct(phone.name);
     await productPage.addToCart();
+    await page.waitForTimeout(500); // Brief wait after add
 
     // Add laptop
     await homePage.navigateToHome();
     await homePage.filterByCategory("Laptops");
     await homePage.clickProduct(laptop.name);
     await productPage.addToCart();
+    await page.waitForTimeout(500); // Brief wait after add
 
     // Verify both present and total is sum of prices
     await cartPage.navigateToCart();
+    await page.waitForTimeout(800); // Wait for cart XHR responses
     await cartPage.verifyItemInCart(phone.name);
     await cartPage.verifyItemInCart(laptop.name);
     const total = await cartPage.getTotalPrice();
     expect(total).toBe(phone.price + laptop.price);
 
     // Checkout
+    await page.waitForTimeout(500);
     await cartPage.clickPlaceOrder();
     await checkoutPage.waitForModal();
     const confirmation = await checkoutPage.completePurchase(checkoutData);
@@ -195,8 +204,13 @@ test.describe("E2E Purchase Flows @e2e @smoke @regression", () => {
     productPage,
     cartPage,
     checkoutPage,
+    page,
   }) => {
     test.skip(!credentialsSet, "TEST_USERNAME not set in .env");
+    test.info().annotations.push({
+      type: "retry",
+      description: "Flaky: Delete and re-checkout with network delays",
+    });
 
     await homePage.navigateToHome();
     await loginPage.loginExpectSuccess(existingUser.username, existingUser.password);
@@ -207,22 +221,26 @@ test.describe("E2E Purchase Flows @e2e @smoke @regression", () => {
     await homePage.navigateToHome();
     await homePage.clickProduct(phone.name);
     await productPage.addToCart();
+    await page.waitForTimeout(500);
 
     // Add laptop
     await homePage.navigateToHome();
     await homePage.filterByCategory("Laptops");
     await homePage.clickProduct(laptop.name);
     await productPage.addToCart();
+    await page.waitForTimeout(500);
 
     // Delete phone, keep laptop
     await cartPage.navigateToCart();
+    await page.waitForTimeout(600);
     await cartPage.deleteItem(phone.name);
-    await cartPage.getPage().waitForTimeout(1_000);
+    await page.waitForTimeout(1200); // Wait for delete XHR and DOM update
 
     const countAfter = await cartPage.getItemCount();
     expect(countAfter).toBeLessThan(2);
 
     if (countAfter > 0) {
+      await page.waitForTimeout(500);
       await cartPage.clickPlaceOrder();
       await checkoutPage.waitForModal();
       const confirmation = await checkoutPage.completePurchase(checkoutData);
@@ -264,8 +282,13 @@ test.describe("E2E Purchase Flows @e2e @smoke @regression", () => {
     loginPage,
     productPage,
     cartPage,
+    page,
   }) => {
     test.skip(!credentialsSet, "TEST_USERNAME not set in .env");
+    test.info().annotations.push({
+      type: "retry",
+      description: "Flaky: Cart persistence with login/logout cycles",
+    });
 
     await homePage.navigateToHome();
     await loginPage.loginExpectSuccess(existingUser.username, existingUser.password);
@@ -276,16 +299,20 @@ test.describe("E2E Purchase Flows @e2e @smoke @regression", () => {
     await homePage.navigateToHome();
     await homePage.clickProduct(phone.name);
     await productPage.addToCart();
+    await page.waitForTimeout(600);
 
     // Logout
     await loginPage.logout();
+    await page.waitForTimeout(800); // Wait for logout to complete
 
     // Login again
     await homePage.navigateToHome();
     await loginPage.loginExpectSuccess(existingUser.username, existingUser.password);
+    await page.waitForTimeout(600);
 
     // Cart should still have the phone
     await cartPage.navigateToCart();
+    await page.waitForTimeout(1000); // Wait for cart XHR response
     await cartPage.verifyItemInCart(phone.name);
   });
 });
