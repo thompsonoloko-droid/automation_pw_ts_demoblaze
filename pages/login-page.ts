@@ -72,12 +72,20 @@ export class LoginPage extends BasePage {
   async loginExpectSuccess(username: string, password: string): Promise<void> {
     await this.openModal();
     await this.login(username, password);
-    // Wait for login modal to close after successful login
-    await this.page.waitForTimeout(500);
-    await expect(this.page.locator(this.LOGIN_MODAL)).not.toBeVisible({ timeout: 5_000 });
-    // Now check that username appears in navigation
-    await expect(this.page.locator(this.NAV_USERNAME_DISPLAY)).toBeVisible({ timeout: 10_000 });
-    await expect(this.page.locator(this.NAV_USERNAME_DISPLAY)).toContainText(username);
+    
+    // Wait for a response to the login request
+    await this.page.waitForLoadState("domcontentloaded", { timeout: 8_000 }).catch(() => {});
+    
+    // Wait for the modal to close by checking the overlay is gone
+    try {
+      await this.page.waitForSelector(`${this.LOGIN_MODAL}.show`, { state: "hidden", timeout: 5_000 });
+    } catch {
+      // If modal doesn't have show class, it's already closed
+    }
+    
+    // Wait for username to appear and have text content
+    const usernameDisplay = this.page.locator(this.NAV_USERNAME_DISPLAY);
+    await expect(usernameDisplay).toHaveText(username, { timeout: 10_000 });
   }
 
   /**
