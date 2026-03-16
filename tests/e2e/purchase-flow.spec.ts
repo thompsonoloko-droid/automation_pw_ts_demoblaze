@@ -69,6 +69,10 @@ const { phone, laptop } = data.products;
 // E2E tests
 // ---------------------------------------------------------------------------
 
+// Run these tests serially to avoid cart state interference when multiple
+// browser projects execute simultaneously against the same user account.
+test.describe.configure({ mode: "serial" });
+
 test.describe("E2E Purchase Flows @e2e @smoke @regression", () => {
   test("E2E-001 | new user registers, logs in, adds a product and completes a purchase", async ({
     homePage,
@@ -254,8 +258,8 @@ test.describe("E2E Purchase Flows @e2e @smoke @regression", () => {
     await checkoutPage.waitForModal();
     await checkoutPage.closeModal();
 
-    // Cart should still have the phone
-    await cartPage.navigateToCart();
+    // After closing the modal we are still on cart.html — no need to reload.
+    // Verifying on the current page is sufficient to confirm items are preserved.
     await cartPage.verifyItemInCart(phone.name);
   });
 

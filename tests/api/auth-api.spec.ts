@@ -30,8 +30,10 @@ test.describe("Auth API — Login @api @auth", () => {
   test("valid credentials return an auth token", async ({ request }) => {
     const start = Date.now();
 
+    // Demoblaze client-side JS base64-encodes the password before sending to the API.
+    const encodedPassword = Buffer.from(user.password).toString("base64");
     const response = await request.post(`${API_BASE_URL}/login`, {
-      data: { username: user.username, password: user.password },
+      data: { username: user.username, password: encodedPassword },
     });
     const elapsed = Date.now() - start;
 
