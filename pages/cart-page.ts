@@ -33,8 +33,12 @@ export class CartPage extends BasePage {
    * Navigate directly to the cart page.
    */
   async navigateToCart(): Promise<void> {
+    // Register listener before navigation so the viewcart XHR response is never missed.
+    const viewcartDone = this.page
+      .waitForResponse((res) => res.url().includes("viewcart"), { timeout: 15_000 })
+      .catch(() => {});
     await this.page.goto(`${this.BASE_URL}/cart.html`, { waitUntil: "domcontentloaded" });
-    await this.waitForCartLoad();
+    await viewcartDone;
   }
 
   /**
@@ -45,13 +49,15 @@ export class CartPage extends BasePage {
    */
   async waitForCartLoad(): Promise<void> {
     await this.page.waitForLoadState("domcontentloaded", { timeout: 8_000 }).catch(() => {});
-    // Wait for the table to have the right structure
+    // Reduced poll — used only in non-navigation contexts (e.g. deleteAllItems).
+    // navigateToCart() already waits for the viewcart XHR, so this is a lightweight
+    // fallback that avoids excessive looping on empty carts in CI.
     let rowCount = 0;
     let attempts = 0;
-    while (rowCount === 0 && attempts < 10) {
+    while (rowCount === 0 && attempts < 5) {
       rowCount = await this.page.locator(this.TABLE_ROWS).count();
       if (rowCount === 0) {
-        await this.page.waitForTimeout(300);
+        await this.page.waitForTimeout(200);
       }
       attempts++;
     }
@@ -94,8 +100,9 @@ export class CartPage extends BasePage {
    * Return the total price shown beneath the cart table.
    */
   async getTotalPrice(): Promise<number> {
-    await this.waitForCartLoad();
-    const text = await this.getText(this.TOTAL_PRICE);
+    // #totalp is hidden when the cart is empty — textContent() works on hidden
+    // elements, avoiding the visibility wait that getText() would impose.
+    const text = (await this.page.locator(this.TOTAL_PRICE).textContent()) ?? "";
     return parseInt(text.replace(/[^0-9]/g, ""), 10) || 0;
   }
 
@@ -103,7 +110,7 @@ export class CartPage extends BasePage {
    * Return true when the cart table contains no product rows.
    */
   async isCartEmpty(): Promise<boolean> {
-    await this.waitForCartLoad();
+    // navigateToCart() has already waited for the viewcart XHR; no extra wait needed.
     return (await this.page.locator(this.TABLE_ROWS).count()) === 0;
   }
 

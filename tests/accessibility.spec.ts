@@ -123,6 +123,9 @@ test.describe("Accessibility (WCAG 2.1 AA)", () => {
   }) => {
     await page.goto("/");
 
+    // Wait for the async product grid before clicking — Demoblaze populates
+    // #tbodyid via XHR after page load, so the link may not exist yet.
+    await page.waitForSelector("#tbodyid .card", { timeout: 30_000 }).catch(() => {});
     // Open a product
     await page.click("//a[contains(text(), 'Samsung galaxy s6')]");
 

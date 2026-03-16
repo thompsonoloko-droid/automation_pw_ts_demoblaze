@@ -25,7 +25,7 @@ export class ApiUtils {
    * @param data     - JSON-serialisable request body.
    */
   async post(endpoint: string, data: Record<string, unknown> = {}): Promise<APIResponse> {
-    return this.request.post(`${this.baseUrl}${endpoint}`, { data });
+    return this.request.post(`${this.baseUrl}${endpoint}`, { data, timeout: 30_000 });
   }
 
   /**
@@ -58,7 +58,7 @@ export class ApiUtils {
    * @param endpoint - Path starting with "/" (e.g. "/entries").
    */
   async get(endpoint: string): Promise<APIResponse> {
-    return this.request.get(`${this.baseUrl}${endpoint}`);
+    return this.request.get(`${this.baseUrl}${endpoint}`, { timeout: 30_000 });
   }
 
   /**

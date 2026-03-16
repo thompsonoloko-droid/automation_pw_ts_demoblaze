@@ -85,6 +85,8 @@ test.describe("Auth API — Login @api @auth", () => {
 });
 
 test.describe("Auth API — Signup @api @auth", () => {
+  test.use({ actionTimeout: 30_000 });
+
   test("new unique username registers successfully", async ({ request }) => {
     const username = uniqueUsername("api_reg");
 

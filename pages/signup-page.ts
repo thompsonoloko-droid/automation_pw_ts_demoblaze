@@ -65,22 +65,8 @@ export class SignupPage extends BasePage {
   async signup(username: string, password: string): Promise<string> {
     await this.page.locator(this.USERNAME_INPUT).waitFor({ state: "visible", timeout: 10_000 });
 
-    // Fill via Playwright to fire focus/input events.
-    await this.page.locator(this.USERNAME_INPUT).fill(username);
-    await this.page.locator(this.PASSWORD_INPUT).fill(password);
-
-    // Overwrite .value atomically just before clicking — Demoblaze's signUp()
-    // reads element.value directly.
-    await this.page.evaluate(
-      ([uSel, pSel, uVal, pVal]: [string, string, string, string]) => {
-        const u = document.querySelector(uSel) as HTMLInputElement | null;
-        const p = document.querySelector(pSel) as HTMLInputElement | null;
-        if (u) u.value = uVal;
-        if (p) p.value = pVal;
-      },
-      [this.USERNAME_INPUT, this.PASSWORD_INPUT, username, password] as [string, string, string, string],
-    );
-
+    // Register the dialog handler before the click so it's ready for either
+    // a synchronous alert (empty-field validation) or an async AJAX alert.
     const alertPromise = new Promise<string>((resolve) => {
       this.page.once("dialog", async (dialog) => {
         const message = dialog.message();
@@ -89,7 +75,26 @@ export class SignupPage extends BasePage {
       });
     });
 
-    await this.click(this.SIGNUP_BTN);
+    // Set both field values and trigger the button in one synchronous JS execution,
+    // preventing Bootstrap from clearing inputs between fill and click.
+    await this.page.evaluate(
+      ([uSel, pSel, btnSel, uVal, pVal]: [string, string, string, string, string]) => {
+        const u = document.querySelector(uSel) as HTMLInputElement | null;
+        const p = document.querySelector(pSel) as HTMLInputElement | null;
+        const btn = document.querySelector(btnSel) as HTMLElement | null;
+        if (u) u.value = uVal;
+        if (p) p.value = pVal;
+        if (btn) btn.click();
+      },
+      [this.USERNAME_INPUT, this.PASSWORD_INPUT, this.SIGNUP_BTN, username, password] as [
+        string,
+        string,
+        string,
+        string,
+        string,
+      ],
+    );
+
     return alertPromise;
   }
 

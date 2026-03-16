@@ -65,24 +65,26 @@ export class LoginPage extends BasePage {
   async login(username: string, password: string): Promise<void> {
     await this.page.locator(this.USERNAME_INPUT).waitFor({ state: "visible", timeout: 10_000 });
 
-    // Fill via Playwright to fire focus/input events.
-    await this.page.locator(this.USERNAME_INPUT).fill(username);
-    await this.page.locator(this.PASSWORD_INPUT).fill(password);
-
-    // Overwrite .value atomically just before clicking — Demoblaze's logIn()
-    // reads element.value directly, so this survives any Bootstrap animation
-    // that might clear inputs between fill() and the button click.
+    // Set both field values and trigger the button in one synchronous JS execution.
+    // This eliminates the window where Bootstrap animation events could clear inputs
+    // between our fill and the Playwright click dispatch — a race seen in CI.
     await this.page.evaluate(
-      ([uSel, pSel, uVal, pVal]: [string, string, string, string]) => {
+      ([uSel, pSel, btnSel, uVal, pVal]: [string, string, string, string, string]) => {
         const u = document.querySelector(uSel) as HTMLInputElement | null;
         const p = document.querySelector(pSel) as HTMLInputElement | null;
+        const btn = document.querySelector(btnSel) as HTMLElement | null;
         if (u) u.value = uVal;
         if (p) p.value = pVal;
+        if (btn) btn.click();
       },
-      [this.USERNAME_INPUT, this.PASSWORD_INPUT, username, password] as [string, string, string, string],
+      [this.USERNAME_INPUT, this.PASSWORD_INPUT, this.LOGIN_BTN, username, password] as [
+        string,
+        string,
+        string,
+        string,
+        string,
+      ],
     );
-
-    await this.click(this.LOGIN_BTN);
   }
 
   /**

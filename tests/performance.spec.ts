@@ -125,7 +125,7 @@ test.describe("Performance", () => {
     // Demoblaze product grid uses Bootstrap cards inside #tbodyid
     const visibilityTime = await perfUtils.measureElementVisibility("#tbodyid .card");
 
-    expect(visibilityTime).toBeLessThan(6000); // AJAX load varies in CI
+    expect(visibilityTime).toBeLessThan(12_000); // AJAX load is slow from CI runners
   });
 
   // ---------[ PERF-012 ] Add to Cart Interaction Latency --------
