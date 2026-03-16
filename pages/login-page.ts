@@ -69,18 +69,36 @@ export class LoginPage extends BasePage {
    * @param password - Demoblaze password.
    */
   async login(username: string, password: string): Promise<void> {
-    // Ensure inputs are visible and ready
-    await this.page.waitForTimeout(200);
-    await this.fill(this.USERNAME_INPUT, username);
-    await this.page.waitForTimeout(100);
-    await this.fill(this.PASSWORD_INPUT, password);
-    await this.page.waitForTimeout(100);
-    // Verify fields were filled before clicking
-    const usernameValue = await this.page.locator(this.USERNAME_INPUT).inputValue();
-    const passwordValue = await this.page.locator(this.PASSWORD_INPUT).inputValue();
-    if (!usernameValue || !passwordValue) {
-      throw new Error(`Form fields not filled: username="${usernameValue}", password="${passwordValue}"`);
+    const usernameInput = this.page.locator(this.USERNAME_INPUT);
+    const passwordInput = this.page.locator(this.PASSWORD_INPUT);
+
+    // Wait for inputs to be stable (modal animation may still be running)
+    await usernameInput.waitFor({ state: "visible", timeout: 8_000 });
+
+    // Retry fill in case the modal is mid-animation and clears the value
+    for (let attempt = 0; attempt < 3; attempt++) {
+      await usernameInput.fill(username);
+      await passwordInput.fill(password);
+
+      const uVal = await usernameInput.inputValue();
+      const pVal = await passwordInput.inputValue();
+      if ((username && !uVal) || (password && !pVal)) {
+        await this.page.waitForTimeout(300);
+        continue;
+      }
+      break;
     }
+
+    // Final validation — only check fields that were supposed to be non-empty
+    if (username) {
+      const uVal = await usernameInput.inputValue();
+      if (!uVal) throw new Error(`Username field not filled after retries`);
+    }
+    if (password) {
+      const pVal = await passwordInput.inputValue();
+      if (!pVal) throw new Error(`Password field not filled after retries`);
+    }
+
     await this.click(this.LOGIN_BTN);
   }
 
