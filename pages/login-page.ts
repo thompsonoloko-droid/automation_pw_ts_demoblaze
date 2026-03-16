@@ -79,19 +79,23 @@ export class LoginPage extends BasePage {
     await usernameLocator.fill(username, { force: true });
     await passwordLocator.fill(password, { force: true });
 
-    // Verify the values were actually set
+    // If either value is empty, retry with keyboard-based clearing
     const usernameValue = await usernameLocator.inputValue();
     const passwordValue = await passwordLocator.inputValue();
     
     if (!usernameValue || !passwordValue) {
-      console.warn(
-        `Input values not properly set. Username: "${usernameValue}", Password: "${passwordValue}". Retrying...`,
-      );
-      // Retry with triple-clear approach
-      await usernameLocator.tripleClick();
-      await usernameLocator.type(username);
-      await passwordLocator.tripleClick();
-      await passwordLocator.type(password);
+      // Clear with keyboard shortcuts for better browser compatibility
+      await usernameLocator.click();
+      await this.page.keyboard.press("Control+A");
+      await this.page.keyboard.press("Delete");
+      await passwordLocator.click();
+      await this.page.keyboard.press("Control+A");
+      await this.page.keyboard.press("Delete");
+      await this.page.waitForTimeout(100);
+      
+      // Fill again
+      await usernameLocator.fill(username);
+      await passwordLocator.fill(password);
     }
 
     // Dispatch input and change events to notify any frameworks watching the inputs
