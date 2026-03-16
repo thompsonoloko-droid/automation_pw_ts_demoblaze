@@ -19,7 +19,7 @@ test.describe("Product API — Listings @api @products", () => {
   }) => {
     const start = Date.now();
 
-    const response = await request.post(`${API_BASE_URL}/entries`, { data: {} });
+    const response = await request.get(`${API_BASE_URL}/entries`);
     const elapsed = Date.now() - start;
 
     expect(response.status()).toBe(200);
@@ -78,7 +78,7 @@ test.describe("Product API — Listings @api @products", () => {
 test.describe("Product API — View @api @products", () => {
   test("POST /view with a valid product ID returns full product details", async ({ request }) => {
     // First fetch a real product ID from /entries
-    const listRes = await request.post(`${API_BASE_URL}/entries`, { data: {} });
+    const listRes = await request.get(`${API_BASE_URL}/entries`);
     const listBody = await listRes.json();
     const productId: number = listBody.Items[0].id;
 
@@ -93,12 +93,13 @@ test.describe("Product API — View @api @products", () => {
     expect(body).toHaveProperty("img");
   });
 
-  test("POST /view with an invalid product ID returns null", async ({ request }) => {
+  test("POST /view with an invalid product ID returns error message", async ({ request }) => {
     const response = await request.post(`${API_BASE_URL}/view`, { data: { id: 9_999_999 } });
 
     expect(response.status()).toBe(200);
-    const body = await response.text();
-    expect(body).toMatch(/null/i);
+    const body = await response.json();
+    expect(body).toHaveProperty("errorMessage");
+    expect(body.errorMessage.toLowerCase()).toContain("not found");
   });
 
   // Data-driven: verify known products exist in the catalogue

@@ -38,7 +38,7 @@ test.describe("Cart API — Add & Delete @api @cart", () => {
 
   test("POST /addtocart adds a product and returns 200", async ({ request }) => {
     // Fetch a real product ID first
-    const listRes = await request.post(`${API_BASE_URL}/entries`, { data: {} });
+    const listRes = await request.get(`${API_BASE_URL}/entries`);
     const listBody = await listRes.json();
     const productId: number = listBody.Items[0].id;
 
