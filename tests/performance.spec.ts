@@ -120,7 +120,8 @@ test.describe("Performance", () => {
   test("PERF-011: Product grid should be visible within 2 seconds", async ({ page, perfUtils }) => {
     await page.goto("/");
 
-    const visibilityTime = await perfUtils.measureElementVisibility(".product-item");
+    // Demoblaze product grid uses Bootstrap cards inside #tbodyid
+    const visibilityTime = await perfUtils.measureElementVisibility("#tbodyid .card");
 
     expect(visibilityTime).toBeLessThan(2000);
   });
@@ -129,9 +130,9 @@ test.describe("Performance", () => {
   test("PERF-012: Add to cart button should respond within 500ms", async ({ page, perfUtils }) => {
     await page.goto("/");
 
-    // Navigate to first product
+    // Navigate to first product — wait for the product title on the detail page
     await page.click("//a[contains(text(), 'Samsung galaxy s6')]");
-    await page.waitForSelector(".product-item", { state: "visible" });
+    await page.waitForSelector(".name", { state: "visible", timeout: 12_000 });
 
     // Measure click latency
     const latency = await perfUtils.measureActionLatency(

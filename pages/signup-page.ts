@@ -30,9 +30,31 @@ export class SignupPage extends BasePage {
    * Click the nav 'Sign up' link and wait for the modal to fully open.
    */
   async openModal(): Promise<void> {
-    await this.click(this.NAV_SIGNUP_LINK);
-    await this.page.waitForSelector(`${this.SIGNUP_MODAL}.show`, { timeout: 8_000 });
-    await this.page.waitForTimeout(250);
+    await this.page.locator(this.NAV_SIGNUP_LINK).click({ force: true }).catch(() => {});
+
+    // Wait for Bootstrap's shown.bs.modal event — fires AFTER the CSS animation
+    // completes, which is more reliable than .show class + fixed timeout.
+    try {
+      await this.page.evaluate(() => {
+        return new Promise<void>((resolve) => {
+          const modal = document.getElementById("signInModal");
+          if (!modal) { resolve(); return; }
+          // Already fully open?
+          if (
+            modal.classList.contains("show") &&
+            window.getComputedStyle(modal).display !== "none" &&
+            parseFloat(window.getComputedStyle(modal).opacity) >= 1
+          ) {
+            resolve();
+            return;
+          }
+          modal.addEventListener("shown.bs.modal", () => resolve(), { once: true });
+          setTimeout(resolve, 4_000); // fallback so we never hang
+        });
+      });
+    } catch {
+      // page evaluate can fail if context is destroyed
+    }
   }
 
   /**

@@ -35,18 +35,30 @@ export class LoginPage extends BasePage {
   async openModal(): Promise<void> {
     // Use force:true to bypass pointer events interception
     await this.page.locator(this.NAV_LOGIN_LINK).click({ force: true }).catch(() => {});
-    
-    // Wait for modal to have the show class
+
+    // Wait for Bootstrap's shown.bs.modal event — fires AFTER the CSS animation
+    // completes, which is more reliable than .show class + fixed timeout.
     try {
-      await this.page.waitForSelector(`${this.LOGIN_MODAL}.show`, { 
-        timeout: 10_000 
+      await this.page.evaluate(() => {
+        return new Promise<void>((resolve) => {
+          const modal = document.getElementById("logInModal");
+          if (!modal) { resolve(); return; }
+          // Already fully open?
+          if (
+            modal.classList.contains("show") &&
+            window.getComputedStyle(modal).display !== "none" &&
+            parseFloat(window.getComputedStyle(modal).opacity) >= 1
+          ) {
+            resolve();
+            return;
+          }
+          modal.addEventListener("shown.bs.modal", () => resolve(), { once: true });
+          setTimeout(resolve, 4_000); // fallback so we never hang
+        });
       });
     } catch {
-      // Modal may already be visible or loading slower in CI
+      // page evaluate can fail if context is destroyed
     }
-    
-    // Give modal time to fully render
-    await this.page.waitForTimeout(500);
   }
 
   /**
@@ -174,9 +186,12 @@ export class LoginPage extends BasePage {
 
   /**
    * Click the Logout nav link and verify the session ends.
+   *
+   * Uses force:true because #logout2 is toggled via inline style by Demoblaze JS
+   * and may not report as 'visible' even when the user is logged in.
    */
   async logout(): Promise<void> {
-    await this.click(this.NAV_LOGOUT_LINK);
+    await this.page.locator(this.NAV_LOGOUT_LINK).click({ force: true });
     await this.verifyLoggedOut();
   }
 }
