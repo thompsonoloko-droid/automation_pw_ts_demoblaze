@@ -72,6 +72,10 @@ export class LoginPage extends BasePage {
   async loginExpectSuccess(username: string, password: string): Promise<void> {
     await this.openModal();
     await this.login(username, password);
+    // Wait for login modal to close after successful login
+    await this.page.waitForTimeout(500);
+    await expect(this.page.locator(this.LOGIN_MODAL)).not.toBeVisible({ timeout: 5_000 });
+    // Now check that username appears in navigation
     await expect(this.page.locator(this.NAV_USERNAME_DISPLAY)).toBeVisible({ timeout: 10_000 });
     await expect(this.page.locator(this.NAV_USERNAME_DISPLAY)).toContainText(username);
   }

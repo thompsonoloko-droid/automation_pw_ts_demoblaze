@@ -85,7 +85,7 @@ test.describe("E2E Purchase Flows @e2e @smoke @regression", () => {
     await homePage.navigateToHome();
     await signupPage.openModal();
     const signupMessage = await signupPage.signup(username, password);
-    expect(signupMessage).toMatch(/sign up successfully/i);
+    expect(signupMessage).toMatch(/sign up successful/i);
 
     // 2 — Login
     await loginPage.openModal();
