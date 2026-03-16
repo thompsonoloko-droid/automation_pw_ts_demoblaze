@@ -8,7 +8,6 @@
 import { expect } from "@playwright/test";
 
 import { BasePage } from "./base-page";
-import { TIMEOUTS } from "../tests/shared/constants";
 
 export class SignupPage extends BasePage {
   // Navigation
@@ -34,7 +33,7 @@ export class SignupPage extends BasePage {
     await this.page.locator(this.NAV_SIGNUP_LINK).click({ force: true }).catch(() => {});
     // Wait for the input field — clearest signal that modal animation is done.
     try {
-      await this.page.locator(this.USERNAME_INPUT).waitFor({ state: "visible", timeout: TIMEOUTS.MODAL_OPEN_WAIT });
+      await this.page.locator(this.USERNAME_INPUT).waitFor({ state: "visible", timeout: 10000 });
     } catch {
       // Proceed anyway; signup() will handle input readiness.
     }
@@ -45,7 +44,7 @@ export class SignupPage extends BasePage {
    */
   async closeModal(): Promise<void> {
     await this.click(this.CLOSE_BTN);
-    await this.page.waitForTimeout(TIMEOUTS.MODAL_ANIMATION);
+    await this.page.waitForTimeout(500);
     await expect(this.page.locator(this.SIGNUP_MODAL)).not.toBeVisible();
   }
 
@@ -64,7 +63,7 @@ export class SignupPage extends BasePage {
    * @returns The alert dialog message text.
    */
   async signup(username: string, password: string): Promise<string> {
-    await this.page.locator(this.USERNAME_INPUT).waitFor({ state: "visible", timeout: TIMEOUTS.MODAL_OPEN_WAIT });
+    await this.page.locator(this.USERNAME_INPUT).waitFor({ state: "visible", timeout: 10000 });
 
     // Fill via Playwright to fire focus/input events.
     await this.page.locator(this.USERNAME_INPUT).fill(username);
@@ -82,7 +81,7 @@ export class SignupPage extends BasePage {
     );
 
     // Brief delay to allow framework state to update.
-    await this.page.waitForTimeout(TIMEOUTS.INPUT_DISPATCH_DELAY);
+    await this.page.waitForTimeout(200);
 
     // Register the dialog handler before clicking (needs to be synchronous).
     const alertPromise = new Promise<string>((resolve) => {

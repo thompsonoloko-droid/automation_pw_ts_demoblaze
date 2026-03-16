@@ -8,7 +8,6 @@
 import { expect } from "@playwright/test";
 
 import { BasePage } from "./base-page";
-import { TIMEOUTS, URLS, POLLING } from "../tests/shared/constants";
 
 /** A single row in the cart table. */
 export interface CartItem {
@@ -34,9 +33,9 @@ export class CartPage extends BasePage {
   async navigateToCart(): Promise<void> {
     // Register listener before navigation so the viewcart XHR response is never missed.
     const viewcartDone = this.page
-      .waitForResponse((res) => res.url().includes("viewcart"), { timeout: TIMEOUTS.CART_XHR_RESPONSE })
+      .waitForResponse((res) => res.url().includes("viewcart"), { timeout: 15000 })
       .catch(() => {});
-    await this.page.goto(`${URLS.CART}`, { waitUntil: "domcontentloaded" });
+    await this.page.goto("https://www.demoblaze.com/cart.html", { waitUntil: "domcontentloaded" });
     await viewcartDone;
   }
 
@@ -47,16 +46,16 @@ export class CartPage extends BasePage {
    * delay is needed before counting rows.
    */
   async waitForCartLoad(): Promise<void> {
-    await this.page.waitForLoadState("domcontentloaded", { timeout: TIMEOUTS.DOM_CONTENT_LOADED }).catch(() => {});
+    await this.page.waitForLoadState("domcontentloaded", { timeout: 8000 }).catch(() => {});
     // Reduced poll — used only in non-navigation contexts (e.g. deleteAllItems).
     // navigateToCart() already waits for the viewcart XHR, so this is a lightweight
     // fallback that avoids excessive looping on empty carts in CI.
     let rowCount = 0;
     let attempts = 0;
-    while (rowCount === 0 && attempts < POLLING.CART_LOAD_MAX_ATTEMPTS) {
+    while (rowCount === 0 && attempts < 5) {
       rowCount = await this.page.locator(this.TABLE_ROWS).count();
       if (rowCount === 0) {
-        await this.page.waitForTimeout(POLLING.CART_LOAD_POLL_INTERVAL);
+        await this.page.waitForTimeout(200);
       }
       attempts++;
     }
@@ -99,18 +98,8 @@ export class CartPage extends BasePage {
    * Return the total price shown beneath the cart table.
    */
   async getTotalPrice(): Promise<number> {
-    // Wait for the element to have numeric content.
-    // This covers both loaded carts (total price) and empty carts ("0").
-    await this.page.waitForFunction(
-      (selector: string) => {
-        const el = document.querySelector(selector);
-        const text = el?.textContent ?? "";
-        return /\d+/.test(text); // At least one digit
-      },
-      this.TOTAL_PRICE,
-      { timeout: TIMEOUTS.DOM_CONTENT_LOADED },
-    );
-
+    // Read the total price text content directly.
+    // If empty or non-numeric, default to 0.
     const text = (await this.page.locator(this.TOTAL_PRICE).textContent()) ?? "0";
     return parseInt(text.replace(/[^0-9]/g, ""), 10) || 0;
   }
@@ -137,7 +126,7 @@ export class CartPage extends BasePage {
   async deleteItem(productName: string): Promise<void> {
     const row = this.page.locator(this.TABLE_ROWS).filter({ hasText: productName });
     await row.locator("a:has-text('Delete')").click();
-    await this.page.waitForTimeout(TIMEOUTS.CART_ITEM_DELETE);
+    await this.page.waitForTimeout(300);
   }
 
   /**
@@ -148,7 +137,7 @@ export class CartPage extends BasePage {
     let count = await this.page.locator(this.TABLE_ROWS).count();
     while (count > 0) {
       await this.page.locator(this.TABLE_ROWS).first().locator("a:has-text('Delete')").click();
-      await this.page.waitForTimeout(TIMEOUTS.CART_ITEM_POLL * 4); // 800ms = 4 * 200ms
+      await this.page.waitForTimeout(800); // 800ms = 4 * 200ms
       count = await this.page.locator(this.TABLE_ROWS).count();
     }
   }
@@ -158,7 +147,7 @@ export class CartPage extends BasePage {
    */
   async clickPlaceOrder(): Promise<void> {
     await this.click(this.PLACE_ORDER_BTN);
-    await this.page.waitForTimeout(TIMEOUTS.MODAL_ANIMATION);
+    await this.page.waitForTimeout(500);
   }
 
   // ---------------------------------------------------------------------------
@@ -172,7 +161,7 @@ export class CartPage extends BasePage {
    */
   async verifyItemInCart(productName: string): Promise<void> {
     const row = this.page.locator(this.TABLE_ROWS).filter({ hasText: productName });
-    await expect(row).toBeVisible({ timeout: TIMEOUTS.ELEMENT_VISIBLE_SHORT });
+    await expect(row).toBeVisible({ timeout: 5000 });
   }
 
   /**
