@@ -135,39 +135,18 @@ export class LoginPage extends BasePage {
     const usernameLocator = this.page.locator(this.USERNAME_INPUT);
     const passwordLocator = this.page.locator(this.PASSWORD_INPUT);
 
-    // HYBRID APPROACH: Playwright type() + explicit event dispatch
-    // type() generates proper keyboard events, but CI headless mode needs
-    // additional jQuery-compatible event dispatch to trigger handlers
+    // Use fill() method - Playwright's native input method
+    // fill() calls clear() then type(), both go through proper APIs
 
-    // Fill username with Playwright type + event dispatch
-    console.log(`[LoginPage.login] Setting username...`);
-    await usernameLocator.focus();
-    await this.page.keyboard.press("Control+A");
-    await this.page.keyboard.press("Delete");
-    await this.page.waitForTimeout(100);
-    
-    await usernameLocator.type(username, { delay: 50 });
-    // Dispatch jQuery events after typing
-    await usernameLocator.dispatchEvent('input');
-    await usernameLocator.dispatchEvent('change');
-    await usernameLocator.dispatchEvent('blur');
+    console.log(`[LoginPage.login] Setting username via fill()...`);
+    await usernameLocator.fill(username);
     await this.page.waitForTimeout(300);
 
-    // Fill password with Playwright type + event dispatch
-    console.log(`[LoginPage.login] Setting password...`);
-    await passwordLocator.focus();
-    await this.page.keyboard.press("Control+A");
-    await this.page.keyboard.press("Delete"); 
-    await this.page.waitForTimeout(100);
-    
-    await passwordLocator.type(password, { delay: 50 });
-    // Dispatch jQuery events after typing
-    await passwordLocator.dispatchEvent('input');
-    await passwordLocator.dispatchEvent('change');
-    await passwordLocator.dispatchEvent('blur');
+    console.log(`[LoginPage.login] Setting password via fill()...`);
+    await passwordLocator.fill(password);
     await this.page.waitForTimeout(300);
 
-    // Verify values before submitting
+    // Verify values are correct before submitting
     const usernameValue = await usernameLocator.inputValue();
     const passwordValue = await passwordLocator.inputValue();
     
@@ -180,13 +159,13 @@ export class LoginPage extends BasePage {
       throw new Error(`Password not set: length ${passwordValue.length}, expected ${password.length}`);
     }
 
-    console.log(`[LoginPage.login] ✓ Values verified, submitting form...`);
+    console.log(`[LoginPage.login] ✓ All values verified, submitting...`);
     
     // Submit the form
     await this.click(this.LOGIN_BTN);
     console.log(`[LoginPage.login] ✓ Form submitted`);
     
-    // Wait for response
+    // Wait for page response
     await this.page.waitForLoadState("networkidle", { timeout: 5000 }).catch(() => {
       // Ignore timeout
     });

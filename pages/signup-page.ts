@@ -146,36 +146,15 @@ export class SignupPage extends BasePage {
     await usernameLocator.waitFor({ state: "visible", timeout: 10000 });
     await passwordLocator.waitFor({ state: "visible", timeout: 10000 });
 
-    // HYBRID APPROACH: Playwright type() + explicit event dispatch
-    // type() generates proper keyboard events, but CI headless mode needs
-    // additional jQuery-compatible event dispatch to trigger handlers
+    // Use fill() method - Playwright's native input method
+    // fill() is designed to set input values reliably
 
-    // Fill username with Playwright type + event dispatch
-    console.log(`[SignupPage.signup] Setting username...`);
-    await usernameLocator.focus();
-    await this.page.keyboard.press("Control+A");
-    await this.page.keyboard.press("Delete");
-    await this.page.waitForTimeout(100);
-
-    await usernameLocator.type(username, { delay: 50 });
-    // Dispatch jQuery events after typing
-    await usernameLocator.dispatchEvent('input');
-    await usernameLocator.dispatchEvent('change');
-    await usernameLocator.dispatchEvent('blur');
+    console.log(`[SignupPage.signup] Setting username via fill()...`);
+    await usernameLocator.fill(username);
     await this.page.waitForTimeout(300);
 
-    // Fill password with Playwright type + event dispatch
-    console.log(`[SignupPage.signup] Setting password...`);
-    await passwordLocator.focus();
-    await this.page.keyboard.press("Control+A");
-    await this.page.keyboard.press("Delete");
-    await this.page.waitForTimeout(100);
-
-    await passwordLocator.type(password, { delay: 50 });
-    // Dispatch jQuery events after typing
-    await passwordLocator.dispatchEvent('input');
-    await passwordLocator.dispatchEvent('change');
-    await passwordLocator.dispatchEvent('blur');
+    console.log(`[SignupPage.signup] Setting password via fill()...`);
+    await passwordLocator.fill(password);
     await this.page.waitForTimeout(300);
 
     // Verify values before submitting
