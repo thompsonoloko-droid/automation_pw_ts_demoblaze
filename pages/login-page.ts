@@ -190,21 +190,6 @@ export class LoginPage extends BasePage {
    * @returns The alert dialog message text.
    */
   async loginExpectAlert(username: string, password: string): Promise<string> {
-    // Register dialog handler BEFORE clicking button
-    const alertPromise = Promise.race([
-      new Promise<string>((resolve) => {
-        this.page.once("dialog", async (dialog) => {
-          const message = dialog.message();
-          await dialog.accept();
-          resolve(message);
-        });
-      }),
-      // Timeout after 15s if dialog never appears
-      new Promise<string>((_resolve, reject) => {
-        setTimeout(() => reject(new Error("Dialog did not appear within 15s")), 15000);
-      }),
-    ]);
-
     const usernameLocator = this.page.locator(this.USERNAME_INPUT);
     const passwordLocator = this.page.locator(this.PASSWORD_INPUT);
     const loginBtn = this.page.locator(this.LOGIN_BTN);
@@ -220,12 +205,58 @@ export class LoginPage extends BasePage {
     await passwordLocator.fill(password);
     await this.page.waitForTimeout(100);
 
-    // Click submit button to trigger the dialog
-    await loginBtn.click();
+    // Register dialog handler BEFORE clicking button
+    let dialogCaught = false;
+    
+    const alertPromise = new Promise<string>((resolve, reject) => {
+      // Set up dialog listener
+      this.page.once("dialog", async (dialog) => {
+        dialogCaught = true;
+        try {
+          const message = dialog.message();
+          console.log(`[LoginPage.loginExpectAlert] Dialog caught, message: "${message}"`);
+          await dialog.accept();
+          resolve(message);
+        } catch (err) {
+          console.log(`[LoginPage.loginExpectAlert] Error handling dialog: ${err}`);
+          reject(err);
+        }
+      });
 
-    // Wait for dialog and return message
-    const result = await alertPromise;
-    return result;
+      // Set up timeout
+      const timeoutHandle = setTimeout(() => {
+        if (!dialogCaught) {
+          const error = new Error("Dialog did not appear within 15s");
+          console.log(`[LoginPage.loginExpectAlert] Dialog timeout after 15s`);
+          reject(error);
+        }
+      }, 15000);
+
+      // Click button
+      loginBtn.click().then(() => {
+        console.log(`[LoginPage.loginExpectAlert] Button clicked successfully`);
+      }).catch((err) => {
+        clearTimeout(timeoutHandle);
+        console.log(`[LoginPage.loginExpectAlert] Error clicking button: ${err}`);
+        reject(err);
+      });
+    });
+
+    try {
+      const result = await alertPromise;
+      console.log(`[LoginPage.loginExpectAlert] Returning dialog message: "${result}"`);
+      return result;
+    } catch (err) {
+      // Capture screenshot of failure state
+      const screenshotPath = `./reports/screenshots/login-dialog-fail-${Date.now()}.png`;
+      try {
+        await this.page.screenshot({ path: screenshotPath });
+        console.log(`[LoginPage.loginExpectAlert] Screenshot saved: ${screenshotPath}`);
+      } catch (screenshotErr) {
+        console.log(`[LoginPage.loginExpectAlert] Could not capture screenshot: ${screenshotErr}`);
+      }
+      throw err;
+    }
   }
 
   // ---------------------------------------------------------------------------
