@@ -70,42 +70,52 @@ export class LoginPage extends BasePage {
     await usernameLocator.waitFor({ state: "visible", timeout: 10000 });
     await passwordLocator.waitFor({ state: "visible", timeout: 10000 });
 
-    // Use evaluate() for maximum reliability - directly manipulate DOM and set values
+    // Focus inputs to ensure they're ready
+    await usernameLocator.focus();
+    await passwordLocator.focus();
+    await this.page.waitForTimeout(200);
+
+    // Use Playwright's fill() method first - most reliable for generic filling
+    await usernameLocator.fill(username);
+    await passwordLocator.fill(password);
+
+    // Verify values were set
+    let usernameValue = await usernameLocator.inputValue();
+    let passwordValue = await passwordLocator.inputValue();
+
+    // If values aren't set (can happen in headless), use keyboard input
+    if (!usernameValue || !passwordValue) {
+      await usernameLocator.click({ force: true });
+      await this.page.keyboard.insertText(username);
+      await passwordLocator.click({ force: true });
+      await this.page.keyboard.insertText(password);
+      
+      usernameValue = await usernameLocator.inputValue();
+      passwordValue = await passwordLocator.inputValue();
+    }
+
+    // Ensure events are dispatched via DOM for framework compatibility
     await this.page.evaluate(
-      ([uSel, pSel, uVal, pVal]: [string, string, string, string]) => {
+      ([uSel, pSel]: [string, string]) => {
         const u = document.querySelector(uSel) as HTMLInputElement | null;
         const p = document.querySelector(pSel) as HTMLInputElement | null;
         
         if (u) {
-          // Clear the input completely
-          u.value = "";
-          u.dispatchEvent(new Event("input", { bubbles: true }));
-          u.dispatchEvent(new Event("change", { bubbles: true }));
-          
-          // Set the new value
-          u.value = uVal;
           u.dispatchEvent(new Event("input", { bubbles: true }));
           u.dispatchEvent(new Event("change", { bubbles: true }));
           u.dispatchEvent(new Event("blur", { bubbles: true }));
         }
         
         if (p) {
-          // Clear the input completely
-          p.value = "";
-          p.dispatchEvent(new Event("input", { bubbles: true }));
-          p.dispatchEvent(new Event("change", { bubbles: true }));
-          
-          // Set the new value
-          p.value = pVal;
           p.dispatchEvent(new Event("input", { bubbles: true }));
           p.dispatchEvent(new Event("change", { bubbles: true }));
           p.dispatchEvent(new Event("blur", { bubbles: true }));
         }
       },
-      [this.USERNAME_INPUT, this.PASSWORD_INPUT, username, password],
+      [this.USERNAME_INPUT, this.PASSWORD_INPUT],
     );
 
-    // Give React/Vue/framework time to update state
+    // Wait for framework to process events
     await this.page.waitForTimeout(500);
 
     // Click via normal Playwright click
