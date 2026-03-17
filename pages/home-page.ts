@@ -88,6 +88,16 @@ export class HomePage extends BasePage {
       if (navHtml !== "N/A" && navHtml.length > 0) {
         console.log(`[HomePage] Nav HTML snippet: ${navHtml.substring(0, 300)}`);
       }
+      
+      // Capture screenshot showing current page state
+      const screenshotPath = `./reports/screenshots/homepage-nav-failure-${Date.now()}.png`;
+      try {
+        await this.page.screenshot({ path: screenshotPath });
+        console.log(`[HomePage] Screenshot saved: ${screenshotPath}`);
+      } catch (screenshotErr) {
+        console.log(`[HomePage] Could not capture screenshot: ${screenshotErr}`);
+      }
+      
       throw err; // Throw so we know navigation failed
     }
     

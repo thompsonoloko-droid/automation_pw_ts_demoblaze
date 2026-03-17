@@ -73,6 +73,16 @@ export class SignupPage extends BasePage {
       const modalHtml = await this.page.locator(this.SIGNUP_MODAL).first().outerHTML().catch(() => "N/A");
       console.log(`[SignupPage.openModal] ✕ SIGNUP_MODAL did not become visible: ${err}`);
       console.log(`[SignupPage.openModal] Modal HTML: ${modalHtml.substring(0, 500)}`);
+      
+      // Capture screenshot showing current state
+      const screenshotPath = `./reports/screenshots/signuppage-modal-failure-${Date.now()}.png`;
+      try {
+        await this.page.screenshot({ path: screenshotPath });
+        console.log(`[SignupPage.openModal] Screenshot saved: ${screenshotPath}`);
+      } catch (screenshotErr) {
+        console.log(`[SignupPage.openModal] Could not capture screenshot: ${screenshotErr}`);
+      }
+      
       throw err;
     }
 
