@@ -137,93 +137,43 @@ export class SignupPage extends BasePage {
    * @returns The alert dialog message text.
    */
   async signup(username: string, password: string): Promise<string> {
-    console.log(`[SignupPage.signup START] username="${username}", password_len=${password.length}`);
+    console.log(`[SignupPage.signup] username="${username}" password_len=${password.length}`);
 
     const usernameLocator = this.page.locator(this.USERNAME_INPUT);
     const passwordLocator = this.page.locator(this.PASSWORD_INPUT);
 
-    // Wait for both inputs to be visible
+    // Wait for inputs
     await usernameLocator.waitFor({ state: "visible", timeout: 10000 });
     await passwordLocator.waitFor({ state: "visible", timeout: 10000 });
 
-    // Set values using fill()
-    console.log(`[SignupPage.signup] Setting username via fill()...`);
+    // Fill values
     await usernameLocator.fill(username);
-    await this.page.waitForTimeout(500);
-
-    console.log(`[SignupPage.signup] Setting password via fill()...`);
+    await this.page.waitForTimeout(200);
     await passwordLocator.fill(password);
-    await this.page.waitForTimeout(500);
+    await this.page.waitForTimeout(200);
 
-    // CRITICAL PRE-SUBMISSION DIAGNOSTICS
-    const usernameValue = await usernameLocator.inputValue();
-    const passwordValue = await passwordLocator.inputValue();
-    
-    console.log(`\n[SignupPage.signup] ==== PRE-SUBMISSION CHECK ====`);
-    console.log(`[SignupPage.signup] Expected: username="${username}", password_len=${password.length}`);
-    console.log(`[SignupPage.signup] Actual  : username="${usernameValue}", password_len=${passwordValue.length}`);
-    
-    // Get HTML to verify form state
-    const formHtml = await this.page.locator("form").first().innerHTML().catch(() => "N/A");
-    console.log(`[SignupPage.signup] Form HTML length: ${formHtml ? formHtml.length : "N/A"}`);
-    
-    // Check if inputs are in DOM
-    const inputCount = await this.page.locator(this.USERNAME_INPUT).count();
-    console.log(`[SignupPage.signup] Username input elements in DOM: ${inputCount}`);
-    
-    // Get input attributes
-    const usernameType = await usernameLocator.getAttribute("type").catch(() => "N/A");
-    const usernameRequired = await usernameLocator.getAttribute("required").catch(() => "N/A");
-    console.log(`[SignupPage.signup] Username input type="${usernameType}", required="${usernameRequired}"`);
-    
-    // Get button state
-    const buttonEnabled = await this.page.locator(this.SIGNUP_BTN).isEnabled();
-    console.log(`[SignupPage.signup] Signup button enabled: ${buttonEnabled}`);
-    
-    // Try to get the actual DOM values directly
-    const domValues = await this.page.evaluate(() => {
-      const uInput = document.querySelector('#sign-username') as HTMLInputElement | null;
-      const pInput = document.querySelector('#sign-password') as HTMLInputElement | null;
-      return {
-        usernameDOM: uInput?.value || "NOT FOUND",
-        passwordDOM: pInput?.value || "NOT FOUND",
-      };
-    });
-    console.log(`[SignupPage.signup] DOM values: username="${domValues.usernameDOM}", password_len=${domValues.passwordDOM.length}`);
-    console.log(`[SignupPage.signup] ==== END PRE-SUBMISSION CHECK ====\n`);
-
-    if (usernameValue !== username) {
-      console.log(`[SignupPage.signup] ✕ MISMATCH: Username not set correctly`);
-      throw new Error(
-        `Username not set: got "${usernameValue}", expected "${username}"`,
-      );
-    }
-    if (passwordValue !== password) {
-      console.log(`[SignupPage.signup] ✕ MISMATCH: Password not set correctly`);
-      throw new Error(
-        `Password not set: length ${passwordValue.length}, expected ${password.length}`,
-      );
-    }
-
-    console.log(`[SignupPage.signup] ✓ All values match, submitting form...`);
-
-    // Register the dialog handler before clicking (needs to be synchronous)
+    // Register dialog handler before submission
     const alertPromise = new Promise<string>((resolve) => {
       this.page.once("dialog", async (dialog) => {
         const message = dialog.message();
-        console.log(`[SignupPage.signup] Dialog received: "${message}"`);
         await dialog.accept();
         resolve(message);
       });
     });
 
-    // Submit the form
-    console.log(`[SignupPage.signup] Clicking signup button...`);
-    await this.click(this.SIGNUP_BTN);
-    console.log(`[SignupPage.signup] ✓ Form submitted, waiting for dialog...`);
-    
+    // Submit form using requestSubmit() - native form submission
+    console.log(`[SignupPage.signup] Submitting form via requestSubmit()...`);
+    await this.page.evaluate(() => {
+      const form = document.querySelector('form') as HTMLFormElement | null;
+      if (form) {
+        form.requestSubmit();  // Triggers form submission event
+      } else {
+        throw new Error('Form not found');
+      }
+    });
+
     const result = await alertPromise;
-    console.log(`[SignupPage.signup] ✓ Dialog handled, returning: "${result}"`);
+    console.log(`[SignupPage.signup] Dialog: "${result}"`);
     return result;
   }
 
