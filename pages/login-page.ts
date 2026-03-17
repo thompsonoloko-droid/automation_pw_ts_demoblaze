@@ -123,110 +123,69 @@ export class LoginPage extends BasePage {
   /**
    * Fill and submit the login form.
    *
-   * Uses direct DOM manipulation to set values, then verifies they persist
-   * before clicking the submit button. This matches the pattern in SignupPage
-   * which has been proven to work in both local and CI environments.
+   * Uses standard Playwright API (fill, type) instead of page.evaluate()
+   * as it's more reliable in headless CI environments.
    *
    * @param username - Demoblaze username.
    * @param password - Demoblaze password.
    */
   async login(username: string, password: string): Promise<void> {
-    const WAIT_TIMEOUT = 2000;  // Short wait since openModal() already waited
-
     console.log(`[LoginPage.login START] username="${username}", password_len=${password.length}`);
 
-    try {
-      const usernameLocator = this.page.locator(this.USERNAME_INPUT);
-      const passwordLocator = this.page.locator(this.PASSWORD_INPUT);
+    const usernameLocator = this.page.locator(this.USERNAME_INPUT);
+    const passwordLocator = this.page.locator(this.PASSWORD_INPUT);
 
-      // Brief wait for inputs to be visible (they should be from openModal)
-      console.log(`[LoginPage] Checking if USERNAME_INPUT is visible...`);
-      try {
-        await usernameLocator.waitFor({ state: "visible", timeout: WAIT_TIMEOUT });
-        console.log(`[LoginPage] ✓ USERNAME_INPUT is visible`);
-      } catch (err) {
-        console.log(`[LoginPage] ⚠️  USERNAME_INPUT not visible within ${WAIT_TIMEOUT}ms, attempting fill anyway`);
-      }
+    // Focus on username field and clear it completely
+    console.log(`[LoginPage.login] Focusing and clearing username field...`);
+    await usernameLocator.focus();
+    await this.page.keyboard.press("Control+A");
+    await this.page.keyboard.press("Delete");
+    
+    // Type username slowly to ensure it's captured
+    console.log(`[LoginPage.login] Typing username: "${username}"...`);
+    await usernameLocator.type(username, { delay: 50 });
+    
+    // Wait for input event to process
+    await this.page.waitForTimeout(300);
 
-      console.log(`[LoginPage] Checking if PASSWORD_INPUT is visible...`);
-      try {
-        await passwordLocator.waitFor({ state: "visible", timeout: WAIT_TIMEOUT });
-        console.log(`[LoginPage] ✓ PASSWORD_INPUT is visible`);
-      } catch (err) {
-        console.log(`[LoginPage] ⚠️  PASSWORD_INPUT not visible within ${WAIT_TIMEOUT}ms, attempting fill anyway`);
-      }
+    // Focus on password field and clear it
+    console.log(`[LoginPage.login] Focusing and clearing password field...`);
+    await passwordLocator.focus();
+    await this.page.keyboard.press("Control+A");
+    await this.page.keyboard.press("Delete");
+    
+    // Type password slowly
+    console.log(`[LoginPage.login] Typing password (${password.length} chars)...`);
+    await passwordLocator.type(password, { delay: 50 });
+    
+    // Wait for input event to process
+    await this.page.waitForTimeout(300);
 
-      // Set values DIRECTLY via DOM manipulation to guarantee they're set
-      console.log(`[LoginPage] Setting values via page.evaluate()...`);
-      const setResult = await this.page.evaluate(
-        ([uSel, pSel, u, p]: [string, string, string, string]) => {
-          const uInput = document.querySelector(uSel) as HTMLInputElement | null;
-          const pInput = document.querySelector(pSel) as HTMLInputElement | null;
+    // Verify values before submitting
+    const usernameValue = await usernameLocator.inputValue();
+    const passwordValue = await passwordLocator.inputValue();
+    
+    console.log(`[LoginPage.login] Verification:
+      username="${usernameValue}" (expected="${username}")
+      password_len=${passwordValue.length} (expected=${password.length})`);
 
-          const result: any = {
-            usernameFound: !!uInput,
-            passwordFound: !!pInput,
-          };
-
-          if (uInput) {
-            result.beforeUsername = uInput.value;
-            uInput.value = "";
-            uInput.value = u;
-            uInput.dispatchEvent(new Event("input", { bubbles: true }));
-            uInput.dispatchEvent(new Event("change", { bubbles: true }));
-            uInput.dispatchEvent(new Event("blur", { bubbles: true }));
-            result.afterUsername = uInput.value;
-          }
-
-          if (pInput) {
-            result.beforePassword = pInput.value;
-            pInput.value = "";
-            pInput.value = p;
-            pInput.dispatchEvent(new Event("input", { bubbles: true }));
-            pInput.dispatchEvent(new Event("change", { bubbles: true }));
-            pInput.dispatchEvent(new Event("blur", { bubbles: true }));
-            result.afterPassword = pInput.value;
-          }
-
-          return result;
-        },
-        [this.USERNAME_INPUT, this.PASSWORD_INPUT, username, password],
-      );
-
-      console.log(`[LoginPage] Set result:`, JSON.stringify(setResult));
-
-      // Verify values were actually set via DOM
-      const verifyResult = await this.page.evaluate(
-        ([uSel, pSel]: [string, string]) => {
-          const u = document.querySelector(uSel) as HTMLInputElement | null;
-          const p = document.querySelector(pSel) as HTMLInputElement | null;
-          return {
-            usernameValue: u?.value || "",
-            passwordValue: p?.value || "",
-            usernameFound: !!u,
-            passwordFound: !!p,
-          };
-        },
-        [this.USERNAME_INPUT, this.PASSWORD_INPUT],
-      );
-
-      console.log(`[LoginPage] Verify result:`, JSON.stringify(verifyResult));
-
-      if (verifyResult.usernameValue !== username || verifyResult.passwordValue !== password) {
-        const err = `LoginPage fill failed: username="${verifyResult.usernameValue}" (expected "${username}"), password="${verifyResult.passwordValue}" (expected "${password}")`;
-        console.log(`[LoginPage] ✕ ${err}`);
-        throw new Error(err);
-      }
-
-      console.log(`[LoginPage] ✓ Values verified correctly`);
-      await this.page.waitForTimeout(300);
-      console.log(`[LoginPage] Submitting form...`);
-      await this.click(this.LOGIN_BTN);
-      console.log(`[LoginPage] ✓ Form submitted`);
-    } catch (err) {
-      console.log(`[LoginPage.login ERROR] ${err}`);
-      throw err;
+    if (usernameValue !== username) {
+      throw new Error(`Username not set correctly: got "${usernameValue}", expected "${username}"`);
     }
+    if (passwordValue !== password) {
+      throw new Error(`Password not set correctly: length ${passwordValue.length}, expected ${password.length}`);
+    }
+
+    console.log(`[LoginPage.login] ✓ Values verified, clicking submit button...`);
+    
+    // Click submit button and wait for navigation/alert
+    await this.click(this.LOGIN_BTN);
+    console.log(`[LoginPage.login] ✓ Form submitted`);
+    
+    // Wait for response (alert dialog or page change)
+    await this.page.waitForLoadState("networkidle", { timeout: 5000 }).catch(() => {
+      // Ignore timeout - might be quick response
+    });
   }
 
   /**
