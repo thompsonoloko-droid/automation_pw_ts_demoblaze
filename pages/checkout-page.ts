@@ -76,15 +76,37 @@ export class CheckoutPage extends BasePage {
    * Fields with an empty string value in the data object are left blank
    * (useful for negative / validation tests).
    *
+   * Uses keyboard input with delays instead of fill() for reliability.
+   *
    * @param data - Order form values.
    */
   async fillOrderForm(data: OrderFormData): Promise<void> {
-    if (data.name) await this.fill(this.NAME_INPUT, data.name);
-    if (data.country) await this.fill(this.COUNTRY_INPUT, data.country);
-    if (data.city) await this.fill(this.CITY_INPUT, data.city);
-    if (data.card) await this.fill(this.CARD_INPUT, data.card);
-    if (data.month) await this.fill(this.MONTH_INPUT, data.month);
-    if (data.year) await this.fill(this.YEAR_INPUT, data.year);
+    const fieldConfigs = [
+      { selector: this.NAME_INPUT, value: data.name },
+      { selector: this.COUNTRY_INPUT, value: data.country },
+      { selector: this.CITY_INPUT, value: data.city },
+      { selector: this.CARD_INPUT, value: data.card },
+      { selector: this.MONTH_INPUT, value: data.month },
+      { selector: this.YEAR_INPUT, value: data.year },
+    ];
+
+    for (const config of fieldConfigs) {
+      if (config.value) {
+        const locator = this.page.locator(config.selector);
+        await locator.waitFor({ state: "visible", timeout: 5000 });
+        
+        // Use keyboard input instead of fill()
+        await locator.click();
+        await this.page.waitForTimeout(50);
+        await locator.press("Control+A");
+        await locator.type(config.value, { delay: 30 });
+        await this.page.waitForTimeout(50);
+        
+        // Verify value was set
+        const actualValue = await locator.inputValue().catch(() => "");
+        console.log(`[CheckoutPage.fillOrderForm] Field ${config.selector}: "${actualValue}"`);
+      }
+    }
   }
 
   /**
