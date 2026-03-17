@@ -123,8 +123,7 @@ export class LoginPage extends BasePage {
   /**
    * Fill and submit the login form.
    *
-   * Fills form fields using keyboard input with delays (not fill()),
-   * then clicks the login button. This method works reliably in both local and CI environments.
+   * Uses direct DOM manipulation to set form values reliably across all environments.
    *
    * @param username - Demoblaze username.
    * @param password - Demoblaze password.
@@ -139,18 +138,36 @@ export class LoginPage extends BasePage {
     await passwordLocator.waitFor({ state: "visible", timeout: 10000 });
     await loginBtn.waitFor({ state: "visible", timeout: 10000 });
 
-    // Clear and fill username field with keyboard input (more reliable than fill())
-    await usernameLocator.click();
-    await this.page.waitForTimeout(50);
-    await usernameLocator.press("Control+A");
-    await usernameLocator.type(username, { delay: 50 });
+    // Set username via direct DOM manipulation
+    await this.page.evaluate(
+      (selector, value) => {
+        const el = document.querySelector(selector) as HTMLInputElement;
+        if (el) {
+          el.value = value;
+          el.dispatchEvent(new Event("input", { bubbles: true }));
+          el.dispatchEvent(new Event("change", { bubbles: true }));
+          el.dispatchEvent(new Event("blur", { bubbles: true }));
+        }
+      },
+      this.USERNAME_INPUT,
+      username
+    );
     await this.page.waitForTimeout(100);
 
-    // Clear and fill password field with keyboard input
-    await passwordLocator.click();
-    await this.page.waitForTimeout(50);
-    await passwordLocator.press("Control+A");
-    await passwordLocator.type(password, { delay: 50 });
+    // Set password via direct DOM manipulation
+    await this.page.evaluate(
+      (selector, value) => {
+        const el = document.querySelector(selector) as HTMLInputElement;
+        if (el) {
+          el.value = value;
+          el.dispatchEvent(new Event("input", { bubbles: true }));
+          el.dispatchEvent(new Event("change", { bubbles: true }));
+          el.dispatchEvent(new Event("blur", { bubbles: true }));
+        }
+      },
+      this.PASSWORD_INPUT,
+      password
+    );
     await this.page.waitForTimeout(100);
 
     // Click submit button - this triggers the form submission
@@ -207,33 +224,46 @@ export class LoginPage extends BasePage {
     await passwordLocator.waitFor({ state: "visible", timeout: 10000 });
     await loginBtn.waitFor({ state: "visible", timeout: 10000 });
 
-    // Clear and fill username field
-    let usernameValue = await usernameLocator.inputValue().catch(() => "");
-    console.log(`[LoginPage.loginExpectAlert] Current username value: "${usernameValue}"`);
-    
-    await usernameLocator.click();
-    await this.page.waitForTimeout(50);
-    await usernameLocator.press("Control+A");
-    await usernameLocator.type(username, { delay: 50 });
+    // Use evaluate to directly set form values via DOM manipulation
+    // This bypasses any timing issues with keyboard input
+    await this.page.evaluate(
+      (selector, value) => {
+        const el = document.querySelector(selector) as HTMLInputElement;
+        if (el) {
+          el.value = value;
+          el.dispatchEvent(new Event("input", { bubbles: true }));
+          el.dispatchEvent(new Event("change", { bubbles: true }));
+          el.dispatchEvent(new Event("blur", { bubbles: true }));
+        }
+      },
+      this.USERNAME_INPUT,
+      username
+    );
     await this.page.waitForTimeout(100);
-    
-    // Verify username was set
-    usernameValue = await usernameLocator.inputValue().catch(() => "");
-    console.log(`[LoginPage.loginExpectAlert] Username after type: "${usernameValue}"`);
 
-    // Clear and fill password field
-    let passwordValue = await passwordLocator.inputValue().catch(() => "");
-    console.log(`[LoginPage.loginExpectAlert] Current password value: "${passwordValue}"`);
-    
-    await passwordLocator.click();
-    await this.page.waitForTimeout(50);
-    await passwordLocator.press("Control+A");
-    await passwordLocator.type(password, { delay: 50 });
+    // Verify username was set
+    let usernameValue = await usernameLocator.inputValue().catch(() => "");
+    console.log(`[LoginPage.loginExpectAlert] Username set to: "${usernameValue}"`);
+
+    // Set password field
+    await this.page.evaluate(
+      (selector, value) => {
+        const el = document.querySelector(selector) as HTMLInputElement;
+        if (el) {
+          el.value = value;
+          el.dispatchEvent(new Event("input", { bubbles: true }));
+          el.dispatchEvent(new Event("change", { bubbles: true }));
+          el.dispatchEvent(new Event("blur", { bubbles: true }));
+        }
+      },
+      this.PASSWORD_INPUT,
+      password
+    );
     await this.page.waitForTimeout(100);
-    
+
     // Verify password was set
-    passwordValue = await passwordLocator.inputValue().catch(() => "");
-    console.log(`[LoginPage.loginExpectAlert] Password after type: "${passwordValue}"`);
+    let passwordValue = await passwordLocator.inputValue().catch(() => "");
+    console.log(`[LoginPage.loginExpectAlert] Password set to: "${passwordValue}"`);
 
     // Register dialog handler BEFORE clicking button
     let dialogCaught = false;

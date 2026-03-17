@@ -144,33 +144,39 @@ export class SignupPage extends BasePage {
     const isEnabled = await submitBtn.isEnabled().catch(() => false);
     console.log(`[SignupPage.signup] Submit button enabled: ${isEnabled}`);
 
-    // Clear and fill username field with keyboard input (more reliable than fill())
-    let usernameValue = await usernameLocator.inputValue().catch(() => "");
-    console.log(`[SignupPage.signup] Current username value: "${usernameValue}"`);
-    
-    await usernameLocator.click();
-    await this.page.waitForTimeout(50);
-    await usernameLocator.press("Control+A");
-    await usernameLocator.type(username, { delay: 50 });
+    // Set username via direct DOM manipulation
+    await this.page.evaluate(
+      (selector, value) => {
+        const el = document.querySelector(selector) as HTMLInputElement;
+        if (el) {
+          el.value = value;
+          el.dispatchEvent(new Event("input", { bubbles: true }));
+          el.dispatchEvent(new Event("change", { bubbles: true }));
+          el.dispatchEvent(new Event("blur", { bubbles: true }));
+        }
+      },
+      this.USERNAME_INPUT,
+      username
+    );
     await this.page.waitForTimeout(100);
-    
-    // Verify username was set
-    usernameValue = await usernameLocator.inputValue().catch(() => "");
-    console.log(`[SignupPage.signup] Username after type: "${usernameValue}"`);
+    console.log(`[SignupPage.signup] Username set to: "${username}"`);
 
-    // Clear and fill password field
-    let passwordValue = await passwordLocator.inputValue().catch(() => "");
-    console.log(`[SignupPage.signup] Current password value: "${passwordValue}"`);
-    
-    await passwordLocator.click();
-    await this.page.waitForTimeout(50);
-    await passwordLocator.press("Control+A");
-    await passwordLocator.type(password, { delay: 50 });
+    // Set password via direct DOM manipulation
+    await this.page.evaluate(
+      (selector, value) => {
+        const el = document.querySelector(selector) as HTMLInputElement;
+        if (el) {
+          el.value = value;
+          el.dispatchEvent(new Event("input", { bubbles: true }));
+          el.dispatchEvent(new Event("change", { bubbles: true }));
+          el.dispatchEvent(new Event("blur", { bubbles: true }));
+        }
+      },
+      this.PASSWORD_INPUT,
+      password
+    );
     await this.page.waitForTimeout(100);
-    
-    // Verify password was set
-    passwordValue = await passwordLocator.inputValue().catch(() => "");
-    console.log(`[SignupPage.signup] Password after type: "${passwordValue}"`);
+    console.log(`[SignupPage.signup] Password set to: "${password}"`);
 
     // Register dialog handler BEFORE clicking button
     let dialogCaught = false;

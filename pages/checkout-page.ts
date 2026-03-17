@@ -76,7 +76,7 @@ export class CheckoutPage extends BasePage {
    * Fields with an empty string value in the data object are left blank
    * (useful for negative / validation tests).
    *
-   * Uses keyboard input with delays instead of fill() for reliability.
+   * Uses direct DOM manipulation for reliable form filling.
    *
    * @param data - Order form values.
    */
@@ -92,18 +92,24 @@ export class CheckoutPage extends BasePage {
 
     for (const config of fieldConfigs) {
       if (config.value) {
-        const locator = this.page.locator(config.selector);
-        await locator.waitFor({ state: "visible", timeout: 5000 });
-        
-        // Use keyboard input instead of fill()
-        await locator.click();
-        await this.page.waitForTimeout(50);
-        await locator.press("Control+A");
-        await locator.type(config.value, { delay: 30 });
+        // Set field value via direct DOM manipulation
+        await this.page.evaluate(
+          (selector, value) => {
+            const el = document.querySelector(selector) as HTMLInputElement;
+            if (el) {
+              el.value = value;
+              el.dispatchEvent(new Event("input", { bubbles: true }));
+              el.dispatchEvent(new Event("change", { bubbles: true }));
+              el.dispatchEvent(new Event("blur", { bubbles: true }));
+            }
+          },
+          config.selector,
+          config.value
+        );
         await this.page.waitForTimeout(50);
         
         // Verify value was set
-        const actualValue = await locator.inputValue().catch(() => "");
+        const actualValue = await this.page.locator(config.selector).inputValue().catch(() => "");
         console.log(`[CheckoutPage.fillOrderForm] Field ${config.selector}: "${actualValue}"`);
       }
     }
