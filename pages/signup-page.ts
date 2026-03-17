@@ -144,11 +144,33 @@ export class SignupPage extends BasePage {
     const isEnabled = await submitBtn.isEnabled().catch(() => false);
     console.log(`[SignupPage.signup] Submit button enabled: ${isEnabled}`);
 
-    // Fill form fields
-    await usernameLocator.fill(username);
+    // Clear and fill username field with keyboard input (more reliable than fill())
+    let usernameValue = await usernameLocator.inputValue().catch(() => "");
+    console.log(`[SignupPage.signup] Current username value: "${usernameValue}"`);
+    
+    await usernameLocator.click();
+    await this.page.waitForTimeout(50);
+    await usernameLocator.press("Control+A");
+    await usernameLocator.type(username, { delay: 50 });
     await this.page.waitForTimeout(100);
-    await passwordLocator.fill(password);
+    
+    // Verify username was set
+    usernameValue = await usernameLocator.inputValue().catch(() => "");
+    console.log(`[SignupPage.signup] Username after type: "${usernameValue}"`);
+
+    // Clear and fill password field
+    let passwordValue = await passwordLocator.inputValue().catch(() => "");
+    console.log(`[SignupPage.signup] Current password value: "${passwordValue}"`);
+    
+    await passwordLocator.click();
+    await this.page.waitForTimeout(50);
+    await passwordLocator.press("Control+A");
+    await passwordLocator.type(password, { delay: 50 });
     await this.page.waitForTimeout(100);
+    
+    // Verify password was set
+    passwordValue = await passwordLocator.inputValue().catch(() => "");
+    console.log(`[SignupPage.signup] Password after type: "${passwordValue}"`);
 
     // Register dialog handler BEFORE clicking button
     let dialogCaught = false;

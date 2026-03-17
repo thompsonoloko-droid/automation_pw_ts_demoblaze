@@ -123,8 +123,8 @@ export class LoginPage extends BasePage {
   /**
    * Fill and submit the login form.
    *
-   * Fills form fields using Playwright fill(), then clicks the login button.
-   * This is the most reliable method that works in both local and CI environments.
+   * Fills form fields using keyboard input with delays (not fill()),
+   * then clicks the login button. This method works reliably in both local and CI environments.
    *
    * @param username - Demoblaze username.
    * @param password - Demoblaze password.
@@ -139,10 +139,18 @@ export class LoginPage extends BasePage {
     await passwordLocator.waitFor({ state: "visible", timeout: 10000 });
     await loginBtn.waitFor({ state: "visible", timeout: 10000 });
 
-    // Fill form fields
-    await usernameLocator.fill(username);
+    // Clear and fill username field with keyboard input (more reliable than fill())
+    await usernameLocator.click();
+    await this.page.waitForTimeout(50);
+    await usernameLocator.press("Control+A");
+    await usernameLocator.type(username, { delay: 50 });
     await this.page.waitForTimeout(100);
-    await passwordLocator.fill(password);
+
+    // Clear and fill password field with keyboard input
+    await passwordLocator.click();
+    await this.page.waitForTimeout(50);
+    await passwordLocator.press("Control+A");
+    await passwordLocator.type(password, { delay: 50 });
     await this.page.waitForTimeout(100);
 
     // Click submit button - this triggers the form submission
@@ -199,11 +207,33 @@ export class LoginPage extends BasePage {
     await passwordLocator.waitFor({ state: "visible", timeout: 10000 });
     await loginBtn.waitFor({ state: "visible", timeout: 10000 });
 
-    // Fill form fields
-    await usernameLocator.fill(username);
+    // Clear and fill username field
+    let usernameValue = await usernameLocator.inputValue().catch(() => "");
+    console.log(`[LoginPage.loginExpectAlert] Current username value: "${usernameValue}"`);
+    
+    await usernameLocator.click();
+    await this.page.waitForTimeout(50);
+    await usernameLocator.press("Control+A");
+    await usernameLocator.type(username, { delay: 50 });
     await this.page.waitForTimeout(100);
-    await passwordLocator.fill(password);
+    
+    // Verify username was set
+    usernameValue = await usernameLocator.inputValue().catch(() => "");
+    console.log(`[LoginPage.loginExpectAlert] Username after type: "${usernameValue}"`);
+
+    // Clear and fill password field
+    let passwordValue = await passwordLocator.inputValue().catch(() => "");
+    console.log(`[LoginPage.loginExpectAlert] Current password value: "${passwordValue}"`);
+    
+    await passwordLocator.click();
+    await this.page.waitForTimeout(50);
+    await passwordLocator.press("Control+A");
+    await passwordLocator.type(password, { delay: 50 });
     await this.page.waitForTimeout(100);
+    
+    // Verify password was set
+    passwordValue = await passwordLocator.inputValue().catch(() => "");
+    console.log(`[LoginPage.loginExpectAlert] Password after type: "${passwordValue}"`);
 
     // Register dialog handler BEFORE clicking button
     let dialogCaught = false;
