@@ -41,15 +41,40 @@ export class HomePage extends BasePage {
    */
   async navigateToHome(): Promise<void> {
     console.log(`[HomePage] Navigating to ${this.BASE_URL}...`);
-    await this.page.goto(this.BASE_URL, { waitUntil: "domcontentloaded" });
-    console.log(`[HomePage] ✓ Page loaded (domcontentloaded)`);
+    const startTime = Date.now();
     
+    await this.page.goto(this.BASE_URL, { waitUntil: "domcontentloaded" });
+    const loadTime = Date.now() - startTime;
+    console.log(`[HomePage] ✓ Page loaded (domcontentloaded) in ${loadTime}ms`);
+    
+    // Verify basic page structure
+    const pageTitle = await this.page.title();
+    console.log(`[HomePage] Page title: "${pageTitle}"`);
+    
+    const navCount = await this.page.locator("nav").count();
+    console.log(`[HomePage] Navigation bars found: ${navCount}`);
+    
+    // Check for auth links specifically
+    const loginLinkCount = await this.page.locator("#login2").count();
+    const signupLinkCount = await this.page.locator("#signin2").count();
+    console.log(`[HomePage] Auth links found - login: ${loginLinkCount}, signup: ${signupLinkCount}`);
+    
+    // Verify auth nav links are ready
     console.log(`[HomePage] Waiting for auth nav links to be ready...`);
     try {
-      await this.page.locator("#login2, #signin2").first().waitFor({ state: "visible", timeout: 10000 });
+      await this.page.locator("#login2, #signin2").first().waitFor({ 
+        state: "visible", 
+        timeout: 10000 
+      });
       console.log(`[HomePage] ✓ Auth nav links are ready`);
     } catch (err) {
       console.log(`[HomePage] ⚠️  Auth nav links not immediately visible: ${err}`);
+      // Log nav element details for debugging
+      const navHtml = await this.page.locator("nav").first().innerHTML().catch(() => "N/A");
+      console.log(`[HomePage] Nav HTML length: ${navHtml.length}`);
+      if (navHtml !== "N/A") {
+        console.log(`[HomePage] Nav HTML snippet: ${navHtml.substring(0, 300)}`);
+      }
     }
     
     await this.waitForProducts();

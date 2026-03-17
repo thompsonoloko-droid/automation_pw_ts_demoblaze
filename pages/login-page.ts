@@ -35,7 +35,14 @@ export class LoginPage extends BasePage {
   async openModal(): Promise<void> {
     console.log(`[LoginPage.openModal START]`);
     
-    // First check if the login link exists
+    // Check page URL and basic state
+    const currentUrl = this.page.url();
+    console.log(`[LoginPage.openModal] Current URL: ${currentUrl}`);
+    
+    // First check if the login link exists in DOM
+    const loginLinkCount = await this.page.locator(this.NAV_LOGIN_LINK).count();
+    console.log(`[LoginPage.openModal] Login link elements found: ${loginLinkCount}`);
+    
     const loginLinkExists = await this.page.locator(this.NAV_LOGIN_LINK).isVisible().catch(() => false);
     console.log(`[LoginPage.openModal] Login link visible: ${loginLinkExists}`);
 
@@ -46,27 +53,47 @@ export class LoginPage extends BasePage {
       console.log(`[LoginPage.openModal] ✓ Login link clicked`);
     } catch (err) {
       console.log(`[LoginPage.openModal] ✕ Error clicking login link: ${err}`);
+      // Log the page content snippet to debug
+      const title = await this.page.title();
+      const navHtml = await this.page.locator("nav").first().innerHTML().catch(() => "N/A");
+      console.log(`[LoginPage.openModal] Page title: ${title}`);
+      console.log(`[LoginPage.openModal] Nav HTML snippet: ${navHtml.substring(0, 200)}`);
       throw err;
     }
+
+    // Small delay for modal animation to start
+    await this.page.waitForTimeout(300);
 
     // Check if modal appears
     console.log(`[LoginPage.openModal] Checking if LOGIN_MODAL becomes visible...`);
     try {
+      const modalCount = await this.page.locator(this.LOGIN_MODAL).count();
+      console.log(`[LoginPage.openModal] Modal elements found: ${modalCount}`);
+      
       await this.page.locator(this.LOGIN_MODAL).waitFor({ state: "visible", timeout: 10000 });
       console.log(`[LoginPage.openModal] ✓ LOGIN_MODAL is now visible`);
     } catch (err) {
+      const modalHtml = await this.page.locator(this.LOGIN_MODAL).first().outerHTML().catch(() => "N/A");
       console.log(`[LoginPage.openModal] ✕ LOGIN_MODAL did not become visible: ${err}`);
+      console.log(`[LoginPage.openModal] Modal HTML: ${modalHtml.substring(0, 500)}`);
       throw err;
     }
 
     // Wait for the input field
     console.log(`[LoginPage.openModal] Waiting for USERNAME_INPUT to be visible...`);
     try {
+      const inputCount = await this.page.locator(this.USERNAME_INPUT).count();
+      console.log(`[LoginPage.openModal] Input fields found: ${inputCount}`);
+      
       await this.page.locator(this.USERNAME_INPUT).waitFor({ state: "visible", timeout: 10000 });
       console.log(`[LoginPage.openModal] ✓ USERNAME_INPUT is visible, modal fully opened`);
     } catch (err) {
-      // Log and continue - we'll try to fill anyway
-      console.log(`[LoginPage.openModal] ⚠️  USERNAME_INPUT not visible within 5s, but continuing. Error: ${err}`);
+      const inputBox = await this.page.locator(this.USERNAME_INPUT).first().boundingBox().catch(() => null);
+      const inputAttrs = await this.page.locator(this.USERNAME_INPUT).first().getAttribute("style").catch(() => "N/A");
+      console.log(`[LoginPage.openModal] ✕ USERNAME_INPUT not visible within 10s: ${err}`);
+      console.log(`[LoginPage.openModal] Input bounding box: ${JSON.stringify(inputBox)}`);
+      console.log(`[LoginPage.openModal] Input style attribute: ${inputAttrs}`);
+      throw err;
     }
   }
 
