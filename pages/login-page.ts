@@ -59,8 +59,9 @@ export class LoginPage extends BasePage {
   /**
    * Fill and submit the login form.
    *
-   * Uses direct DOM manipulation with debugging to understand why forms
-   * aren't being filled in CI environments.
+   * Uses direct DOM manipulation to set values, then verifies they persist
+   * before clicking the submit button. This matches the pattern in SignupPage
+   * which has been proven to work in both local and CI environments.
    *
    * @param username - Demoblaze username.
    * @param password - Demoblaze password.
@@ -73,59 +74,55 @@ export class LoginPage extends BasePage {
     await usernameLocator.waitFor({ state: "visible", timeout: 10000 });
     await passwordLocator.waitFor({ state: "visible", timeout: 10000 });
 
-    // Debug: Check element properties
-    const elementDebug = await this.page.evaluate(
-      ([uSel, pSel]: [string, string]) => {
-        const u = document.querySelector(uSel);
-        const p = document.querySelector(pSel);
-        return {
-          usernameExists: !!u,
-          usernameType: u?.tagName,
-          usernameClass: u?.className,
-          passwordExists: !!p,
-          passwordType: p?.tagName,
-          passwordClass: p?.className,
-        };
-      },
-      [this.USERNAME_INPUT, this.PASSWORD_INPUT],
-    );
-    console.log("[DEBUG] Element properties:", JSON.stringify(elementDebug));
-
-    // Set values DIRECTLY via DOM manipulation
-    const setValuesResult = await this.page.evaluate(
+    // Set values DIRECTLY via DOM manipulation to guarantee they're set
+    // This approach bypasses Playwright's internal mechanisms which behave differently
+    // in headless CI environments vs local testing
+    await this.page.evaluate(
       ([uSel, pSel, u, p]: [string, string, string, string]) => {
         const uInput = document.querySelector(uSel) as HTMLInputElement | null;
         const pInput = document.querySelector(pSel) as HTMLInputElement | null;
 
-        if (!uInput || !pInput) {
-          return { success: false, error: `Elements not found: u=${!!uInput}, p=${!!pInput}` };
-        }
-
-        try {
-          // Clear first
+        if (uInput) {
+          // Clear first, then set
           uInput.value = "";
           uInput.value = u;
+          // Trigger all relevant events
           uInput.dispatchEvent(new Event("input", { bubbles: true }));
           uInput.dispatchEvent(new Event("change", { bubbles: true }));
           uInput.dispatchEvent(new Event("blur", { bubbles: true }));
+        }
 
+        if (pInput) {
+          // Clear first, then set
           pInput.value = "";
           pInput.value = p;
+          // Trigger all relevant events
           pInput.dispatchEvent(new Event("input", { bubbles: true }));
           pInput.dispatchEvent(new Event("change", { bubbles: true }));
           pInput.dispatchEvent(new Event("blur", { bubbles: true }));
-
-          return { success: true, uValue: uInput.value, pValue: pInput.value };
-        } catch (e) {
-          return { success: false, error: String(e) };
         }
       },
       [this.USERNAME_INPUT, this.PASSWORD_INPUT, username, password],
     );
-    console.log("[DEBUG] Set values result:", JSON.stringify(setValuesResult));
 
-    if (!setValuesResult.success) {
-      throw new Error(`Failed to set form values: ${setValuesResult.error}`);
+    // Verify values were actually set via DOM
+    const { usernameValue, passwordValue } = await this.page.evaluate(
+      ([uSel, pSel]: [string, string]) => {
+        const u = document.querySelector(uSel) as HTMLInputElement | null;
+        const p = document.querySelector(pSel) as HTMLInputElement | null;
+        return {
+          usernameValue: u?.value || "",
+          passwordValue: p?.value || "",
+        };
+      },
+      [this.USERNAME_INPUT, this.PASSWORD_INPUT],
+    );
+
+    // Verify values match what we set
+    if (usernameValue !== username || passwordValue !== password) {
+      throw new Error(
+        `LoginPage fill failed: username="${usernameValue}" (expected "${username}"), password="${passwordValue}" (expected "${password}")`,
+      );
     }
 
     // Extra wait to ensure framework state is updated
