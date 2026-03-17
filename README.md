@@ -88,6 +88,9 @@ CHECKOUT_YEAR=2027
 ```
 
 > Tests that require login are automatically skipped when credentials are not set — safe to run without an account for product/API tests.
+>
+> Auth credentials are considered configured only when both TEST_USERNAME and TEST_PASSWORD are non-empty.
+> Empty secrets in CI now fail open (warning + skip) instead of producing misleading auth failures.
 
 ---
 
@@ -158,3 +161,9 @@ The API always returns HTTP `200` — errors are signalled in the response body.
 
 The `.github/workflows/e2e.yml` pipeline runs on every push, pull request, and daily at 06:00 UTC.
 Add secrets (`TEST_USERNAME`, `TEST_PASSWORD`, etc.) in your repository settings.
+
+Pipeline jobs now include:
+
+- Quality gate: `npm run quality` (typecheck, lint, format check) before test fan-out.
+- Credentials preflight warning: emits an explicit warning when auth secrets are missing.
+- Sharded browser execution with report artifact upload and merged report generation.
