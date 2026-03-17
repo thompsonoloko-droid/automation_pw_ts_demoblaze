@@ -30,12 +30,40 @@ export class SignupPage extends BasePage {
    * Click the nav 'Sign up' link and wait for the modal to fully open.
    */
   async openModal(): Promise<void> {
-    await this.page.locator(this.NAV_SIGNUP_LINK).click({ force: true }).catch(() => {});
-    // Wait for the input field — clearest signal that modal animation is done.
+    console.log(`[SignupPage.openModal START]`);
+    
+    // First check if the signup link exists
+    const signupLinkExists = await this.page.locator(this.NAV_SIGNUP_LINK).isVisible().catch(() => false);
+    console.log(`[SignupPage.openModal] Signup link visible: ${signupLinkExists}`);
+
+    // Click the signup link
+    console.log(`[SignupPage.openModal] Clicking nav signup link...`);
     try {
-      await this.page.locator(this.USERNAME_INPUT).waitFor({ state: "visible", timeout: 10000 });
-    } catch {
-      // Proceed anyway; signup() will handle input readiness.
+      await this.page.locator(this.NAV_SIGNUP_LINK).click({ force: true });
+      console.log(`[SignupPage.openModal] ✓ Signup link clicked`);
+    } catch (err) {
+      console.log(`[SignupPage.openModal] ✕ Error clicking signup link: ${err}`);
+      throw err;
+    }
+
+    // Check if modal appears
+    console.log(`[SignupPage.openModal] Checking if SIGNUP_MODAL becomes visible...`);
+    try {
+      await this.page.locator(this.SIGNUP_MODAL).waitFor({ state: "visible", timeout: 5000 });
+      console.log(`[SignupPage.openModal] ✓ SIGNUP_MODAL is now visible`);
+    } catch (err) {
+      console.log(`[SignupPage.openModal] ✕ SIGNUP_MODAL did not become visible: ${err}`);
+      throw err;
+    }
+
+    // Wait for the input field
+    console.log(`[SignupPage.openModal] Waiting for USERNAME_INPUT to be visible...`);
+    try {
+      await this.page.locator(this.USERNAME_INPUT).waitFor({ state: "visible", timeout: 5000 });
+      console.log(`[SignupPage.openModal] ✓ USERNAME_INPUT is visible, modal fully opened`);
+    } catch (err) {
+      // Log and continue - we'll try to fill anyway
+      console.log(`[SignupPage.openModal] ⚠️  USERNAME_INPUT not visible within 5s, but continuing. Error: ${err}`);
     }
   }
 

@@ -33,17 +33,40 @@ export class LoginPage extends BasePage {
    * Click the nav 'Log in' link and wait for the modal to fully open.
    */
   async openModal(): Promise<void> {
-    console.log(`[LoginPage.openModal START] Clicking nav login link...`);
-    await this.page.locator(this.NAV_LOGIN_LINK).click({ force: true }).catch(() => {});
+    console.log(`[LoginPage.openModal START]`);
     
-    // Wait for the input field — clearest signal that modal animation is done.
+    // First check if the login link exists
+    const loginLinkExists = await this.page.locator(this.NAV_LOGIN_LINK).isVisible().catch(() => false);
+    console.log(`[LoginPage.openModal] Login link visible: ${loginLinkExists}`);
+
+    // Click the login link
+    console.log(`[LoginPage.openModal] Clicking nav login link...`);
+    try {
+      await this.page.locator(this.NAV_LOGIN_LINK).click({ force: true });
+      console.log(`[LoginPage.openModal] ✓ Login link clicked`);
+    } catch (err) {
+      console.log(`[LoginPage.openModal] ✕ Error clicking login link: ${err}`);
+      throw err;
+    }
+
+    // Check if modal appears
+    console.log(`[LoginPage.openModal] Checking if LOGIN_MODAL becomes visible...`);
+    try {
+      await this.page.locator(this.LOGIN_MODAL).waitFor({ state: "visible", timeout: 5000 });
+      console.log(`[LoginPage.openModal] ✓ LOGIN_MODAL is now visible`);
+    } catch (err) {
+      console.log(`[LoginPage.openModal] ✕ LOGIN_MODAL did not become visible: ${err}`);
+      throw err;
+    }
+
+    // Wait for the input field
     console.log(`[LoginPage.openModal] Waiting for USERNAME_INPUT to be visible...`);
     try {
-      await this.page.locator(this.USERNAME_INPUT).waitFor({ state: "visible", timeout: 10000 });
-      console.log(`[LoginPage.openModal] ✓ USERNAME_INPUT is visible, modal opened successfully`);
+      await this.page.locator(this.USERNAME_INPUT).waitFor({ state: "visible", timeout: 5000 });
+      console.log(`[LoginPage.openModal] ✓ USERNAME_INPUT is visible, modal fully opened`);
     } catch (err) {
-      // Log the error for debugging but don't throw
-      console.log(`[LoginPage.openModal] ⚠️  WARNING: USERNAME_INPUT did not become visible within 10s. Proceeding anyway. Error: ${err}`);
+      // Log and continue - we'll try to fill anyway
+      console.log(`[LoginPage.openModal] ⚠️  USERNAME_INPUT not visible within 5s, but continuing. Error: ${err}`);
     }
   }
 

@@ -40,8 +40,20 @@ export class HomePage extends BasePage {
    * Navigate to the home page and wait for the product grid to populate.
    */
   async navigateToHome(): Promise<void> {
+    console.log(`[HomePage] Navigating to ${this.BASE_URL}...`);
     await this.page.goto(this.BASE_URL, { waitUntil: "domcontentloaded" });
+    console.log(`[HomePage] ✓ Page loaded (domcontentloaded)`);
+    
+    console.log(`[HomePage] Waiting for auth nav links to be ready...`);
+    try {
+      await this.page.locator("#login2, #signin2").first().waitFor({ state: "visible", timeout: 10000 });
+      console.log(`[HomePage] ✓ Auth nav links are ready`);
+    } catch (err) {
+      console.log(`[HomePage] ⚠️  Auth nav links not immediately visible: ${err}`);
+    }
+    
     await this.waitForProducts();
+    console.log(`[HomePage] ✓ navigateToHome complete`);
   }
 
   /**
@@ -62,7 +74,11 @@ export class HomePage extends BasePage {
   async waitForProducts(): Promise<void> {
     // Non-throwing: product AJAX can be slow in CI; tests assert on specific
     // elements themselves rather than relying on this setup guard.
-    await this.page.waitForSelector(this.PRODUCT_CARDS, { timeout: 30_000 }).catch(() => {});
+    console.log(`[HomePage] Waiting for product cards (timeout 30s)...`);
+    await this.page.waitForSelector(this.PRODUCT_CARDS, { timeout: 30_000 }).catch((err) => {
+      console.log(`[HomePage] ⚠️  Products not loaded within 30s: ${err}`);
+    });
+    console.log(`[HomePage] ✓ waitForProducts complete`);
   }
 
   /**
