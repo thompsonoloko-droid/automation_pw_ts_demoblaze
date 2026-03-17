@@ -146,35 +146,66 @@ export class SignupPage extends BasePage {
     await usernameLocator.waitFor({ state: "visible", timeout: 10000 });
     await passwordLocator.waitFor({ state: "visible", timeout: 10000 });
 
-    // Use fill() method - Playwright's native input method
-    // fill() is designed to set input values reliably
-
+    // Set values using fill()
     console.log(`[SignupPage.signup] Setting username via fill()...`);
     await usernameLocator.fill(username);
-    await this.page.waitForTimeout(300);
+    await this.page.waitForTimeout(500);
 
     console.log(`[SignupPage.signup] Setting password via fill()...`);
     await passwordLocator.fill(password);
-    await this.page.waitForTimeout(300);
+    await this.page.waitForTimeout(500);
 
-    // Verify values before submitting
+    // CRITICAL PRE-SUBMISSION DIAGNOSTICS
     const usernameValue = await usernameLocator.inputValue();
     const passwordValue = await passwordLocator.inputValue();
-
-    console.log(`[SignupPage.signup] Verification: username="${usernameValue}", password_len=${passwordValue.length}`);
+    
+    console.log(`\n[SignupPage.signup] ==== PRE-SUBMISSION CHECK ====`);
+    console.log(`[SignupPage.signup] Expected: username="${username}", password_len=${password.length}`);
+    console.log(`[SignupPage.signup] Actual  : username="${usernameValue}", password_len=${passwordValue.length}`);
+    
+    // Get HTML to verify form state
+    const formHtml = await this.page.locator("form").first().innerHTML().catch(() => "N/A");
+    console.log(`[SignupPage.signup] Form HTML length: ${formHtml ? formHtml.length : "N/A"}`);
+    
+    // Check if inputs are in DOM
+    const inputCount = await this.page.locator(this.USERNAME_INPUT).count();
+    console.log(`[SignupPage.signup] Username input elements in DOM: ${inputCount}`);
+    
+    // Get input attributes
+    const usernameType = await usernameLocator.getAttribute("type").catch(() => "N/A");
+    const usernameRequired = await usernameLocator.getAttribute("required").catch(() => "N/A");
+    console.log(`[SignupPage.signup] Username input type="${usernameType}", required="${usernameRequired}"`);
+    
+    // Get button state
+    const buttonEnabled = await this.page.locator(this.SIGNUP_BTN).isEnabled();
+    console.log(`[SignupPage.signup] Signup button enabled: ${buttonEnabled}`);
+    
+    // Try to get the actual DOM values directly
+    const domValues = await this.page.evaluate(() => {
+      const uInput = document.querySelector('#sign-username') as HTMLInputElement | null;
+      const pInput = document.querySelector('#sign-password') as HTMLInputElement | null;
+      return {
+        usernameDOM: uInput?.value || "NOT FOUND",
+        passwordDOM: pInput?.value || "NOT FOUND",
+      };
+    });
+    console.log(`[SignupPage.signup] DOM values: username="${domValues.usernameDOM}", password_len=${domValues.passwordDOM.length}`);
+    console.log(`[SignupPage.signup] ==== END PRE-SUBMISSION CHECK ====\n`);
 
     if (usernameValue !== username) {
+      console.log(`[SignupPage.signup] ✕ MISMATCH: Username not set correctly`);
       throw new Error(
         `Username not set: got "${usernameValue}", expected "${username}"`,
       );
     }
     if (passwordValue !== password) {
+      console.log(`[SignupPage.signup] ✕ MISMATCH: Password not set correctly`);
       throw new Error(
         `Password not set: length ${passwordValue.length}, expected ${password.length}`,
       );
     }
 
-    console.log(`[SignupPage.signup] ✓ Values verified, submitting...`);
+    console.log(`[SignupPage.signup] ✓ All values match, submitting form...`);
 
     // Register the dialog handler before clicking (needs to be synchronous)
     const alertPromise = new Promise<string>((resolve) => {
@@ -187,6 +218,7 @@ export class SignupPage extends BasePage {
     });
 
     // Submit the form
+    console.log(`[SignupPage.signup] Clicking signup button...`);
     await this.click(this.SIGNUP_BTN);
     console.log(`[SignupPage.signup] ✓ Form submitted, waiting for dialog...`);
     

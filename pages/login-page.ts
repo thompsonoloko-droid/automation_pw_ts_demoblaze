@@ -136,30 +136,61 @@ export class LoginPage extends BasePage {
     const passwordLocator = this.page.locator(this.PASSWORD_INPUT);
 
     // Use fill() method - Playwright's native input method
-    // fill() calls clear() then type(), both go through proper APIs
-
     console.log(`[LoginPage.login] Setting username via fill()...`);
     await usernameLocator.fill(username);
-    await this.page.waitForTimeout(300);
+    await this.page.waitForTimeout(500);
 
     console.log(`[LoginPage.login] Setting password via fill()...`);
     await passwordLocator.fill(password);
-    await this.page.waitForTimeout(300);
+    await this.page.waitForTimeout(500);
 
-    // Verify values are correct before submitting
+    // CRITICAL PRE-SUBMISSION DIAGNOSTICS
     const usernameValue = await usernameLocator.inputValue();
     const passwordValue = await passwordLocator.inputValue();
     
-    console.log(`[LoginPage.login] Verification: username="${usernameValue}", password_len=${passwordValue.length}`);
+    console.log(`\n[LoginPage.login] ==== PRE-SUBMISSION CHECK ====`);
+    console.log(`[LoginPage.login] Expected: username="${username}", password_len=${password.length}`);
+    console.log(`[LoginPage.login] Actual  : username="${usernameValue}", password_len=${passwordValue.length}`);
+    
+    // Get HTML to verify form state
+    const formHtml = await this.page.locator("form").first().innerHTML().catch(() => "N/A");
+    console.log(`[LoginPage.login] Form HTML length: ${formHtml ? formHtml.length : "N/A"}`);
+    
+    // Check if inputs are in DOM
+    const inputCount = await this.page.locator(this.USERNAME_INPUT).count();
+    console.log(`[LoginPage.login] Username input elements in DOM: ${inputCount}`);
+    
+    // Get input attributes  
+    const usernameType = await usernameLocator.getAttribute("type").catch(() => "N/A");
+    const usernameRequired = await usernameLocator.getAttribute("required").catch(() => "N/A");
+    console.log(`[LoginPage.login] Username input type="${usernameType}", required="${usernameRequired}"`);
+    
+    // Get button state
+    const buttonEnabled = await this.page.locator(this.LOGIN_BTN).isEnabled();
+    console.log(`[LoginPage.login] Login button enabled: ${buttonEnabled}`);
+    
+    // Try to get the actual DOM values directly
+    const domValues = await this.page.evaluate(() => {
+      const uInput = document.querySelector('#loginusername') as HTMLInputElement | null;
+      const pInput = document.querySelector('#loginpassword') as HTMLInputElement | null;
+      return {
+        usernameDOM: uInput?.value || "NOT FOUND",
+        passwordDOM: pInput?.value || "NOT FOUND",
+      };
+    });
+    console.log(`[LoginPage.login] DOM values: username="${domValues.usernameDOM}", password_len=${domValues.passwordDOM.length}`);
+    console.log(`[LoginPage.login] ==== END PRE-SUBMISSION CHECK ====\n`);
 
     if (usernameValue !== username) {
+      console.log(`[LoginPage.login] ✕ MISMATCH: Username not set correctly`);
       throw new Error(`Username not set: got "${usernameValue}", expected "${username}"`);
     }
     if (passwordValue !== password) {
+      console.log(`[LoginPage.login] ✕ MISMATCH: Password not set correctly`);
       throw new Error(`Password not set: length ${passwordValue.length}, expected ${password.length}`);
     }
 
-    console.log(`[LoginPage.login] ✓ All values verified, submitting...`);
+    console.log(`[LoginPage.login] ✓ All values match, submit form...`);
     
     // Submit the form
     await this.click(this.LOGIN_BTN);
