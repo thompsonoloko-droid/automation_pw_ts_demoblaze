@@ -43,17 +43,18 @@ export class HomePage extends BasePage {
     console.log(`[HomePage] Navigating to ${this.BASE_URL}...`);
     const startTime = Date.now();
     
-    // Use networkidle instead of just domcontentloaded for better reliability in CI
-    // This ensures all scripts have executed and resources loaded
-    await this.page.goto(this.BASE_URL, { waitUntil: "networkidle", timeout: 30000 });
+    // Use domcontentloaded (safe), but with explicit timeout
+    // Don't use networkidle - it hangs on sites with long-running requests
+    await this.page.goto(this.BASE_URL, { waitUntil: "domcontentloaded", timeout: 30000 });
     const loadTime = Date.now() - startTime;
-    console.log(`[HomePage] ✓ Page loaded (networkidle) in ${loadTime}ms`);
+    console.log(`[HomePage] ✓ Page loaded (domcontentloaded) in ${loadTime}ms`);
     
     // Verify we're on the right page
     const finalUrl = this.page.url();
     console.log(`[HomePage] Final URL: ${finalUrl}`);
     if (!finalUrl.includes("demoblaze")) {
-      console.log(`[HomePage] ⚠️ WARNING: URL doesn't contain 'demoblaze': ${finalUrl}`);
+      console.log(`[HomePage] ⚠️  WARNING: URL doesn't contain 'demoblaze': ${finalUrl}`);
+      throw new Error(`Unexpected URL after navigation: ${finalUrl}`);
     }
     
     // Verify basic page structure
@@ -76,11 +77,11 @@ export class HomePage extends BasePage {
     try {
       await this.page.locator("#login2, #signin2").first().waitFor({ 
         state: "visible", 
-        timeout: 10000 
+        timeout: 15000  // Increased from 10s to account for slow CI
       });
       console.log(`[HomePage] ✓ Auth nav links are ready`);
     } catch (err) {
-      console.log(`[HomePage] ✕ Auth nav links NOT visible after 10s: ${err}`);
+      console.log(`[HomePage] ✕ Auth nav links NOT visible after 15s: ${err}`);
       // Log nav element details for debugging
       const navHtml = await this.page.locator("nav").first().innerHTML().catch(() => "N/A");
       console.log(`[HomePage] Nav HTML length: ${navHtml === "N/A" ? "N/A" : navHtml.length}`);
