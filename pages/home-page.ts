@@ -43,9 +43,18 @@ export class HomePage extends BasePage {
     console.log(`[HomePage] Navigating to ${this.BASE_URL}...`);
     const startTime = Date.now();
     
-    await this.page.goto(this.BASE_URL, { waitUntil: "domcontentloaded" });
+    // Use networkidle instead of just domcontentloaded for better reliability in CI
+    // This ensures all scripts have executed and resources loaded
+    await this.page.goto(this.BASE_URL, { waitUntil: "networkidle", timeout: 30000 });
     const loadTime = Date.now() - startTime;
-    console.log(`[HomePage] ✓ Page loaded (domcontentloaded) in ${loadTime}ms`);
+    console.log(`[HomePage] ✓ Page loaded (networkidle) in ${loadTime}ms`);
+    
+    // Verify we're on the right page
+    const finalUrl = this.page.url();
+    console.log(`[HomePage] Final URL: ${finalUrl}`);
+    if (!finalUrl.includes("demoblaze")) {
+      console.log(`[HomePage] ⚠️ WARNING: URL doesn't contain 'demoblaze': ${finalUrl}`);
+    }
     
     // Verify basic page structure
     const pageTitle = await this.page.title();
@@ -53,6 +62,9 @@ export class HomePage extends BasePage {
     
     const navCount = await this.page.locator("nav").count();
     console.log(`[HomePage] Navigation bars found: ${navCount}`);
+    
+    const bodyContent = await this.page.locator("body").innerHTML().then(h => h.length);
+    console.log(`[HomePage] Page body HTML size: ${bodyContent} bytes`);
     
     // Check for auth links specifically
     const loginLinkCount = await this.page.locator("#login2").count();
@@ -68,13 +80,14 @@ export class HomePage extends BasePage {
       });
       console.log(`[HomePage] ✓ Auth nav links are ready`);
     } catch (err) {
-      console.log(`[HomePage] ⚠️  Auth nav links not immediately visible: ${err}`);
+      console.log(`[HomePage] ✕ Auth nav links NOT visible after 10s: ${err}`);
       // Log nav element details for debugging
       const navHtml = await this.page.locator("nav").first().innerHTML().catch(() => "N/A");
-      console.log(`[HomePage] Nav HTML length: ${navHtml.length}`);
-      if (navHtml !== "N/A") {
+      console.log(`[HomePage] Nav HTML length: ${navHtml === "N/A" ? "N/A" : navHtml.length}`);
+      if (navHtml !== "N/A" && navHtml.length > 0) {
         console.log(`[HomePage] Nav HTML snippet: ${navHtml.substring(0, 300)}`);
       }
+      throw err; // Throw so we know navigation failed
     }
     
     await this.waitForProducts();
