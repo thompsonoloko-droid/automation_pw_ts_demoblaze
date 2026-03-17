@@ -52,7 +52,7 @@ export class LoginPage extends BasePage {
     // Check if modal appears
     console.log(`[LoginPage.openModal] Checking if LOGIN_MODAL becomes visible...`);
     try {
-      await this.page.locator(this.LOGIN_MODAL).waitFor({ state: "visible", timeout: 5000 });
+      await this.page.locator(this.LOGIN_MODAL).waitFor({ state: "visible", timeout: 10000 });
       console.log(`[LoginPage.openModal] ✓ LOGIN_MODAL is now visible`);
     } catch (err) {
       console.log(`[LoginPage.openModal] ✕ LOGIN_MODAL did not become visible: ${err}`);
@@ -62,7 +62,7 @@ export class LoginPage extends BasePage {
     // Wait for the input field
     console.log(`[LoginPage.openModal] Waiting for USERNAME_INPUT to be visible...`);
     try {
-      await this.page.locator(this.USERNAME_INPUT).waitFor({ state: "visible", timeout: 5000 });
+      await this.page.locator(this.USERNAME_INPUT).waitFor({ state: "visible", timeout: 10000 });
       console.log(`[LoginPage.openModal] ✓ USERNAME_INPUT is visible, modal fully opened`);
     } catch (err) {
       // Log and continue - we'll try to fill anyway
@@ -94,22 +94,21 @@ export class LoginPage extends BasePage {
    * @param password - Demoblaze password.
    */
   async login(username: string, password: string): Promise<void> {
-    const WAIT_TIMEOUT = 1000;
+    const WAIT_TIMEOUT = 2000;  // Short wait since openModal() already waited
 
-    console.log(`[LoginPage.login START] username="${username}",
- password_len=${password.length}, timeout=${WAIT_TIMEOUT}ms`);
+    console.log(`[LoginPage.login START] username="${username}", password_len=${password.length}`);
 
     try {
       const usernameLocator = this.page.locator(this.USERNAME_INPUT);
       const passwordLocator = this.page.locator(this.PASSWORD_INPUT);
 
-      // Wait briefly for inputs to be visible (they should be from openModal)
+      // Brief wait for inputs to be visible (they should be from openModal)
       console.log(`[LoginPage] Checking if USERNAME_INPUT is visible...`);
       try {
         await usernameLocator.waitFor({ state: "visible", timeout: WAIT_TIMEOUT });
         console.log(`[LoginPage] ✓ USERNAME_INPUT is visible`);
       } catch (err) {
-        console.log(`[LoginPage] ⚠️  USERNAME_INPUT not visible within ${WAIT_TIMEOUT}ms, continuing anyway`);
+        console.log(`[LoginPage] ⚠️  USERNAME_INPUT not visible within ${WAIT_TIMEOUT}ms, attempting fill anyway`);
       }
 
       console.log(`[LoginPage] Checking if PASSWORD_INPUT is visible...`);
@@ -117,7 +116,7 @@ export class LoginPage extends BasePage {
         await passwordLocator.waitFor({ state: "visible", timeout: WAIT_TIMEOUT });
         console.log(`[LoginPage] ✓ PASSWORD_INPUT is visible`);
       } catch (err) {
-        console.log(`[LoginPage] ⚠️  PASSWORD_INPUT not visible within ${WAIT_TIMEOUT}ms, continuing anyway`);
+        console.log(`[LoginPage] ⚠️  PASSWORD_INPUT not visible within ${WAIT_TIMEOUT}ms, attempting fill anyway`);
       }
 
       // Set values DIRECTLY via DOM manipulation to guarantee they're set
@@ -134,10 +133,8 @@ export class LoginPage extends BasePage {
 
           if (uInput) {
             result.beforeUsername = uInput.value;
-            // Clear first, then set
             uInput.value = "";
             uInput.value = u;
-            // Trigger all relevant events
             uInput.dispatchEvent(new Event("input", { bubbles: true }));
             uInput.dispatchEvent(new Event("change", { bubbles: true }));
             uInput.dispatchEvent(new Event("blur", { bubbles: true }));
@@ -146,10 +143,8 @@ export class LoginPage extends BasePage {
 
           if (pInput) {
             result.beforePassword = pInput.value;
-            // Clear first, then set
             pInput.value = "";
             pInput.value = p;
-            // Trigger all relevant events
             pInput.dispatchEvent(new Event("input", { bubbles: true }));
             pInput.dispatchEvent(new Event("change", { bubbles: true }));
             pInput.dispatchEvent(new Event("blur", { bubbles: true }));
@@ -180,7 +175,6 @@ export class LoginPage extends BasePage {
 
       console.log(`[LoginPage] Verify result:`, JSON.stringify(verifyResult));
 
-      // Verify values match what we set
       if (verifyResult.usernameValue !== username || verifyResult.passwordValue !== password) {
         const err = `LoginPage fill failed: username="${verifyResult.usernameValue}" (expected "${username}"), password="${verifyResult.passwordValue}" (expected "${password}")`;
         console.log(`[LoginPage] ✕ ${err}`);
@@ -188,14 +182,10 @@ export class LoginPage extends BasePage {
       }
 
       console.log(`[LoginPage] ✓ Values verified correctly`);
-
-      // Extra wait to ensure framework state is updated
       await this.page.waitForTimeout(300);
-
-      // Submit the form
       console.log(`[LoginPage] Submitting form...`);
       await this.click(this.LOGIN_BTN);
-      console.log(`[LoginPage] ✓ Form submitted, waiting for response`);
+      console.log(`[LoginPage] ✓ Form submitted`);
     } catch (err) {
       console.log(`[LoginPage.login ERROR] ${err}`);
       throw err;

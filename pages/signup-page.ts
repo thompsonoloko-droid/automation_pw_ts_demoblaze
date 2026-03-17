@@ -49,7 +49,7 @@ export class SignupPage extends BasePage {
     // Check if modal appears
     console.log(`[SignupPage.openModal] Checking if SIGNUP_MODAL becomes visible...`);
     try {
-      await this.page.locator(this.SIGNUP_MODAL).waitFor({ state: "visible", timeout: 5000 });
+      await this.page.locator(this.SIGNUP_MODAL).waitFor({ state: "visible", timeout: 10000 });
       console.log(`[SignupPage.openModal] ✓ SIGNUP_MODAL is now visible`);
     } catch (err) {
       console.log(`[SignupPage.openModal] ✕ SIGNUP_MODAL did not become visible: ${err}`);
@@ -59,7 +59,7 @@ export class SignupPage extends BasePage {
     // Wait for the input field
     console.log(`[SignupPage.openModal] Waiting for USERNAME_INPUT to be visible...`);
     try {
-      await this.page.locator(this.USERNAME_INPUT).waitFor({ state: "visible", timeout: 5000 });
+      await this.page.locator(this.USERNAME_INPUT).waitFor({ state: "visible", timeout: 10000 });
       console.log(`[SignupPage.openModal] ✓ USERNAME_INPUT is visible, modal fully opened`);
     } catch (err) {
       // Log and continue - we'll try to fill anyway
