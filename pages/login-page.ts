@@ -141,9 +141,9 @@ export class LoginPage extends BasePage {
     // Set username via direct DOM manipulation
     await this.page.evaluate(
       (selector, value) => {
-        const el = document.querySelector(selector) as HTMLInputElement;
+        const el = document.querySelector(selector);
         if (el) {
-          el.value = value;
+          (el as any).value = value;
           el.dispatchEvent(new Event("input", { bubbles: true }));
           el.dispatchEvent(new Event("change", { bubbles: true }));
           el.dispatchEvent(new Event("blur", { bubbles: true }));
@@ -157,9 +157,9 @@ export class LoginPage extends BasePage {
     // Set password via direct DOM manipulation
     await this.page.evaluate(
       (selector, value) => {
-        const el = document.querySelector(selector) as HTMLInputElement;
+        const el = document.querySelector(selector);
         if (el) {
-          el.value = value;
+          (el as any).value = value;
           el.dispatchEvent(new Event("input", { bubbles: true }));
           el.dispatchEvent(new Event("change", { bubbles: true }));
           el.dispatchEvent(new Event("blur", { bubbles: true }));
@@ -228,9 +228,9 @@ export class LoginPage extends BasePage {
     // This bypasses any timing issues with keyboard input
     await this.page.evaluate(
       (selector, value) => {
-        const el = document.querySelector(selector) as HTMLInputElement;
+        const el = document.querySelector(selector);
         if (el) {
-          el.value = value;
+          (el as any).value = value;
           el.dispatchEvent(new Event("input", { bubbles: true }));
           el.dispatchEvent(new Event("change", { bubbles: true }));
           el.dispatchEvent(new Event("blur", { bubbles: true }));
@@ -248,9 +248,9 @@ export class LoginPage extends BasePage {
     // Set password field
     await this.page.evaluate(
       (selector, value) => {
-        const el = document.querySelector(selector) as HTMLInputElement;
+        const el = document.querySelector(selector);
         if (el) {
-          el.value = value;
+          (el as any).value = value;
           el.dispatchEvent(new Event("input", { bubbles: true }));
           el.dispatchEvent(new Event("change", { bubbles: true }));
           el.dispatchEvent(new Event("blur", { bubbles: true }));
