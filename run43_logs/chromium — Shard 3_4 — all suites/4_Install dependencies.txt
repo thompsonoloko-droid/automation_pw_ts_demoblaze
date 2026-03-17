@@ -1,0 +1,17 @@
+﻿2026-03-17T19:35:32.0481693Z ##[group]Run npm ci
+2026-03-17T19:35:32.0482012Z [36;1mnpm ci[0m
+2026-03-17T19:35:32.0543820Z shell: /usr/bin/bash -e {0}
+2026-03-17T19:35:32.0544160Z ##[endgroup]
+2026-03-17T19:35:34.9771780Z 
+2026-03-17T19:35:34.9781491Z > automation_pw_ts_demoblaze@1.0.0 prepare
+2026-03-17T19:35:34.9782141Z > simple-git-hooks
+2026-03-17T19:35:34.9782355Z 
+2026-03-17T19:35:35.0325473Z [INFO] Successfully set the pre-commit with command: npm run quality
+2026-03-17T19:35:35.1044224Z [INFO] Successfully set all git hooks
+2026-03-17T19:35:35.1110310Z 
+2026-03-17T19:35:35.1110855Z added 98 packages, and audited 99 packages in 3s
+2026-03-17T19:35:35.1111360Z 
+2026-03-17T19:35:35.1111604Z 33 packages are looking for funding
+2026-03-17T19:35:35.1111925Z   run `npm fund` for details
+2026-03-17T19:35:35.1121529Z 
+2026-03-17T19:35:35.1121724Z found 0 vulnerabilities

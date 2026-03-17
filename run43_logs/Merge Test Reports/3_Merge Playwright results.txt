@@ -1,0 +1,29 @@
+﻿2026-03-17T19:37:45.6301252Z ##[group]Run npm init -y
+2026-03-17T19:37:45.6302399Z [36;1mnpm init -y[0m
+2026-03-17T19:37:45.6303390Z [36;1mnpm install -D @playwright/test[0m
+2026-03-17T19:37:45.6305070Z [36;1mnpx playwright merge-reports --output-folder merged-results all-reports[0m
+2026-03-17T19:37:45.6362002Z shell: /usr/bin/bash -e {0}
+2026-03-17T19:37:45.6362997Z ##[endgroup]
+2026-03-17T19:37:46.4199943Z Wrote to /home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/package.json:
+2026-03-17T19:37:46.4200932Z 
+2026-03-17T19:37:46.4201113Z {
+2026-03-17T19:37:46.4201529Z   "name": "automation_pw_ts_demoblaze",
+2026-03-17T19:37:46.4202072Z   "version": "1.0.0",
+2026-03-17T19:37:46.4202504Z   "main": "index.js",
+2026-03-17T19:37:46.4202945Z   "scripts": {
+2026-03-17T19:37:46.4203444Z     "test": "echo \"Error: no test specified\" && exit 1"
+2026-03-17T19:37:46.4204218Z   },
+2026-03-17T19:37:46.4204608Z   "keywords": [],
+2026-03-17T19:37:46.4205045Z   "author": "",
+2026-03-17T19:37:46.4205478Z   "license": "ISC",
+2026-03-17T19:37:46.4206029Z   "description": ""
+2026-03-17T19:37:46.4206427Z }
+2026-03-17T19:37:46.4206625Z 
+2026-03-17T19:37:46.4206670Z 
+2026-03-17T19:37:46.4220422Z 
+2026-03-17T19:37:48.1627783Z 
+2026-03-17T19:37:48.1628691Z added 3 packages, and audited 4 packages in 2s
+2026-03-17T19:37:48.1635946Z 
+2026-03-17T19:37:48.1636610Z found 0 vulnerabilities
+2026-03-17T19:37:49.1461565Z error: unknown option '--output-folder'
+2026-03-17T19:37:49.1670345Z ##[error]Process completed with exit code 1.

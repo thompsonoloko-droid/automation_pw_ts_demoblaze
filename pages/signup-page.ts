@@ -120,14 +120,8 @@ export class SignupPage extends BasePage {
   /**
    * Fill and submit the signup form, then capture and return the alert message.
    *
-   * Uses Playwright's native type() and keyboard methods to fill form fields.
-   * This properly propagates events through the framework event handlers,
-   * ensuring compatible behavior in both local and CI (headless) environments.
-   *
-   * page.evaluate() approach was setting DOM values directly but bypassing
-   * jQuery/framework event propagation, causing "Please fill out" validation
-   * errors in CI. The type() method simulates actual user typing, ensuring
-   * proper event chain from keyboard -> input -> jQuery handlers.
+   * Fills form fields using Playwright fill(), then clicks submit button.
+   * This is the most reliable method that works in both local and CI environments.
    *
    * Demoblaze shows a browser alert on both success ("sign up successful")
    * and failure ("This user already exist.").
@@ -137,43 +131,42 @@ export class SignupPage extends BasePage {
    * @returns The alert dialog message text.
    */
   async signup(username: string, password: string): Promise<string> {
-    console.log(`[SignupPage.signup] username="${username}" password_len=${password.length}`);
-
     const usernameLocator = this.page.locator(this.USERNAME_INPUT);
     const passwordLocator = this.page.locator(this.PASSWORD_INPUT);
+    const submitBtn = this.page.locator(this.SIGNUP_BTN);
 
-    // Wait for inputs
+    // Wait for inputs to be ready
     await usernameLocator.waitFor({ state: "visible", timeout: 10000 });
     await passwordLocator.waitFor({ state: "visible", timeout: 10000 });
+    await submitBtn.waitFor({ state: "visible", timeout: 10000 });
 
-    // Fill values
+    // Fill form fields
     await usernameLocator.fill(username);
-    await this.page.waitForTimeout(200);
+    await this.page.waitForTimeout(100);
     await passwordLocator.fill(password);
-    await this.page.waitForTimeout(200);
+    await this.page.waitForTimeout(100);
 
-    // Register dialog handler before submission
-    const alertPromise = new Promise<string>((resolve) => {
-      this.page.once("dialog", async (dialog) => {
-        const message = dialog.message();
-        await dialog.accept();
-        resolve(message);
-      });
-    });
+    // Register dialog handler BEFORE clicking button
+    // Demoblaze will show an alert on successful submission or validation error
+    const alertPromise = Promise.race([
+      new Promise<string>((resolve) => {
+        this.page.once("dialog", async (dialog) => {
+          const message = dialog.message();
+          await dialog.accept();
+          resolve(message);
+        });
+      }),
+      // Timeout after 15s if dialog never appears
+      new Promise<string>((_resolve, reject) => {
+        setTimeout(() => reject(new Error("Dialog did not appear within 15s")), 15000);
+      }),
+    ]);
 
-    // Submit form using requestSubmit() - native form submission
-    console.log(`[SignupPage.signup] Submitting form via requestSubmit()...`);
-    await this.page.evaluate(() => {
-      const form = document.querySelector('form') as HTMLFormElement | null;
-      if (form) {
-        form.requestSubmit();  // Triggers form submission event
-      } else {
-        throw new Error('Form not found');
-      }
-    });
+    // Click submit button to trigger form submission
+    await submitBtn.click();
 
+    // Wait for dialog and return message (or timeout error)
     const result = await alertPromise;
-    console.log(`[SignupPage.signup] Dialog: "${result}"`);
     return result;
   }
 

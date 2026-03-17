@@ -123,34 +123,30 @@ export class LoginPage extends BasePage {
   /**
    * Fill and submit the login form.
    *
-   * Uses standard Playwright API (fill, type) instead of page.evaluate()
-   * as it's more reliable in headless CI environments.
+   * Fills form fields using Playwright fill(), then clicks the login button.
+   * This is the most reliable method that works in both local and CI environments.
    *
    * @param username - Demoblaze username.
    * @param password - Demoblaze password.
    */
   async login(username: string, password: string): Promise<void> {
-    console.log(`[LoginPage.login] username="${username}" password_len=${password.length}`);
-
     const usernameLocator = this.page.locator(this.USERNAME_INPUT);
     const passwordLocator = this.page.locator(this.PASSWORD_INPUT);
+    const loginBtn = this.page.locator(this.LOGIN_BTN);
 
-    // Fill values
+    // Wait for elements
+    await usernameLocator.waitFor({ state: "visible", timeout: 10000 });
+    await passwordLocator.waitFor({ state: "visible", timeout: 10000 });
+    await loginBtn.waitFor({ state: "visible", timeout: 10000 });
+
+    // Fill form fields
     await usernameLocator.fill(username);
-    await this.page.waitForTimeout(200);
+    await this.page.waitForTimeout(100);
     await passwordLocator.fill(password);
-    await this.page.waitForTimeout(200);
+    await this.page.waitForTimeout(100);
 
-    // Submit form using requestSubmit() - native form submission
-    console.log(`[LoginPage.login] Submitting form via requestSubmit()...`);
-    await this.page.evaluate(() => {
-      const form = document.querySelector('form') as HTMLFormElement | null;
-      if (form) {
-        form.requestSubmit();  // Triggers form submission event
-      } else {
-        throw new Error('Form not found');
-      }
-    });
+    // Click submit button - this triggers the form submission
+    await loginBtn.click();
 
     // Wait for page response
     await this.page.waitForLoadState("networkidle", { timeout: 5000 }).catch(() => {
@@ -194,15 +190,42 @@ export class LoginPage extends BasePage {
    * @returns The alert dialog message text.
    */
   async loginExpectAlert(username: string, password: string): Promise<string> {
-    const alertPromise = new Promise<string>((resolve) => {
-      this.page.once("dialog", async (dialog) => {
-        const message = dialog.message();
-        await dialog.accept();
-        resolve(message);
-      });
-    });
-    await this.login(username, password);
-    return alertPromise;
+    // Register dialog handler BEFORE clicking button
+    const alertPromise = Promise.race([
+      new Promise<string>((resolve) => {
+        this.page.once("dialog", async (dialog) => {
+          const message = dialog.message();
+          await dialog.accept();
+          resolve(message);
+        });
+      }),
+      // Timeout after 15s if dialog never appears
+      new Promise<string>((_resolve, reject) => {
+        setTimeout(() => reject(new Error("Dialog did not appear within 15s")), 15000);
+      }),
+    ]);
+
+    const usernameLocator = this.page.locator(this.USERNAME_INPUT);
+    const passwordLocator = this.page.locator(this.PASSWORD_INPUT);
+    const loginBtn = this.page.locator(this.LOGIN_BTN);
+
+    // Wait for elements
+    await usernameLocator.waitFor({ state: "visible", timeout: 10000 });
+    await passwordLocator.waitFor({ state: "visible", timeout: 10000 });
+    await loginBtn.waitFor({ state: "visible", timeout: 10000 });
+
+    // Fill form fields
+    await usernameLocator.fill(username);
+    await this.page.waitForTimeout(100);
+    await passwordLocator.fill(password);
+    await this.page.waitForTimeout(100);
+
+    // Click submit button to trigger the dialog
+    await loginBtn.click();
+
+    // Wait for dialog and return message
+    const result = await alertPromise;
+    return result;
   }
 
   // ---------------------------------------------------------------------------

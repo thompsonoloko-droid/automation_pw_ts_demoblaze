@@ -1,0 +1,11 @@
+﻿2026-03-17T19:37:49.1758073Z ##[group]Run actions/upload-artifact@v4
+2026-03-17T19:37:49.1758430Z with:
+2026-03-17T19:37:49.1758665Z   name: playwright-merged-report
+2026-03-17T19:37:49.1758948Z   path: merged-results/
+2026-03-17T19:37:49.1759206Z   retention-days: 30
+2026-03-17T19:37:49.1759445Z   if-no-files-found: warn
+2026-03-17T19:37:49.1759923Z   compression-level: 6
+2026-03-17T19:37:49.1760163Z   overwrite: false
+2026-03-17T19:37:49.1760405Z   include-hidden-files: false
+2026-03-17T19:37:49.1760703Z ##[endgroup]
+2026-03-17T19:37:49.4003858Z ##[warning]No files were found with the provided path: merged-results/. No artifacts will be uploaded.

@@ -1,0 +1,1794 @@
+﻿2026-03-17T19:35:54.1921000Z ##[group]Run if [ -n "" ]; then
+2026-03-17T19:35:54.1921312Z [36;1mif [ -n "" ]; then[0m
+2026-03-17T19:35:54.1921550Z [36;1m  npx playwright test tests// \[0m
+2026-03-17T19:35:54.1921830Z [36;1m    --project=chromium \[0m
+2026-03-17T19:35:54.1922089Z [36;1m    --shard=1/4 \[0m
+2026-03-17T19:35:54.1922332Z [36;1m    --reporter=json,github,html[0m
+2026-03-17T19:35:54.1922569Z [36;1melse[0m
+2026-03-17T19:35:54.1922758Z [36;1m  npx playwright test \[0m
+2026-03-17T19:35:54.1923022Z [36;1m    --project=chromium \[0m
+2026-03-17T19:35:54.1923246Z [36;1m    --shard=1/4 \[0m
+2026-03-17T19:35:54.1923470Z [36;1m    --reporter=json,github,html[0m
+2026-03-17T19:35:54.1923708Z [36;1mfi[0m
+2026-03-17T19:35:54.1972979Z shell: /usr/bin/bash -e {0}
+2026-03-17T19:35:54.1973219Z env:
+2026-03-17T19:35:54.1973377Z   CI: true
+2026-03-17T19:35:54.1973543Z   TEST_USERNAME: 
+2026-03-17T19:35:54.1973725Z   TEST_PASSWORD: 
+2026-03-17T19:35:54.1973905Z   CHECKOUT_NAME: 
+2026-03-17T19:35:54.1974085Z   CHECKOUT_COUNTRY: 
+2026-03-17T19:35:54.1974301Z   CHECKOUT_CITY: 
+2026-03-17T19:35:54.1974494Z   CHECKOUT_CARD: 
+2026-03-17T19:35:54.1974658Z   CHECKOUT_MONTH: 
+2026-03-17T19:35:54.1974834Z   CHECKOUT_YEAR: 
+2026-03-17T19:35:54.1975117Z ##[endgroup]
+2026-03-17T19:35:55.5782418Z [dotenv@17.3.1] injecting env (2) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+2026-03-17T19:36:04.6841978Z {
+2026-03-17T19:36:04.6854864Z   "config": {
+2026-03-17T19:36:04.6856826Z     "configFile": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/playwright.config.ts",
+2026-03-17T19:36:04.6858110Z     "rootDir": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/tests",
+2026-03-17T19:36:04.6858856Z     "forbidOnly": true,
+2026-03-17T19:36:04.6859211Z     "fullyParallel": true,
+2026-03-17T19:36:04.6860089Z     "globalSetup": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/global-setup.ts",
+2026-03-17T19:36:04.6860934Z     "globalTeardown": null,
+2026-03-17T19:36:04.6861317Z     "globalTimeout": 0,
+2026-03-17T19:36:04.6861642Z     "grep": {},
+2026-03-17T19:36:04.6861943Z     "grepInvert": null,
+2026-03-17T19:36:04.6862275Z     "maxFailures": 0,
+2026-03-17T19:36:04.6862591Z     "metadata": {
+2026-03-17T19:36:04.6862881Z       "ci": {
+2026-03-17T19:36:04.6863922Z         "commitHref": "https://github.com/thompsonoloko-droid/automation_pw_ts_demoblaze/commit/e89a0e9b41412db8bdedb25750e9c930c3267581",
+2026-03-17T19:36:04.6865283Z         "commitHash": "e89a0e9b41412db8bdedb25750e9c930c3267581",
+2026-03-17T19:36:04.6866352Z         "buildHref": "https://github.com/thompsonoloko-droid/automation_pw_ts_demoblaze/actions/runs/23212911779"
+2026-03-17T19:36:04.6867176Z       },
+2026-03-17T19:36:04.6867454Z       "gitCommit": {
+2026-03-17T19:36:04.6867823Z         "shortHash": "e89a0e9",
+2026-03-17T19:36:04.6868332Z         "hash": "e89a0e9b41412db8bdedb25750e9c930c3267581",
+2026-03-17T19:36:04.6869213Z         "subject": "Fix: Use Playwright type() method instead of page.evaluate() for form filling",
+2026-03-17T19:36:04.6875429Z         "body": "Fix: Use Playwright type() method instead of page.evaluate() for form filling\n\n**CRITICAL CHANGE** - Switch from page.evaluate() (unreliable in headless CI) to native\nPlaywright API:\n\n- Focus on field before typing (ensures field is ready)\n- Clear field with Ctrl+A + Delete (more reliable than direct value assignment)\n- Use locator.type() with 50ms delay between keystrokes (simulates human typing)\n- Verify via locator.inputValue() before submitting\n- Remove page.evaluate() which doesn't work reliably in CI headless mode\n\nThis is the fundamental fix for the CI failures. page.evaluate() was setting\nvalues directly on the DOM but the Demoblaze JavaScript wasn't seeing them.\nUsing standard Playwright type() methods ensures compatibility with the app's\nevent handling.\n",
+2026-03-17T19:36:04.6880324Z         "author": {
+2026-03-17T19:36:04.6880707Z           "name": "thompsonoloko-droid",
+2026-03-17T19:36:04.6881224Z           "email": "thompson.oloko@gmail.com",
+2026-03-17T19:36:04.6881970Z           "time": 1773776112000
+2026-03-17T19:36:04.6882319Z         },
+2026-03-17T19:36:04.6882597Z         "committer": {
+2026-03-17T19:36:04.6882995Z           "name": "thompsonoloko-droid",
+2026-03-17T19:36:04.6883493Z           "email": "thompson.oloko@gmail.com",
+2026-03-17T19:36:04.6883966Z           "time": 1773776112000
+2026-03-17T19:36:04.6884306Z         },
+2026-03-17T19:36:04.6884587Z         "branch": "main"
+2026-03-17T19:36:04.6884900Z       },
+2026-03-17T19:36:04.6891237Z       "actualWorkers": 4
+2026-03-17T19:36:04.6891611Z     },
+2026-03-17T19:36:04.6891960Z     "preserveOutput": "always",
+2026-03-17T19:36:04.6892347Z     "projects": [
+2026-03-17T19:36:04.6892641Z       {
+2026-03-17T19:36:04.6893421Z         "outputDir": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/test-results",
+2026-03-17T19:36:04.6894243Z         "repeatEach": 1,
+2026-03-17T19:36:04.6894580Z         "retries": 3,
+2026-03-17T19:36:04.6894915Z         "metadata": {
+2026-03-17T19:36:04.6895444Z           "ci": {
+2026-03-17T19:36:04.6896493Z             "commitHref": "https://github.com/thompsonoloko-droid/automation_pw_ts_demoblaze/commit/e89a0e9b41412db8bdedb25750e9c930c3267581",
+2026-03-17T19:36:04.6897694Z             "commitHash": "e89a0e9b41412db8bdedb25750e9c930c3267581",
+2026-03-17T19:36:04.6898765Z             "buildHref": "https://github.com/thompsonoloko-droid/automation_pw_ts_demoblaze/actions/runs/23212911779"
+2026-03-17T19:36:04.6901848Z           },
+2026-03-17T19:36:04.6902162Z           "gitCommit": {
+2026-03-17T19:36:04.6902576Z             "shortHash": "e89a0e9",
+2026-03-17T19:36:04.6903131Z             "hash": "e89a0e9b41412db8bdedb25750e9c930c3267581",
+2026-03-17T19:36:04.6904059Z             "subject": "Fix: Use Playwright type() method instead of page.evaluate() for form filling",
+2026-03-17T19:36:04.6910269Z             "body": "Fix: Use Playwright type() method instead of page.evaluate() for form filling\n\n**CRITICAL CHANGE** - Switch from page.evaluate() (unreliable in headless CI) to native\nPlaywright API:\n\n- Focus on field before typing (ensures field is ready)\n- Clear field with Ctrl+A + Delete (more reliable than direct value assignment)\n- Use locator.type() with 50ms delay between keystrokes (simulates human typing)\n- Verify via locator.inputValue() before submitting\n- Remove page.evaluate() which doesn't work reliably in CI headless mode\n\nThis is the fundamental fix for the CI failures. page.evaluate() was setting\nvalues directly on the DOM but the Demoblaze JavaScript wasn't seeing them.\nUsing standard Playwright type() methods ensures compatibility with the app's\nevent handling.\n",
+2026-03-17T19:36:04.6915301Z             "author": {
+2026-03-17T19:36:04.6915720Z               "name": "thompsonoloko-droid",
+2026-03-17T19:36:04.6916259Z               "email": "thompson.oloko@gmail.com",
+2026-03-17T19:36:04.6916753Z               "time": 1773776112000
+2026-03-17T19:36:04.6917127Z             },
+2026-03-17T19:36:04.6917426Z             "committer": {
+2026-03-17T19:36:04.6917855Z               "name": "thompsonoloko-droid",
+2026-03-17T19:36:04.6918379Z               "email": "thompson.oloko@gmail.com",
+2026-03-17T19:36:04.6918860Z               "time": 1773776112000
+2026-03-17T19:36:04.6919224Z             },
+2026-03-17T19:36:04.6919514Z             "branch": "main"
+2026-03-17T19:36:04.6919858Z           },
+2026-03-17T19:36:04.6920147Z           "actualWorkers": 4
+2026-03-17T19:36:04.6920496Z         },
+2026-03-17T19:36:04.6920766Z         "id": "chromium",
+2026-03-17T19:36:04.6921111Z         "name": "chromium",
+2026-03-17T19:36:04.6921883Z         "testDir": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/tests",
+2026-03-17T19:36:04.6922636Z         "testIgnore": [],
+2026-03-17T19:36:04.6922974Z         "testMatch": [
+2026-03-17T19:36:04.6923397Z           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+2026-03-17T19:36:04.6923810Z         ],
+2026-03-17T19:36:04.6924088Z         "timeout": 90000
+2026-03-17T19:36:04.6924987Z       },
+2026-03-17T19:36:04.6925396Z       {
+2026-03-17T19:36:04.6926199Z         "outputDir": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/test-results",
+2026-03-17T19:36:04.6927005Z         "repeatEach": 1,
+2026-03-17T19:36:04.6927334Z         "retries": 3,
+2026-03-17T19:36:04.6927654Z         "metadata": {
+2026-03-17T19:36:04.6927960Z           "ci": {
+2026-03-17T19:36:04.6929011Z             "commitHref": "https://github.com/thompsonoloko-droid/automation_pw_ts_demoblaze/commit/e89a0e9b41412db8bdedb25750e9c930c3267581",
+2026-03-17T19:36:04.6930218Z             "commitHash": "e89a0e9b41412db8bdedb25750e9c930c3267581",
+2026-03-17T19:36:04.6931296Z             "buildHref": "https://github.com/thompsonoloko-droid/automation_pw_ts_demoblaze/actions/runs/23212911779"
+2026-03-17T19:36:04.6932247Z           },
+2026-03-17T19:36:04.6932534Z           "gitCommit": {
+2026-03-17T19:36:04.6932920Z             "shortHash": "e89a0e9",
+2026-03-17T19:36:04.6933465Z             "hash": "e89a0e9b41412db8bdedb25750e9c930c3267581",
+2026-03-17T19:36:04.6934375Z             "subject": "Fix: Use Playwright type() method instead of page.evaluate() for form filling",
+2026-03-17T19:36:04.6941021Z             "body": "Fix: Use Playwright type() method instead of page.evaluate() for form filling\n\n**CRITICAL CHANGE** - Switch from page.evaluate() (unreliable in headless CI) to native\nPlaywright API:\n\n- Focus on field before typing (ensures field is ready)\n- Clear field with Ctrl+A + Delete (more reliable than direct value assignment)\n- Use locator.type() with 50ms delay between keystrokes (simulates human typing)\n- Verify via locator.inputValue() before submitting\n- Remove page.evaluate() which doesn't work reliably in CI headless mode\n\nThis is the fundamental fix for the CI failures. page.evaluate() was setting\nvalues directly on the DOM but the Demoblaze JavaScript wasn't seeing them.\nUsing standard Playwright type() methods ensures compatibility with the app's\nevent handling.\n",
+2026-03-17T19:36:04.6946479Z             "author": {
+2026-03-17T19:36:04.6946896Z               "name": "thompsonoloko-droid",
+2026-03-17T19:36:04.6947427Z               "email": "thompson.oloko@gmail.com",
+2026-03-17T19:36:04.6947913Z               "time": 1773776112000
+2026-03-17T19:36:04.6948279Z             },
+2026-03-17T19:36:04.6948563Z             "committer": {
+2026-03-17T19:36:04.6948987Z               "name": "thompsonoloko-droid",
+2026-03-17T19:36:04.6949516Z               "email": "thompson.oloko@gmail.com",
+2026-03-17T19:36:04.6949995Z               "time": 1773776112000
+2026-03-17T19:36:04.6950866Z             },
+2026-03-17T19:36:04.6951164Z             "branch": "main"
+2026-03-17T19:36:04.6951507Z           },
+2026-03-17T19:36:04.6951798Z           "actualWorkers": 4
+2026-03-17T19:36:04.6952141Z         },
+2026-03-17T19:36:04.6952411Z         "id": "firefox",
+2026-03-17T19:36:04.6952745Z         "name": "firefox",
+2026-03-17T19:36:04.6953511Z         "testDir": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/tests",
+2026-03-17T19:36:04.6954271Z         "testIgnore": [],
+2026-03-17T19:36:04.6954609Z         "testMatch": [
+2026-03-17T19:36:04.6955140Z           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+2026-03-17T19:36:04.6955557Z         ],
+2026-03-17T19:36:04.6955836Z         "timeout": 90000
+2026-03-17T19:36:04.6956144Z       },
+2026-03-17T19:36:04.6956404Z       {
+2026-03-17T19:36:04.6957367Z         "outputDir": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/test-results",
+2026-03-17T19:36:04.6958420Z         "repeatEach": 1,
+2026-03-17T19:36:04.6986176Z         "retries": 3,
+2026-03-17T19:36:04.6986549Z         "metadata": {
+2026-03-17T19:36:04.6986879Z           "ci": {
+2026-03-17T19:36:04.6987948Z             "commitHref": "https://github.com/thompsonoloko-droid/automation_pw_ts_demoblaze/commit/e89a0e9b41412db8bdedb25750e9c930c3267581",
+2026-03-17T19:36:04.6989167Z             "commitHash": "e89a0e9b41412db8bdedb25750e9c930c3267581",
+2026-03-17T19:36:04.6990506Z             "buildHref": "https://github.com/thompsonoloko-droid/automation_pw_ts_demoblaze/actions/runs/23212911779"
+2026-03-17T19:36:04.6991354Z           },
+2026-03-17T19:36:04.6991649Z           "gitCommit": {
+2026-03-17T19:36:04.6992043Z             "shortHash": "e89a0e9",
+2026-03-17T19:36:04.6992572Z             "hash": "e89a0e9b41412db8bdedb25750e9c930c3267581",
+2026-03-17T19:36:04.6993482Z             "subject": "Fix: Use Playwright type() method instead of page.evaluate() for form filling",
+2026-03-17T19:36:04.7000489Z             "body": "Fix: Use Playwright type() method instead of page.evaluate() for form filling\n\n**CRITICAL CHANGE** - Switch from page.evaluate() (unreliable in headless CI) to native\nPlaywright API:\n\n- Focus on field before typing (ensures field is ready)\n- Clear field with Ctrl+A + Delete (more reliable than direct value assignment)\n- Use locator.type() with 50ms delay between keystrokes (simulates human typing)\n- Verify via locator.inputValue() before submitting\n- Remove page.evaluate() which doesn't work reliably in CI headless mode\n\nThis is the fundamental fix for the CI failures. page.evaluate() was setting\nvalues directly on the DOM but the Demoblaze JavaScript wasn't seeing them.\nUsing standard Playwright type() methods ensures compatibility with the app's\nevent handling.\n",
+2026-03-17T19:36:04.7005520Z             "author": {
+2026-03-17T19:36:04.7005953Z               "name": "thompsonoloko-droid",
+2026-03-17T19:36:04.7006679Z               "email": "thompson.oloko@gmail.com",
+2026-03-17T19:36:04.7007179Z               "time": 1773776112000
+2026-03-17T19:36:04.7007549Z             },
+2026-03-17T19:36:04.7007846Z             "committer": {
+2026-03-17T19:36:04.7008273Z               "name": "thompsonoloko-droid",
+2026-03-17T19:36:04.7008798Z               "email": "thompson.oloko@gmail.com",
+2026-03-17T19:36:04.7009284Z               "time": 1773776112000
+2026-03-17T19:36:04.7009646Z             },
+2026-03-17T19:36:04.7009943Z             "branch": "main"
+2026-03-17T19:36:04.7010292Z           },
+2026-03-17T19:36:04.7010583Z           "actualWorkers": 4
+2026-03-17T19:36:04.7010921Z         },
+2026-03-17T19:36:04.7011189Z         "id": "webkit",
+2026-03-17T19:36:04.7011516Z         "name": "webkit",
+2026-03-17T19:36:04.7012281Z         "testDir": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/tests",
+2026-03-17T19:36:04.7013031Z         "testIgnore": [],
+2026-03-17T19:36:04.7013380Z         "testMatch": [
+2026-03-17T19:36:04.7013767Z           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+2026-03-17T19:36:04.7014174Z         ],
+2026-03-17T19:36:04.7014447Z         "timeout": 90000
+2026-03-17T19:36:04.7014766Z       },
+2026-03-17T19:36:04.7015164Z       {
+2026-03-17T19:36:04.7015937Z         "outputDir": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/test-results",
+2026-03-17T19:36:04.7016742Z         "repeatEach": 1,
+2026-03-17T19:36:04.7017079Z         "retries": 3,
+2026-03-17T19:36:04.7017395Z         "metadata": {
+2026-03-17T19:36:04.7017700Z           "ci": {
+2026-03-17T19:36:04.7018746Z             "commitHref": "https://github.com/thompsonoloko-droid/automation_pw_ts_demoblaze/commit/e89a0e9b41412db8bdedb25750e9c930c3267581",
+2026-03-17T19:36:04.7019951Z             "commitHash": "e89a0e9b41412db8bdedb25750e9c930c3267581",
+2026-03-17T19:36:04.7021021Z             "buildHref": "https://github.com/thompsonoloko-droid/automation_pw_ts_demoblaze/actions/runs/23212911779"
+2026-03-17T19:36:04.7021849Z           },
+2026-03-17T19:36:04.7022143Z           "gitCommit": {
+2026-03-17T19:36:04.7022533Z             "shortHash": "e89a0e9",
+2026-03-17T19:36:04.7023073Z             "hash": "e89a0e9b41412db8bdedb25750e9c930c3267581",
+2026-03-17T19:36:04.7023983Z             "subject": "Fix: Use Playwright type() method instead of page.evaluate() for form filling",
+2026-03-17T19:36:04.7030235Z             "body": "Fix: Use Playwright type() method instead of page.evaluate() for form filling\n\n**CRITICAL CHANGE** - Switch from page.evaluate() (unreliable in headless CI) to native\nPlaywright API:\n\n- Focus on field before typing (ensures field is ready)\n- Clear field with Ctrl+A + Delete (more reliable than direct value assignment)\n- Use locator.type() with 50ms delay between keystrokes (simulates human typing)\n- Verify via locator.inputValue() before submitting\n- Remove page.evaluate() which doesn't work reliably in CI headless mode\n\nThis is the fundamental fix for the CI failures. page.evaluate() was setting\nvalues directly on the DOM but the Demoblaze JavaScript wasn't seeing them.\nUsing standard Playwright type() methods ensures compatibility with the app's\nevent handling.\n",
+2026-03-17T19:36:04.7035417Z             "author": {
+2026-03-17T19:36:04.7035841Z               "name": "thompsonoloko-droid",
+2026-03-17T19:36:04.7036374Z               "email": "thompson.oloko@gmail.com",
+2026-03-17T19:36:04.7036870Z               "time": 1773776112000
+2026-03-17T19:36:04.7037237Z             },
+2026-03-17T19:36:04.7037539Z             "committer": {
+2026-03-17T19:36:04.7037956Z               "name": "thompsonoloko-droid",
+2026-03-17T19:36:04.7038477Z               "email": "thompson.oloko@gmail.com",
+2026-03-17T19:36:04.7038958Z               "time": 1773776112000
+2026-03-17T19:36:04.7039328Z             },
+2026-03-17T19:36:04.7039613Z             "branch": "main"
+2026-03-17T19:36:04.7039953Z           },
+2026-03-17T19:36:04.7043721Z           "actualWorkers": 4
+2026-03-17T19:36:04.7044365Z         },
+2026-03-17T19:36:04.7044700Z         "id": "mobile-chrome",
+2026-03-17T19:36:04.7045288Z         "name": "mobile-chrome",
+2026-03-17T19:36:04.7046104Z         "testDir": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/tests",
+2026-03-17T19:36:04.7046858Z         "testIgnore": [],
+2026-03-17T19:36:04.7047203Z         "testMatch": [
+2026-03-17T19:36:04.7047596Z           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+2026-03-17T19:36:04.7048007Z         ],
+2026-03-17T19:36:04.7048284Z         "timeout": 90000
+2026-03-17T19:36:04.7048613Z       },
+2026-03-17T19:36:04.7048860Z       {
+2026-03-17T19:36:04.7049618Z         "outputDir": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/test-results",
+2026-03-17T19:36:04.7050416Z         "repeatEach": 1,
+2026-03-17T19:36:04.7050749Z         "retries": 3,
+2026-03-17T19:36:04.7051056Z         "metadata": {
+2026-03-17T19:36:04.7051362Z           "ci": {
+2026-03-17T19:36:04.7052419Z             "commitHref": "https://github.com/thompsonoloko-droid/automation_pw_ts_demoblaze/commit/e89a0e9b41412db8bdedb25750e9c930c3267581",
+2026-03-17T19:36:04.7053633Z             "commitHash": "e89a0e9b41412db8bdedb25750e9c930c3267581",
+2026-03-17T19:36:04.7054713Z             "buildHref": "https://github.com/thompsonoloko-droid/automation_pw_ts_demoblaze/actions/runs/23212911779"
+2026-03-17T19:36:04.7075842Z           },
+2026-03-17T19:36:04.7076177Z           "gitCommit": {
+2026-03-17T19:36:04.7076595Z             "shortHash": "e89a0e9",
+2026-03-17T19:36:04.7077171Z             "hash": "e89a0e9b41412db8bdedb25750e9c930c3267581",
+2026-03-17T19:36:04.7078090Z             "subject": "Fix: Use Playwright type() method instead of page.evaluate() for form filling",
+2026-03-17T19:36:04.7084121Z             "body": "Fix: Use Playwright type() method instead of page.evaluate() for form filling\n\n**CRITICAL CHANGE** - Switch from page.evaluate() (unreliable in headless CI) to native\nPlaywright API:\n\n- Focus on field before typing (ensures field is ready)\n- Clear field with Ctrl+A + Delete (more reliable than direct value assignment)\n- Use locator.type() with 50ms delay between keystrokes (simulates human typing)\n- Verify via locator.inputValue() before submitting\n- Remove page.evaluate() which doesn't work reliably in CI headless mode\n\nThis is the fundamental fix for the CI failures. page.evaluate() was setting\nvalues directly on the DOM but the Demoblaze JavaScript wasn't seeing them.\nUsing standard Playwright type() methods ensures compatibility with the app's\nevent handling.\n",
+2026-03-17T19:36:04.7089347Z             "author": {
+2026-03-17T19:36:04.7089770Z               "name": "thompsonoloko-droid",
+2026-03-17T19:36:04.7090305Z               "email": "thompson.oloko@gmail.com",
+2026-03-17T19:36:04.7090798Z               "time": 1773776112000
+2026-03-17T19:36:04.7091169Z             },
+2026-03-17T19:36:04.7091462Z             "committer": {
+2026-03-17T19:36:04.7091878Z               "name": "thompsonoloko-droid",
+2026-03-17T19:36:04.7092412Z               "email": "thompson.oloko@gmail.com",
+2026-03-17T19:36:04.7092893Z               "time": 1773776112000
+2026-03-17T19:36:04.7093258Z             },
+2026-03-17T19:36:04.7093543Z             "branch": "main"
+2026-03-17T19:36:04.7093887Z           },
+2026-03-17T19:36:04.7094188Z           "actualWorkers": 4
+2026-03-17T19:36:04.7094530Z         },
+2026-03-17T19:36:04.7094935Z         "id": "mobile-safari",
+2026-03-17T19:36:04.7095498Z         "name": "mobile-safari",
+2026-03-17T19:36:04.7096303Z         "testDir": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/tests",
+2026-03-17T19:36:04.7097054Z         "testIgnore": [],
+2026-03-17T19:36:04.7097399Z         "testMatch": [
+2026-03-17T19:36:04.7097799Z           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+2026-03-17T19:36:04.7098215Z         ],
+2026-03-17T19:36:04.7098488Z         "timeout": 90000
+2026-03-17T19:36:04.7098806Z       }
+2026-03-17T19:36:04.7099059Z     ],
+2026-03-17T19:36:04.7099497Z     "quiet": false,
+2026-03-17T19:36:04.7099798Z     "reporter": [
+2026-03-17T19:36:04.7100100Z       [
+2026-03-17T19:36:04.7100355Z         "json"
+2026-03-17T19:36:04.7100629Z       ],
+2026-03-17T19:36:04.7100873Z       [
+2026-03-17T19:36:04.7101129Z         "github"
+2026-03-17T19:36:04.7101406Z       ],
+2026-03-17T19:36:04.7101655Z       [
+2026-03-17T19:36:04.7101901Z         "html"
+2026-03-17T19:36:04.7102165Z       ]
+2026-03-17T19:36:04.7102411Z     ],
+2026-03-17T19:36:04.7102682Z     "reportSlowTests": {
+2026-03-17T19:36:04.7103019Z       "max": 5,
+2026-03-17T19:36:04.7103323Z       "threshold": 300000
+2026-03-17T19:36:04.7103650Z     },
+2026-03-17T19:36:04.7103914Z     "runAgents": "none",
+2026-03-17T19:36:04.7104238Z     "shard": {
+2026-03-17T19:36:04.7104523Z       "current": 1,
+2026-03-17T19:36:04.7104822Z       "total": 4
+2026-03-17T19:36:04.7135350Z     },
+2026-03-17T19:36:04.7135704Z     "tags": [],
+2026-03-17T19:36:04.7136094Z     "updateSnapshots": "missing",
+2026-03-17T19:36:04.7136591Z     "updateSourceMethod": "patch",
+2026-03-17T19:36:04.7137001Z     "version": "1.58.2",
+2026-03-17T19:36:04.7137333Z     "workers": 4,
+2026-03-17T19:36:04.7137640Z     "webServer": null
+2026-03-17T19:36:04.7137950Z   },
+2026-03-17T19:36:04.7138210Z   "suites": [
+2026-03-17T19:36:04.7138479Z     {
+2026-03-17T19:36:04.7138831Z       "title": "accessibility.spec.ts",
+2026-03-17T19:36:04.7139337Z       "file": "accessibility.spec.ts",
+2026-03-17T19:36:04.7139751Z       "column": 0,
+2026-03-17T19:36:04.7140044Z       "line": 0,
+2026-03-17T19:36:04.7140338Z       "specs": [],
+2026-03-17T19:36:04.7140640Z       "suites": [
+2026-03-17T19:36:04.7141040Z         {
+2026-03-17T19:36:04.7141411Z           "title": "Accessibility (WCAG 2.1 AA)",
+2026-03-17T19:36:04.7141938Z           "file": "accessibility.spec.ts",
+2026-03-17T19:36:04.7142361Z           "line": 17,
+2026-03-17T19:36:04.7142675Z           "column": 6,
+2026-03-17T19:36:04.7142985Z           "specs": [
+2026-03-17T19:36:04.7143294Z             {
+2026-03-17T19:36:04.7143824Z               "title": "A11Y-001: Homepage should be WCAG 2.1 AA compliant",
+2026-03-17T19:36:04.7144397Z               "ok": true,
+2026-03-17T19:36:04.7144733Z               "tags": [],
+2026-03-17T19:36:04.7145203Z               "tests": [
+2026-03-17T19:36:04.7145532Z                 {
+2026-03-17T19:36:04.7145876Z                   "timeout": 90000,
+2026-03-17T19:36:04.7146306Z                   "annotations": [],
+2026-03-17T19:36:04.7146784Z                   "expectedStatus": "passed",
+2026-03-17T19:36:04.7147281Z                   "projectId": "chromium",
+2026-03-17T19:36:04.7147985Z                   "projectName": "chromium",
+2026-03-17T19:36:04.7148430Z                   "results": [
+2026-03-17T19:36:04.7148785Z                     {
+2026-03-17T19:36:04.7149151Z                       "workerIndex": 0,
+2026-03-17T19:36:04.7149615Z                       "parallelIndex": 0,
+2026-03-17T19:36:04.7150085Z                       "status": "passed",
+2026-03-17T19:36:04.7150533Z                       "duration": 2046,
+2026-03-17T19:36:04.7150972Z                       "errors": [],
+2026-03-17T19:36:04.7151388Z                       "stdout": [],
+2026-03-17T19:36:04.7151800Z                       "stderr": [],
+2026-03-17T19:36:04.7152210Z                       "retry": 0,
+2026-03-17T19:36:04.7152708Z                       "startTime": "2026-03-17T19:35:57.910Z",
+2026-03-17T19:36:04.7153231Z                       "annotations": [],
+2026-03-17T19:36:04.7153694Z                       "attachments": []
+2026-03-17T19:36:04.7154082Z                     }
+2026-03-17T19:36:04.7154399Z                   ],
+2026-03-17T19:36:04.7154766Z                   "status": "expected"
+2026-03-17T19:36:04.7155297Z                 }
+2026-03-17T19:36:04.7155576Z               ],
+2026-03-17T19:36:04.7156032Z               "id": "ddd864604af8a6a0198f-8bd522bdaeceb658b1ec",
+2026-03-17T19:36:04.7156624Z               "file": "accessibility.spec.ts",
+2026-03-17T19:36:04.7157067Z               "line": 19,
+2026-03-17T19:36:04.7157616Z               "column": 7
+2026-03-17T19:36:04.7157939Z             },
+2026-03-17T19:36:04.7158216Z             {
+2026-03-17T19:36:04.7158736Z               "title": "A11Y-002: Page should have proper heading hierarchy",
+2026-03-17T19:36:04.7159299Z               "ok": true,
+2026-03-17T19:36:04.7159622Z               "tags": [],
+2026-03-17T19:36:04.7159946Z               "tests": [
+2026-03-17T19:36:04.7160268Z                 {
+2026-03-17T19:36:04.7160609Z                   "timeout": 90000,
+2026-03-17T19:36:04.7161029Z                   "annotations": [
+2026-03-17T19:36:04.7161413Z                     {
+2026-03-17T19:36:04.7161777Z                       "type": "skip",
+2026-03-17T19:36:04.7162208Z                       "location": {
+2026-03-17T19:36:04.7163212Z                         "file": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/tests/accessibility.spec.ts",
+2026-03-17T19:36:04.7164162Z                         "line": 30,
+2026-03-17T19:36:04.7164587Z                         "column": 8
+2026-03-17T19:36:04.7164965Z                       }
+2026-03-17T19:36:04.7167401Z                     }
+2026-03-17T19:36:04.7167744Z                   ],
+2026-03-17T19:36:04.7168159Z                   "expectedStatus": "skipped",
+2026-03-17T19:36:04.7168672Z                   "projectId": "chromium",
+2026-03-17T19:36:04.7169162Z                   "projectName": "chromium",
+2026-03-17T19:36:04.7169609Z                   "results": [
+2026-03-17T19:36:04.7169953Z                     {
+2026-03-17T19:36:04.7170342Z                       "workerIndex": -1,
+2026-03-17T19:36:04.7170831Z                       "parallelIndex": -1,
+2026-03-17T19:36:04.7171292Z                       "status": "skipped",
+2026-03-17T19:36:04.7171736Z                       "duration": 0,
+2026-03-17T19:36:04.7172162Z                       "errors": [],
+2026-03-17T19:36:04.7172577Z                       "stdout": [],
+2026-03-17T19:36:04.7172975Z                       "stderr": [],
+2026-03-17T19:36:04.7173377Z                       "retry": 0,
+2026-03-17T19:36:04.7173869Z                       "startTime": "2026-03-17T19:35:56.167Z",
+2026-03-17T19:36:04.7174381Z                       "annotations": [
+2026-03-17T19:36:04.7174761Z                         {
+2026-03-17T19:36:04.7175317Z                           "type": "skip",
+2026-03-17T19:36:04.7175766Z                           "location": {
+2026-03-17T19:36:04.7176794Z                             "file": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/tests/accessibility.spec.ts",
+2026-03-17T19:36:04.7177749Z                             "line": 30,
+2026-03-17T19:36:04.7178381Z                             "column": 8
+2026-03-17T19:36:04.7178768Z                           }
+2026-03-17T19:36:04.7179104Z                         }
+2026-03-17T19:36:04.7179427Z                       ],
+2026-03-17T19:36:04.7179800Z                       "attachments": []
+2026-03-17T19:36:04.7180184Z                     }
+2026-03-17T19:36:04.7180487Z                   ],
+2026-03-17T19:36:04.7180858Z                   "status": "skipped"
+2026-03-17T19:36:04.7181237Z                 }
+2026-03-17T19:36:04.7181524Z               ],
+2026-03-17T19:36:04.7181965Z               "id": "ddd864604af8a6a0198f-9682657c459a71293ea3",
+2026-03-17T19:36:04.7182543Z               "file": "accessibility.spec.ts",
+2026-03-17T19:36:04.7182974Z               "line": 30,
+2026-03-17T19:36:04.7183303Z               "column": 8
+2026-03-17T19:36:04.7183621Z             },
+2026-03-17T19:36:04.7183896Z             {
+2026-03-17T19:36:04.7184418Z               "title": "A11Y-003: All images should have descriptive alt text",
+2026-03-17T19:36:04.7184992Z               "ok": true,
+2026-03-17T19:36:04.7185461Z               "tags": [],
+2026-03-17T19:36:04.7185787Z               "tests": [
+2026-03-17T19:36:04.7186105Z                 {
+2026-03-17T19:36:04.7186441Z                   "timeout": 90000,
+2026-03-17T19:36:04.7186874Z                   "annotations": [
+2026-03-17T19:36:04.7201973Z                     {
+2026-03-17T19:36:04.7202713Z                       "type": "skip",
+2026-03-17T19:36:04.7203542Z                       "location": {
+2026-03-17T19:36:04.7204662Z                         "file": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/tests/accessibility.spec.ts",
+2026-03-17T19:36:04.7205871Z                         "line": 41,
+2026-03-17T19:36:04.7206316Z                         "column": 8
+2026-03-17T19:36:04.7206709Z                       }
+2026-03-17T19:36:04.7207071Z                     }
+2026-03-17T19:36:04.7207420Z                   ],
+2026-03-17T19:36:04.7207859Z                   "expectedStatus": "skipped",
+2026-03-17T19:36:04.7208425Z                   "projectId": "chromium",
+2026-03-17T19:36:04.7208957Z                   "projectName": "chromium",
+2026-03-17T19:36:04.7209468Z                   "results": [
+2026-03-17T19:36:04.7209839Z                     {
+2026-03-17T19:36:04.7210227Z                       "workerIndex": -1,
+2026-03-17T19:36:04.7210761Z                       "parallelIndex": -1,
+2026-03-17T19:36:04.7211334Z                       "status": "skipped",
+2026-03-17T19:36:04.7211842Z                       "duration": 0,
+2026-03-17T19:36:04.7212292Z                       "errors": [],
+2026-03-17T19:36:04.7212730Z                       "stdout": [],
+2026-03-17T19:36:04.7213180Z                       "stderr": [],
+2026-03-17T19:36:04.7213638Z                       "retry": 0,
+2026-03-17T19:36:04.7214195Z                       "startTime": "2026-03-17T19:35:56.167Z",
+2026-03-17T19:36:04.7214764Z                       "annotations": [
+2026-03-17T19:36:04.7215445Z                         {
+2026-03-17T19:36:04.7215906Z                           "type": "skip",
+2026-03-17T19:36:04.7216415Z                           "location": {
+2026-03-17T19:36:04.7217549Z                             "file": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/tests/accessibility.spec.ts",
+2026-03-17T19:36:04.7218614Z                             "line": 41,
+2026-03-17T19:36:04.7219128Z                             "column": 8
+2026-03-17T19:36:04.7219561Z                           }
+2026-03-17T19:36:04.7219947Z                         }
+2026-03-17T19:36:04.7220299Z                       ],
+2026-03-17T19:36:04.7220732Z                       "attachments": []
+2026-03-17T19:36:04.7221181Z                     }
+2026-03-17T19:36:04.7221543Z                   ],
+2026-03-17T19:36:04.7221955Z                   "status": "skipped"
+2026-03-17T19:36:04.7222388Z                 }
+2026-03-17T19:36:04.7222708Z               ],
+2026-03-17T19:36:04.7223499Z               "id": "ddd864604af8a6a0198f-3bc79c8faf4b0a927c35",
+2026-03-17T19:36:04.7224154Z               "file": "accessibility.spec.ts",
+2026-03-17T19:36:04.7224666Z               "line": 41,
+2026-03-17T19:36:04.7225258Z               "column": 8
+2026-03-17T19:36:04.7225636Z             },
+2026-03-17T19:36:04.7225950Z             {
+2026-03-17T19:36:04.7226519Z               "title": "A11Y-004: Form inputs should have associated labels",
+2026-03-17T19:36:04.7227168Z               "ok": true,
+2026-03-17T19:36:04.7227556Z               "tags": [],
+2026-03-17T19:36:04.7227929Z               "tests": [
+2026-03-17T19:36:04.7228288Z                 {
+2026-03-17T19:36:04.7228679Z                   "timeout": 90000,
+2026-03-17T19:36:04.7229163Z                   "annotations": [],
+2026-03-17T19:36:04.7229696Z                   "expectedStatus": "passed",
+2026-03-17T19:36:04.7230247Z                   "projectId": "chromium",
+2026-03-17T19:36:04.7230801Z                   "projectName": "chromium",
+2026-03-17T19:36:04.7231320Z                   "results": [
+2026-03-17T19:36:04.7231707Z                     {
+2026-03-17T19:36:04.7232120Z                       "workerIndex": 1,
+2026-03-17T19:36:04.7232652Z                       "parallelIndex": 3,
+2026-03-17T19:36:04.7233166Z                       "status": "passed",
+2026-03-17T19:36:04.7233673Z                       "duration": 2712,
+2026-03-17T19:36:04.7234164Z                       "errors": [],
+2026-03-17T19:36:04.7234901Z                       "stdout": [],
+2026-03-17T19:36:04.7235575Z                       "stderr": [],
+2026-03-17T19:36:04.7236036Z                       "retry": 0,
+2026-03-17T19:36:04.7236591Z                       "startTime": "2026-03-17T19:35:57.910Z",
+2026-03-17T19:36:04.7237157Z                       "annotations": [],
+2026-03-17T19:36:04.7237658Z                       "attachments": []
+2026-03-17T19:36:04.7238083Z                     }
+2026-03-17T19:36:04.7238402Z                   ],
+2026-03-17T19:36:04.7238790Z                   "status": "expected"
+2026-03-17T19:36:04.7239226Z                 }
+2026-03-17T19:36:04.7239550Z               ],
+2026-03-17T19:36:04.7240040Z               "id": "ddd864604af8a6a0198f-744cf5fedf3f290394ad",
+2026-03-17T19:36:04.7240672Z               "file": "accessibility.spec.ts",
+2026-03-17T19:36:04.7241160Z               "line": 54,
+2026-03-17T19:36:04.7241542Z               "column": 7
+2026-03-17T19:36:04.7241904Z             },
+2026-03-17T19:36:04.7242218Z             {
+2026-03-17T19:36:04.7242719Z               "title": "A11Y-005: Login modal should be accessible",
+2026-03-17T19:36:04.7243279Z               "ok": true,
+2026-03-17T19:36:04.7243643Z               "tags": [],
+2026-03-17T19:36:04.7244008Z               "tests": [
+2026-03-17T19:36:04.7244373Z                 {
+2026-03-17T19:36:04.7244751Z                   "timeout": 90000,
+2026-03-17T19:36:04.7245431Z                   "annotations": [],
+2026-03-17T19:36:04.7245977Z                   "expectedStatus": "passed",
+2026-03-17T19:36:04.7246534Z                   "projectId": "chromium",
+2026-03-17T19:36:04.7247107Z                   "projectName": "chromium",
+2026-03-17T19:36:04.7247622Z                   "results": [
+2026-03-17T19:36:04.7248002Z                     {
+2026-03-17T19:36:04.7248397Z                       "workerIndex": 2,
+2026-03-17T19:36:04.7248918Z                       "parallelIndex": 1,
+2026-03-17T19:36:04.7249433Z                       "status": "passed",
+2026-03-17T19:36:04.7249960Z                       "duration": 2869,
+2026-03-17T19:36:04.7250458Z                       "errors": [],
+2026-03-17T19:36:04.7250925Z                       "stdout": [],
+2026-03-17T19:36:04.7251381Z                       "stderr": [],
+2026-03-17T19:36:04.7251851Z                       "retry": 0,
+2026-03-17T19:36:04.7252431Z                       "startTime": "2026-03-17T19:35:57.917Z",
+2026-03-17T19:36:04.7253033Z                       "annotations": [],
+2026-03-17T19:36:04.7253564Z                       "attachments": []
+2026-03-17T19:36:04.7254313Z                     }
+2026-03-17T19:36:04.7254670Z                   ],
+2026-03-17T19:36:04.7255327Z                   "status": "expected"
+2026-03-17T19:36:04.7255779Z                 }
+2026-03-17T19:36:04.7256103Z               ],
+2026-03-17T19:36:04.7256599Z               "id": "ddd864604af8a6a0198f-749ba60902bc654af1b4",
+2026-03-17T19:36:04.7257222Z               "file": "accessibility.spec.ts",
+2026-03-17T19:36:04.7257724Z               "line": 68,
+2026-03-17T19:36:04.7258152Z               "column": 7
+2026-03-17T19:36:04.7258506Z             },
+2026-03-17T19:36:04.7258818Z             {
+2026-03-17T19:36:04.7259489Z               "title": "A11Y-006: All interactive elements should be keyboard accessible",
+2026-03-17T19:36:04.7260206Z               "ok": true,
+2026-03-17T19:36:04.7260588Z               "tags": [],
+2026-03-17T19:36:04.7260962Z               "tests": [
+2026-03-17T19:36:04.7261329Z                 {
+2026-03-17T19:36:04.7261714Z                   "timeout": 90000,
+2026-03-17T19:36:04.7262196Z                   "annotations": [
+2026-03-17T19:36:04.7262607Z                     {
+2026-03-17T19:36:04.7263016Z                       "type": "skip",
+2026-03-17T19:36:04.7263485Z                       "location": {
+2026-03-17T19:36:04.7264573Z                         "file": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/tests/accessibility.spec.ts",
+2026-03-17T19:36:04.7265847Z                         "line": 106,
+2026-03-17T19:36:04.7266619Z                         "column": 8
+2026-03-17T19:36:04.7267047Z                       }
+2026-03-17T19:36:04.7267396Z                     }
+2026-03-17T19:36:04.7267720Z                   ],
+2026-03-17T19:36:04.7268170Z                   "expectedStatus": "skipped",
+2026-03-17T19:36:04.7268738Z                   "projectId": "chromium",
+2026-03-17T19:36:04.7269297Z                   "projectName": "chromium",
+2026-03-17T19:36:04.7269816Z                   "results": [
+2026-03-17T19:36:04.7270219Z                     {
+2026-03-17T19:36:04.7270672Z                       "workerIndex": -1,
+2026-03-17T19:36:04.7271211Z                       "parallelIndex": -1,
+2026-03-17T19:36:04.7271729Z                       "status": "skipped",
+2026-03-17T19:36:04.7272229Z                       "duration": 0,
+2026-03-17T19:36:04.7272713Z                       "errors": [],
+2026-03-17T19:36:04.7273200Z                       "stdout": [],
+2026-03-17T19:36:04.7273651Z                       "stderr": [],
+2026-03-17T19:36:04.7274134Z                       "retry": 0,
+2026-03-17T19:36:04.7274689Z                       "startTime": "2026-03-17T19:35:56.168Z",
+2026-03-17T19:36:04.7275475Z                       "annotations": [
+2026-03-17T19:36:04.7275936Z                         {
+2026-03-17T19:36:04.7276376Z                           "type": "skip",
+2026-03-17T19:36:04.7276876Z                           "location": {
+2026-03-17T19:36:04.7277975Z                             "file": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/tests/accessibility.spec.ts",
+2026-03-17T19:36:04.7279070Z                             "line": 106,
+2026-03-17T19:36:04.7279577Z                             "column": 8
+2026-03-17T19:36:04.7280031Z                           }
+2026-03-17T19:36:04.7280413Z                         }
+2026-03-17T19:36:04.7280785Z                       ],
+2026-03-17T19:36:04.7281222Z                       "attachments": []
+2026-03-17T19:36:04.7281662Z                     }
+2026-03-17T19:36:04.7282024Z                   ],
+2026-03-17T19:36:04.7282442Z                   "status": "skipped"
+2026-03-17T19:36:04.7282870Z                 }
+2026-03-17T19:36:04.7283191Z               ],
+2026-03-17T19:36:04.7283690Z               "id": "ddd864604af8a6a0198f-1adc2231a1d5f819e25b",
+2026-03-17T19:36:04.7284367Z               "file": "accessibility.spec.ts",
+2026-03-17T19:36:04.7284863Z               "line": 106,
+2026-03-17T19:36:04.7285439Z               "column": 8
+2026-03-17T19:36:04.7285808Z             },
+2026-03-17T19:36:04.7286122Z             {
+2026-03-17T19:36:04.7287040Z               "title": "A11Y-007: Product detail page should be WCAG 2.1 AA compliant",
+2026-03-17T19:36:04.7287730Z               "ok": true,
+2026-03-17T19:36:04.7288094Z               "tags": [],
+2026-03-17T19:36:04.7288463Z               "tests": [
+2026-03-17T19:36:04.7288836Z                 {
+2026-03-17T19:36:04.7289205Z                   "timeout": 90000,
+2026-03-17T19:36:04.7289686Z                   "annotations": [],
+2026-03-17T19:36:04.7290229Z                   "expectedStatus": "passed",
+2026-03-17T19:36:04.7290796Z                   "projectId": "chromium",
+2026-03-17T19:36:04.7291333Z                   "projectName": "chromium",
+2026-03-17T19:36:04.7291842Z                   "results": [
+2026-03-17T19:36:04.7292239Z                     {
+2026-03-17T19:36:04.7292644Z                       "workerIndex": 3,
+2026-03-17T19:36:04.7293158Z                       "parallelIndex": 2,
+2026-03-17T19:36:04.7293680Z                       "status": "passed",
+2026-03-17T19:36:04.7294200Z                       "duration": 3184,
+2026-03-17T19:36:04.7294696Z                       "errors": [],
+2026-03-17T19:36:04.7295354Z                       "stdout": [],
+2026-03-17T19:36:04.7295819Z                       "stderr": [],
+2026-03-17T19:36:04.7296283Z                       "retry": 0,
+2026-03-17T19:36:04.7296810Z                       "startTime": "2026-03-17T19:35:57.912Z",
+2026-03-17T19:36:04.7297380Z                       "annotations": [],
+2026-03-17T19:36:04.7298163Z                       "attachments": []
+2026-03-17T19:36:04.7298591Z                     }
+2026-03-17T19:36:04.7298953Z                   ],
+2026-03-17T19:36:04.7299382Z                   "status": "expected"
+2026-03-17T19:36:04.7299817Z                 }
+2026-03-17T19:36:04.7300141Z               ],
+2026-03-17T19:36:04.7300643Z               "id": "ddd864604af8a6a0198f-758358896b81dadee793",
+2026-03-17T19:36:04.7301283Z               "file": "accessibility.spec.ts",
+2026-03-17T19:36:04.7301774Z               "line": 120,
+2026-03-17T19:36:04.7302178Z               "column": 7
+2026-03-17T19:36:04.7302545Z             },
+2026-03-17T19:36:04.7302854Z             {
+2026-03-17T19:36:04.7303171Z               "title": "A11Y-008: Cart page should have proper aria labels",
+2026-03-17T19:36:04.7303519Z               "ok": true,
+2026-03-17T19:36:04.7303726Z               "tags": [],
+2026-03-17T19:36:04.7303932Z               "tests": [
+2026-03-17T19:36:04.7304132Z                 {
+2026-03-17T19:36:04.7304348Z                   "timeout": 90000,
+2026-03-17T19:36:04.7304608Z                   "annotations": [
+2026-03-17T19:36:04.7304835Z                     {
+2026-03-17T19:36:04.7305279Z                       "type": "skip",
+2026-03-17T19:36:04.7305553Z                       "location": {
+2026-03-17T19:36:04.7306176Z                         "file": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/tests/accessibility.spec.ts",
+2026-03-17T19:36:04.7306755Z                         "line": 147,
+2026-03-17T19:36:04.7307018Z                         "column": 8
+2026-03-17T19:36:04.7307231Z                       }
+2026-03-17T19:36:04.7307423Z                     }
+2026-03-17T19:36:04.7307604Z                   ],
+2026-03-17T19:36:04.7307844Z                   "expectedStatus": "skipped",
+2026-03-17T19:36:04.7308140Z                   "projectId": "chromium",
+2026-03-17T19:36:04.7308464Z                   "projectName": "chromium",
+2026-03-17T19:36:04.7308736Z                   "results": [
+2026-03-17T19:36:04.7308952Z                     {
+2026-03-17T19:36:04.7309194Z                       "workerIndex": -1,
+2026-03-17T19:36:04.7309473Z                       "parallelIndex": -1,
+2026-03-17T19:36:04.7309781Z                       "status": "skipped",
+2026-03-17T19:36:04.7310052Z                       "duration": 0,
+2026-03-17T19:36:04.7310303Z                       "errors": [],
+2026-03-17T19:36:04.7310541Z                       "stdout": [],
+2026-03-17T19:36:04.7310779Z                       "stderr": [],
+2026-03-17T19:36:04.7311205Z                       "retry": 0,
+2026-03-17T19:36:04.7311501Z                       "startTime": "2026-03-17T19:36:02.194Z",
+2026-03-17T19:36:04.7311805Z                       "annotations": [
+2026-03-17T19:36:04.7312039Z                         {
+2026-03-17T19:36:04.7312273Z                           "type": "skip",
+2026-03-17T19:36:04.7312541Z                           "location": {
+2026-03-17T19:36:04.7313124Z                             "file": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/tests/accessibility.spec.ts",
+2026-03-17T19:36:04.7313701Z                             "line": 147,
+2026-03-17T19:36:04.7313962Z                             "column": 8
+2026-03-17T19:36:04.7314215Z                           }
+2026-03-17T19:36:04.7314419Z                         }
+2026-03-17T19:36:04.7314633Z                       ],
+2026-03-17T19:36:04.7314891Z                       "attachments": []
+2026-03-17T19:36:04.7315342Z                     }
+2026-03-17T19:36:04.7315559Z                   ],
+2026-03-17T19:36:04.7315801Z                   "status": "skipped"
+2026-03-17T19:36:04.7316038Z                 }
+2026-03-17T19:36:04.7316240Z               ],
+2026-03-17T19:36:04.7316512Z               "id": "ddd864604af8a6a0198f-ac316f3535b6cf76b165",
+2026-03-17T19:36:04.7316871Z               "file": "accessibility.spec.ts",
+2026-03-17T19:36:04.7317157Z               "line": 147,
+2026-03-17T19:36:04.7317386Z               "column": 8
+2026-03-17T19:36:04.7317742Z             },
+2026-03-17T19:36:04.7317913Z             {
+2026-03-17T19:36:04.7318247Z               "title": "A11Y-009: Signup modal should be accessible with keyboard",
+2026-03-17T19:36:04.7318616Z               "ok": true,
+2026-03-17T19:36:04.7318835Z               "tags": [],
+2026-03-17T19:36:04.7319031Z               "tests": [
+2026-03-17T19:36:04.7319238Z                 {
+2026-03-17T19:36:04.7319444Z                   "timeout": 90000,
+2026-03-17T19:36:04.7319720Z                   "annotations": [],
+2026-03-17T19:36:04.7320021Z                   "expectedStatus": "passed",
+2026-03-17T19:36:04.7320332Z                   "projectId": "chromium",
+2026-03-17T19:36:04.7320638Z                   "projectName": "chromium",
+2026-03-17T19:36:04.7320920Z                   "results": [
+2026-03-17T19:36:04.7321132Z                     {
+2026-03-17T19:36:04.7321365Z                       "workerIndex": 0,
+2026-03-17T19:36:04.7321656Z                       "parallelIndex": 0,
+2026-03-17T19:36:04.7321972Z                       "status": "passed",
+2026-03-17T19:36:04.7322256Z                       "duration": 1249,
+2026-03-17T19:36:04.7322507Z                       "errors": [],
+2026-03-17T19:36:04.7322768Z                       "stdout": [],
+2026-03-17T19:36:04.7323027Z                       "stderr": [],
+2026-03-17T19:36:04.7323299Z                       "retry": 0,
+2026-03-17T19:36:04.7323600Z                       "startTime": "2026-03-17T19:36:02.195Z",
+2026-03-17T19:36:04.7323934Z                       "annotations": [],
+2026-03-17T19:36:04.7324246Z                       "attachments": []
+2026-03-17T19:36:04.7324504Z                     }
+2026-03-17T19:36:04.7324707Z                   ],
+2026-03-17T19:36:04.7324924Z                   "status": "expected"
+2026-03-17T19:36:04.7325300Z                 }
+2026-03-17T19:36:04.7325484Z               ],
+2026-03-17T19:36:04.7325773Z               "id": "ddd864604af8a6a0198f-b9685d4084cc7a2162f2",
+2026-03-17T19:36:04.7326141Z               "file": "accessibility.spec.ts",
+2026-03-17T19:36:04.7326431Z               "line": 161,
+2026-03-17T19:36:04.7326636Z               "column": 7
+2026-03-17T19:36:04.7326866Z             },
+2026-03-17T19:36:04.7327045Z             {
+2026-03-17T19:36:04.7327345Z               "title": "A11Y-010: Checkout form should have labeled inputs",
+2026-03-17T19:36:04.7327703Z               "ok": true,
+2026-03-17T19:36:04.7327925Z               "tags": [],
+2026-03-17T19:36:04.7328123Z               "tests": [
+2026-03-17T19:36:04.7328334Z                 {
+2026-03-17T19:36:04.7328559Z                   "timeout": 90000,
+2026-03-17T19:36:04.7328972Z                   "annotations": [
+2026-03-17T19:36:04.7329216Z                     {
+2026-03-17T19:36:04.7329428Z                       "type": "skip",
+2026-03-17T19:36:04.7329786Z                       "description": "Test requires user to be logged in",
+2026-03-17T19:36:04.7330141Z                       "location": {
+2026-03-17T19:36:04.7330744Z                         "file": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/tests/accessibility.spec.ts",
+2026-03-17T19:36:04.7331299Z                         "line": 185,
+2026-03-17T19:36:04.7331576Z                         "column": 10
+2026-03-17T19:36:04.7331810Z                       }
+2026-03-17T19:36:04.7332024Z                     }
+2026-03-17T19:36:04.7332205Z                   ],
+2026-03-17T19:36:04.7332464Z                   "expectedStatus": "skipped",
+2026-03-17T19:36:04.7332797Z                   "projectId": "chromium",
+2026-03-17T19:36:04.7333108Z                   "projectName": "chromium",
+2026-03-17T19:36:04.7333409Z                   "results": [
+2026-03-17T19:36:04.7333612Z                     {
+2026-03-17T19:36:04.7333852Z                       "workerIndex": 1,
+2026-03-17T19:36:04.7334127Z                       "parallelIndex": 3,
+2026-03-17T19:36:04.7334425Z                       "status": "skipped",
+2026-03-17T19:36:04.7334711Z                       "duration": 290,
+2026-03-17T19:36:04.7335229Z                       "errors": [],
+2026-03-17T19:36:04.7335492Z                       "stdout": [],
+2026-03-17T19:36:04.7335737Z                       "stderr": [],
+2026-03-17T19:36:04.7335995Z                       "retry": 0,
+2026-03-17T19:36:04.7336304Z                       "startTime": "2026-03-17T19:36:02.938Z",
+2026-03-17T19:36:04.7336607Z                       "annotations": [
+2026-03-17T19:36:04.7336865Z                         {
+2026-03-17T19:36:04.7337110Z                           "type": "skip",
+2026-03-17T19:36:04.7337480Z                           "description": "Test requires user to be logged in",
+2026-03-17T19:36:04.7337851Z                           "location": {
+2026-03-17T19:36:04.7338459Z                             "file": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/tests/accessibility.spec.ts",
+2026-03-17T19:36:04.7339048Z                             "line": 185,
+2026-03-17T19:36:04.7339323Z                             "column": 10
+2026-03-17T19:36:04.7339567Z                           }
+2026-03-17T19:36:04.7339794Z                         }
+2026-03-17T19:36:04.7339991Z                       ],
+2026-03-17T19:36:04.7340235Z                       "attachments": []
+2026-03-17T19:36:04.7340481Z                     }
+2026-03-17T19:36:04.7340671Z                   ],
+2026-03-17T19:36:04.7340905Z                   "status": "skipped"
+2026-03-17T19:36:04.7341130Z                 }
+2026-03-17T19:36:04.7341328Z               ],
+2026-03-17T19:36:04.7341601Z               "id": "ddd864604af8a6a0198f-e90eb8270b877c209843",
+2026-03-17T19:36:04.7341975Z               "file": "accessibility.spec.ts",
+2026-03-17T19:36:04.7342268Z               "line": 177,
+2026-03-17T19:36:04.7342474Z               "column": 7
+2026-03-17T19:36:04.7342690Z             },
+2026-03-17T19:36:04.7342860Z             {
+2026-03-17T19:36:04.7343278Z               "title": "A11Y-011: Error messages should be programmatically associated with inputs",
+2026-03-17T19:36:04.7343730Z               "ok": true,
+2026-03-17T19:36:04.7343934Z               "tags": [],
+2026-03-17T19:36:04.7344149Z               "tests": [
+2026-03-17T19:36:04.7344343Z                 {
+2026-03-17T19:36:04.7344568Z                   "timeout": 90000,
+2026-03-17T19:36:04.7344842Z                   "annotations": [],
+2026-03-17T19:36:04.7345225Z                   "expectedStatus": "passed",
+2026-03-17T19:36:04.7345540Z                   "projectId": "chromium",
+2026-03-17T19:36:04.7345849Z                   "projectName": "chromium",
+2026-03-17T19:36:04.7346115Z                   "results": [
+2026-03-17T19:36:04.7346478Z                     {
+2026-03-17T19:36:04.7346719Z                       "workerIndex": 2,
+2026-03-17T19:36:04.7346989Z                       "parallelIndex": 1,
+2026-03-17T19:36:04.7347282Z                       "status": "passed",
+2026-03-17T19:36:04.7347573Z                       "duration": 1404,
+2026-03-17T19:36:04.7347851Z                       "errors": [],
+2026-03-17T19:36:04.7348100Z                       "stdout": [],
+2026-03-17T19:36:04.7348363Z                       "stderr": [],
+2026-03-17T19:36:04.7348623Z                       "retry": 0,
+2026-03-17T19:36:04.7348916Z                       "startTime": "2026-03-17T19:36:03.085Z",
+2026-03-17T19:36:04.7349245Z                       "annotations": [],
+2026-03-17T19:36:04.7349523Z                       "attachments": []
+2026-03-17T19:36:04.7349752Z                     }
+2026-03-17T19:36:04.7349956Z                   ],
+2026-03-17T19:36:04.7350174Z                   "status": "expected"
+2026-03-17T19:36:04.7350421Z                 }
+2026-03-17T19:36:04.7350621Z               ],
+2026-03-17T19:36:04.7350888Z               "id": "ddd864604af8a6a0198f-1589e58b23c6c7ae3a7a",
+2026-03-17T19:36:04.7351256Z               "file": "accessibility.spec.ts",
+2026-03-17T19:36:04.7351541Z               "line": 202,
+2026-03-17T19:36:04.7351779Z               "column": 7
+2026-03-17T19:36:04.7351994Z             }
+2026-03-17T19:36:04.7352159Z           ]
+2026-03-17T19:36:04.7352508Z         }
+2026-03-17T19:36:04.7352660Z       ]
+2026-03-17T19:36:04.7352877Z     },
+2026-03-17T19:36:04.7353042Z     {
+2026-03-17T19:36:04.7353267Z       "title": "api/auth-api.spec.ts",
+2026-03-17T19:36:04.7353557Z       "file": "api/auth-api.spec.ts",
+2026-03-17T19:36:04.7353819Z       "column": 0,
+2026-03-17T19:36:04.7354000Z       "line": 0,
+2026-03-17T19:36:04.7354176Z       "specs": [],
+2026-03-17T19:36:04.7354371Z       "suites": [
+2026-03-17T19:36:04.7354557Z         {
+2026-03-17T19:36:04.7355202Z           "title": "Auth API — Login @api @auth",
+2026-03-17T19:36:04.7355598Z           "file": "api/auth-api.spec.ts",
+2026-03-17T19:36:04.7355843Z           "line": 27,
+2026-03-17T19:36:04.7356053Z           "column": 6,
+2026-03-17T19:36:04.7356246Z           "specs": [
+2026-03-17T19:36:04.7356424Z             {
+2026-03-17T19:36:04.7356677Z               "title": "valid credentials return an auth token",
+2026-03-17T19:36:04.7356966Z               "ok": true,
+2026-03-17T19:36:04.7357236Z               "tags": [
+2026-03-17T19:36:04.7357507Z                 "api",
+2026-03-17T19:36:04.7357738Z                 "auth"
+2026-03-17T19:36:04.7357964Z               ],
+2026-03-17T19:36:04.7358170Z               "tests": [
+2026-03-17T19:36:04.7358366Z                 {
+2026-03-17T19:36:04.7358563Z                   "timeout": 90000,
+2026-03-17T19:36:04.7358819Z                   "annotations": [
+2026-03-17T19:36:04.7359040Z                     {
+2026-03-17T19:36:04.7359253Z                       "type": "skip",
+2026-03-17T19:36:04.7359590Z                       "description": "TEST_USERNAME not set in .env",
+2026-03-17T19:36:04.7359920Z                       "location": {
+2026-03-17T19:36:04.7360484Z                         "file": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/tests/api/auth-api.spec.ts",
+2026-03-17T19:36:04.7361308Z                         "line": 28,
+2026-03-17T19:36:04.7361755Z                         "column": 8
+2026-03-17T19:36:04.7362145Z                       }
+2026-03-17T19:36:04.7362495Z                     }
+2026-03-17T19:36:04.7362828Z                   ],
+2026-03-17T19:36:04.7363238Z                   "expectedStatus": "skipped",
+2026-03-17T19:36:04.7363863Z                   "projectId": "chromium",
+2026-03-17T19:36:04.7364561Z                   "projectName": "chromium",
+2026-03-17T19:36:04.7365320Z                   "results": [
+2026-03-17T19:36:04.7365758Z                     {
+2026-03-17T19:36:04.7366135Z                       "workerIndex": -1,
+2026-03-17T19:36:04.7366601Z                       "parallelIndex": -1,
+2026-03-17T19:36:04.7367454Z                       "status": "skipped",
+2026-03-17T19:36:04.7367895Z                       "duration": 0,
+2026-03-17T19:36:04.7368310Z                       "errors": [],
+2026-03-17T19:36:04.7368693Z                       "stdout": [],
+2026-03-17T19:36:04.7369102Z                       "stderr": [],
+2026-03-17T19:36:04.7369528Z                       "retry": 0,
+2026-03-17T19:36:04.7369967Z                       "startTime": "2026-03-17T19:36:03.266Z",
+2026-03-17T19:36:04.7370497Z                       "annotations": [
+2026-03-17T19:36:04.7370888Z                         {
+2026-03-17T19:36:04.7371266Z                           "type": "skip",
+2026-03-17T19:36:04.7371816Z                           "description": "TEST_USERNAME not set in .env",
+2026-03-17T19:36:04.7372346Z                           "location": {
+2026-03-17T19:36:04.7373343Z                             "file": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/tests/api/auth-api.spec.ts",
+2026-03-17T19:36:04.7374205Z                             "line": 28,
+2026-03-17T19:36:04.7374481Z                             "column": 8
+2026-03-17T19:36:04.7374718Z                           }
+2026-03-17T19:36:04.7374917Z                         }
+2026-03-17T19:36:04.7375342Z                       ],
+2026-03-17T19:36:04.7375580Z                       "attachments": []
+2026-03-17T19:36:04.7375814Z                     }
+2026-03-17T19:36:04.7375994Z                   ],
+2026-03-17T19:36:04.7376388Z                   "status": "skipped"
+2026-03-17T19:36:04.7376618Z                 }
+2026-03-17T19:36:04.7376792Z               ],
+2026-03-17T19:36:04.7377048Z               "id": "811441bc76ae2ee42483-e65534f7281680a27ba9",
+2026-03-17T19:36:04.7377383Z               "file": "api/auth-api.spec.ts",
+2026-03-17T19:36:04.7377645Z               "line": 30,
+2026-03-17T19:36:04.7377847Z               "column": 7
+2026-03-17T19:36:04.7378031Z             },
+2026-03-17T19:36:04.7378196Z             {
+2026-03-17T19:36:04.7378446Z               "title": "wrong password returns error body",
+2026-03-17T19:36:04.7378736Z               "ok": true,
+2026-03-17T19:36:04.7378923Z               "tags": [
+2026-03-17T19:36:04.7379116Z                 "api",
+2026-03-17T19:36:04.7379302Z                 "auth"
+2026-03-17T19:36:04.7379482Z               ],
+2026-03-17T19:36:04.7379652Z               "tests": [
+2026-03-17T19:36:04.7379842Z                 {
+2026-03-17T19:36:04.7380047Z                   "timeout": 90000,
+2026-03-17T19:36:04.7380311Z                   "annotations": [
+2026-03-17T19:36:04.7380530Z                     {
+2026-03-17T19:36:04.7380747Z                       "type": "skip",
+2026-03-17T19:36:04.7381070Z                       "description": "TEST_USERNAME not set in .env",
+2026-03-17T19:36:04.7381394Z                       "location": {
+2026-03-17T19:36:04.7381948Z                         "file": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/tests/api/auth-api.spec.ts",
+2026-03-17T19:36:04.7382470Z                         "line": 28,
+2026-03-17T19:36:04.7382717Z                         "column": 8
+2026-03-17T19:36:04.7382935Z                       }
+2026-03-17T19:36:04.7383122Z                     }
+2026-03-17T19:36:04.7383297Z                   ],
+2026-03-17T19:36:04.7383544Z                   "expectedStatus": "skipped",
+2026-03-17T19:36:04.7384021Z                   "projectId": "chromium",
+2026-03-17T19:36:04.7384421Z                   "projectName": "chromium",
+2026-03-17T19:36:04.7384864Z                   "results": [
+2026-03-17T19:36:04.7385413Z                     {
+2026-03-17T19:36:04.7385755Z                       "workerIndex": -1,
+2026-03-17T19:36:04.7386183Z                       "parallelIndex": -1,
+2026-03-17T19:36:04.7386590Z                       "status": "skipped",
+2026-03-17T19:36:04.7386960Z                       "duration": 0,
+2026-03-17T19:36:04.7387368Z                       "errors": [],
+2026-03-17T19:36:04.7387678Z                       "stdout": [],
+2026-03-17T19:36:04.7388024Z                       "stderr": [],
+2026-03-17T19:36:04.7388600Z                       "retry": 0,
+2026-03-17T19:36:04.7389002Z                       "startTime": "2026-03-17T19:36:03.266Z",
+2026-03-17T19:36:04.7389395Z                       "annotations": [
+2026-03-17T19:36:04.7389760Z                         {
+2026-03-17T19:36:04.7390100Z                           "type": "skip",
+2026-03-17T19:36:04.7390565Z                           "description": "TEST_USERNAME not set in .env",
+2026-03-17T19:36:04.7391085Z                           "location": {
+2026-03-17T19:36:04.7391747Z                             "file": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/tests/api/auth-api.spec.ts",
+2026-03-17T19:36:04.7392394Z                             "line": 28,
+2026-03-17T19:36:04.7392803Z                             "column": 8
+2026-03-17T19:36:04.7402112Z                           }
+2026-03-17T19:36:04.7402404Z                         }
+2026-03-17T19:36:04.7402722Z                       ],
+2026-03-17T19:36:04.7403090Z                       "attachments": []
+2026-03-17T19:36:04.7403468Z                     }
+2026-03-17T19:36:04.7403768Z                   ],
+2026-03-17T19:36:04.7404190Z                   "status": "skipped"
+2026-03-17T19:36:04.7404579Z                 }
+2026-03-17T19:36:04.7404885Z               ],
+2026-03-17T19:36:04.7405522Z               "id": "811441bc76ae2ee42483-51d1fa6c2d391a5bb55b",
+2026-03-17T19:36:04.7406325Z               "file": "api/auth-api.spec.ts",
+2026-03-17T19:36:04.7406674Z               "line": 48,
+2026-03-17T19:36:04.7406886Z               "column": 7
+2026-03-17T19:36:04.7407077Z             },
+2026-03-17T19:36:04.7407248Z             {
+2026-03-17T19:36:04.7407530Z               "title": "unknown username returns user-not-found error",
+2026-03-17T19:36:04.7407852Z               "ok": true,
+2026-03-17T19:36:04.7408055Z               "tags": [
+2026-03-17T19:36:04.7408254Z                 "api",
+2026-03-17T19:36:04.7408439Z                 "auth"
+2026-03-17T19:36:04.7409258Z               ],
+2026-03-17T19:36:04.7409580Z               "tests": [
+2026-03-17T19:36:04.7409903Z                 {
+2026-03-17T19:36:04.7410120Z                   "timeout": 90000,
+2026-03-17T19:36:04.7410379Z                   "annotations": [
+2026-03-17T19:36:04.7410601Z                     {
+2026-03-17T19:36:04.7410825Z                       "type": "skip",
+2026-03-17T19:36:04.7411152Z                       "description": "TEST_USERNAME not set in .env",
+2026-03-17T19:36:04.7411483Z                       "location": {
+2026-03-17T19:36:04.7412042Z                         "file": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/tests/api/auth-api.spec.ts",
+2026-03-17T19:36:04.7412566Z                         "line": 28,
+2026-03-17T19:36:04.7412803Z                         "column": 8
+2026-03-17T19:36:04.7413018Z                       }
+2026-03-17T19:36:04.7413205Z                     }
+2026-03-17T19:36:04.7413379Z                   ],
+2026-03-17T19:36:04.7413613Z                   "expectedStatus": "skipped",
+2026-03-17T19:36:04.7413912Z                   "projectId": "chromium",
+2026-03-17T19:36:04.7414220Z                   "projectName": "chromium",
+2026-03-17T19:36:04.7414490Z                   "results": [
+2026-03-17T19:36:04.7414706Z                     {
+2026-03-17T19:36:04.7414934Z                       "workerIndex": -1,
+2026-03-17T19:36:04.7415447Z                       "parallelIndex": -1,
+2026-03-17T19:36:04.7415737Z                       "status": "skipped",
+2026-03-17T19:36:04.7415994Z                       "duration": 0,
+2026-03-17T19:36:04.7416242Z                       "errors": [],
+2026-03-17T19:36:04.7416484Z                       "stdout": [],
+2026-03-17T19:36:04.7416718Z                       "stderr": [],
+2026-03-17T19:36:04.7416951Z                       "retry": 0,
+2026-03-17T19:36:04.7417238Z                       "startTime": "2026-03-17T19:36:03.266Z",
+2026-03-17T19:36:04.7417538Z                       "annotations": [
+2026-03-17T19:36:04.7417957Z                         {
+2026-03-17T19:36:04.7418181Z                           "type": "skip",
+2026-03-17T19:36:04.7418513Z                           "description": "TEST_USERNAME not set in .env",
+2026-03-17T19:36:04.7418843Z                           "location": {
+2026-03-17T19:36:04.7419418Z                             "file": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/tests/api/auth-api.spec.ts",
+2026-03-17T19:36:04.7419953Z                             "line": 28,
+2026-03-17T19:36:04.7420201Z                             "column": 8
+2026-03-17T19:36:04.7420430Z                           }
+2026-03-17T19:36:04.7420641Z                         }
+2026-03-17T19:36:04.7420839Z                       ],
+2026-03-17T19:36:04.7421061Z                       "attachments": []
+2026-03-17T19:36:04.7421284Z                     }
+2026-03-17T19:36:04.7421463Z                   ],
+2026-03-17T19:36:04.7421678Z                   "status": "skipped"
+2026-03-17T19:36:04.7421897Z                 }
+2026-03-17T19:36:04.7422077Z               ],
+2026-03-17T19:36:04.7422340Z               "id": "811441bc76ae2ee42483-3e9720f429a393208338",
+2026-03-17T19:36:04.7422680Z               "file": "api/auth-api.spec.ts",
+2026-03-17T19:36:04.7422929Z               "line": 58,
+2026-03-17T19:36:04.7423127Z               "column": 7
+2026-03-17T19:36:04.7423313Z             },
+2026-03-17T19:36:04.7423476Z             {
+2026-03-17T19:36:04.7423838Z               "title": "invalid login — wrong-password",
+2026-03-17T19:36:04.7424240Z               "ok": true,
+2026-03-17T19:36:04.7424429Z               "tags": [
+2026-03-17T19:36:04.7424618Z                 "api",
+2026-03-17T19:36:04.7424801Z                 "auth"
+2026-03-17T19:36:04.7424972Z               ],
+2026-03-17T19:36:04.7425320Z               "tests": [
+2026-03-17T19:36:04.7425511Z                 {
+2026-03-17T19:36:04.7425714Z                   "timeout": 90000,
+2026-03-17T19:36:04.7425961Z                   "annotations": [
+2026-03-17T19:36:04.7426184Z                     {
+2026-03-17T19:36:04.7426412Z                       "type": "skip",
+2026-03-17T19:36:04.7426730Z                       "description": "TEST_USERNAME not set in .env",
+2026-03-17T19:36:04.7427041Z                       "location": {
+2026-03-17T19:36:04.7427594Z                         "file": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/tests/api/auth-api.spec.ts",
+2026-03-17T19:36:04.7428117Z                         "line": 28,
+2026-03-17T19:36:04.7428364Z                         "column": 8
+2026-03-17T19:36:04.7428572Z                       }
+2026-03-17T19:36:04.7428770Z                     }
+2026-03-17T19:36:04.7428950Z                   ],
+2026-03-17T19:36:04.7429183Z                   "expectedStatus": "skipped",
+2026-03-17T19:36:04.7429471Z                   "projectId": "chromium",
+2026-03-17T19:36:04.7429743Z                   "projectName": "chromium",
+2026-03-17T19:36:04.7430004Z                   "results": [
+2026-03-17T19:36:04.7430210Z                     {
+2026-03-17T19:36:04.7430433Z                       "workerIndex": -1,
+2026-03-17T19:36:04.7430700Z                       "parallelIndex": -1,
+2026-03-17T19:36:04.7430970Z                       "status": "skipped",
+2026-03-17T19:36:04.7431231Z                       "duration": 0,
+2026-03-17T19:36:04.7431478Z                       "errors": [],
+2026-03-17T19:36:04.7431708Z                       "stdout": [],
+2026-03-17T19:36:04.7431941Z                       "stderr": [],
+2026-03-17T19:36:04.7432185Z                       "retry": 0,
+2026-03-17T19:36:04.7432469Z                       "startTime": "2026-03-17T19:36:03.267Z",
+2026-03-17T19:36:04.7432764Z                       "annotations": [
+2026-03-17T19:36:04.7432995Z                         {
+2026-03-17T19:36:04.7433219Z                           "type": "skip",
+2026-03-17T19:36:04.7433543Z                           "description": "TEST_USERNAME not set in .env",
+2026-03-17T19:36:04.7433869Z                           "location": {
+2026-03-17T19:36:04.7434600Z                             "file": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/tests/api/auth-api.spec.ts",
+2026-03-17T19:36:04.7435311Z                             "line": 28,
+2026-03-17T19:36:04.7435564Z                             "column": 8
+2026-03-17T19:36:04.7435789Z                           }
+2026-03-17T19:36:04.7435978Z                         }
+2026-03-17T19:36:04.7436169Z                       ],
+2026-03-17T19:36:04.7436393Z                       "attachments": []
+2026-03-17T19:36:04.7436615Z                     }
+2026-03-17T19:36:04.7436787Z                   ],
+2026-03-17T19:36:04.7436992Z                   "status": "skipped"
+2026-03-17T19:36:04.7437211Z                 }
+2026-03-17T19:36:04.7437380Z               ],
+2026-03-17T19:36:04.7437631Z               "id": "811441bc76ae2ee42483-63e3eac0df047fdeeed6",
+2026-03-17T19:36:04.7437959Z               "file": "api/auth-api.spec.ts",
+2026-03-17T19:36:04.7438205Z               "line": 72,
+2026-03-17T19:36:04.7438401Z               "column": 9
+2026-03-17T19:36:04.7438586Z             },
+2026-03-17T19:36:04.7438742Z             {
+2026-03-17T19:36:04.7439035Z               "title": "invalid login — unknown-user",
+2026-03-17T19:36:04.7439297Z               "ok": true,
+2026-03-17T19:36:04.7439486Z               "tags": [
+2026-03-17T19:36:04.7439670Z                 "api",
+2026-03-17T19:36:04.7439907Z                 "auth"
+2026-03-17T19:36:04.7440085Z               ],
+2026-03-17T19:36:04.7440392Z               "tests": [
+2026-03-17T19:36:04.7440574Z                 {
+2026-03-17T19:36:04.7440772Z                   "timeout": 90000,
+2026-03-17T19:36:04.7441020Z                   "annotations": [
+2026-03-17T19:36:04.7441241Z                     {
+2026-03-17T19:36:04.7441444Z                       "type": "skip",
+2026-03-17T19:36:04.7441760Z                       "description": "TEST_USERNAME not set in .env",
+2026-03-17T19:36:04.7442073Z                       "location": {
+2026-03-17T19:36:04.7442620Z                         "file": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/tests/api/auth-api.spec.ts",
+2026-03-17T19:36:04.7443143Z                         "line": 28,
+2026-03-17T19:36:04.7443373Z                         "column": 8
+2026-03-17T19:36:04.7443586Z                       }
+2026-03-17T19:36:04.7443771Z                     }
+2026-03-17T19:36:04.7443946Z                   ],
+2026-03-17T19:36:04.7444174Z                   "expectedStatus": "skipped",
+2026-03-17T19:36:04.7444466Z                   "projectId": "chromium",
+2026-03-17T19:36:04.7444747Z                   "projectName": "chromium",
+2026-03-17T19:36:04.7445155Z                   "results": [
+2026-03-17T19:36:04.7445380Z                     {
+2026-03-17T19:36:04.7445599Z                       "workerIndex": -1,
+2026-03-17T19:36:04.7445903Z                       "parallelIndex": -1,
+2026-03-17T19:36:04.7446186Z                       "status": "skipped",
+2026-03-17T19:36:04.7446434Z                       "duration": 0,
+2026-03-17T19:36:04.7446687Z                       "errors": [],
+2026-03-17T19:36:04.7446922Z                       "stdout": [],
+2026-03-17T19:36:04.7447163Z                       "stderr": [],
+2026-03-17T19:36:04.7447396Z                       "retry": 0,
+2026-03-17T19:36:04.7447672Z                       "startTime": "2026-03-17T19:36:03.267Z",
+2026-03-17T19:36:04.7447969Z                       "annotations": [
+2026-03-17T19:36:04.7448195Z                         {
+2026-03-17T19:36:04.7448424Z                           "type": "skip",
+2026-03-17T19:36:04.7448742Z                           "description": "TEST_USERNAME not set in .env",
+2026-03-17T19:36:04.7449066Z                           "location": {
+2026-03-17T19:36:04.7449624Z                             "file": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/tests/api/auth-api.spec.ts",
+2026-03-17T19:36:04.7450149Z                             "line": 28,
+2026-03-17T19:36:04.7450399Z                             "column": 8
+2026-03-17T19:36:04.7450752Z                           }
+2026-03-17T19:36:04.7450948Z                         }
+2026-03-17T19:36:04.7451139Z                       ],
+2026-03-17T19:36:04.7451359Z                       "attachments": []
+2026-03-17T19:36:04.7451576Z                     }
+2026-03-17T19:36:04.7451756Z                   ],
+2026-03-17T19:36:04.7451965Z                   "status": "skipped"
+2026-03-17T19:36:04.7452189Z                 }
+2026-03-17T19:36:04.7452359Z               ],
+2026-03-17T19:36:04.7452613Z               "id": "811441bc76ae2ee42483-58a2055f56ef16596be3",
+2026-03-17T19:36:04.7452939Z               "file": "api/auth-api.spec.ts",
+2026-03-17T19:36:04.7453188Z               "line": 72,
+2026-03-17T19:36:04.7453380Z               "column": 9
+2026-03-17T19:36:04.7453567Z             }
+2026-03-17T19:36:04.7453723Z           ]
+2026-03-17T19:36:04.7453881Z         },
+2026-03-17T19:36:04.7454032Z         {
+2026-03-17T19:36:04.7454314Z           "title": "Auth API — Signup @api @auth",
+2026-03-17T19:36:04.7454665Z           "file": "api/auth-api.spec.ts",
+2026-03-17T19:36:04.7454905Z           "line": 87,
+2026-03-17T19:36:04.7455289Z           "column": 6,
+2026-03-17T19:36:04.7455483Z           "specs": [
+2026-03-17T19:36:04.7455653Z             {
+2026-03-17T19:36:04.7455920Z               "title": "new unique username registers successfully",
+2026-03-17T19:36:04.7456221Z               "ok": true,
+2026-03-17T19:36:04.7456413Z               "tags": [
+2026-03-17T19:36:04.7456751Z                 "api",
+2026-03-17T19:36:04.7456938Z                 "auth"
+2026-03-17T19:36:04.7457122Z               ],
+2026-03-17T19:36:04.7457294Z               "tests": [
+2026-03-17T19:36:04.7457478Z                 {
+2026-03-17T19:36:04.7457684Z                   "timeout": 90000,
+2026-03-17T19:36:04.7457938Z                   "annotations": [],
+2026-03-17T19:36:04.7458210Z                   "expectedStatus": "passed",
+2026-03-17T19:36:04.7458491Z                   "projectId": "chromium",
+2026-03-17T19:36:04.7458767Z                   "projectName": "chromium",
+2026-03-17T19:36:04.7459031Z                   "results": [
+2026-03-17T19:36:04.7459234Z                     {
+2026-03-17T19:36:04.7459438Z                       "workerIndex": 1,
+2026-03-17T19:36:04.7459698Z                       "parallelIndex": 3,
+2026-03-17T19:36:04.7459955Z                       "status": "passed",
+2026-03-17T19:36:04.7460212Z                       "duration": 269,
+2026-03-17T19:36:04.7460458Z                       "errors": [],
+2026-03-17T19:36:04.7460697Z                       "stdout": [],
+2026-03-17T19:36:04.7460930Z                       "stderr": [],
+2026-03-17T19:36:04.7461163Z                       "retry": 0,
+2026-03-17T19:36:04.7461439Z                       "startTime": "2026-03-17T19:36:03.277Z",
+2026-03-17T19:36:04.7461723Z                       "annotations": [],
+2026-03-17T19:36:04.7461982Z                       "attachments": []
+2026-03-17T19:36:04.7462200Z                     }
+2026-03-17T19:36:04.7462374Z                   ],
+2026-03-17T19:36:04.7462583Z                   "status": "expected"
+2026-03-17T19:36:04.7462802Z                 }
+2026-03-17T19:36:04.7462971Z               ],
+2026-03-17T19:36:04.7463225Z               "id": "811441bc76ae2ee42483-8db1641380b1b2afebb8",
+2026-03-17T19:36:04.7463542Z               "file": "api/auth-api.spec.ts",
+2026-03-17T19:36:04.7463790Z               "line": 90,
+2026-03-17T19:36:04.7463985Z               "column": 7
+2026-03-17T19:36:04.7464178Z             },
+2026-03-17T19:36:04.7464341Z             {
+2026-03-17T19:36:04.7464603Z               "title": "duplicate username returns conflict message",
+2026-03-17T19:36:04.7464904Z               "ok": true,
+2026-03-17T19:36:04.7465317Z               "tags": [
+2026-03-17T19:36:04.7465532Z                 "api",
+2026-03-17T19:36:04.7465711Z                 "auth"
+2026-03-17T19:36:04.7465888Z               ],
+2026-03-17T19:36:04.7466065Z               "tests": [
+2026-03-17T19:36:04.7466254Z                 {
+2026-03-17T19:36:04.7466445Z                   "timeout": 90000,
+2026-03-17T19:36:04.7466829Z                   "annotations": [
+2026-03-17T19:36:04.7467051Z                     {
+2026-03-17T19:36:04.7467277Z                       "type": "skip",
+2026-03-17T19:36:04.7467705Z                       "description": "TEST_USERNAME not set in .env",
+2026-03-17T19:36:04.7468035Z                       "location": {
+2026-03-17T19:36:04.7468598Z                         "file": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/tests/api/auth-api.spec.ts",
+2026-03-17T19:36:04.7469134Z                         "line": 104,
+2026-03-17T19:36:04.7469389Z                         "column": 10
+2026-03-17T19:36:04.7469607Z                       }
+2026-03-17T19:36:04.7469801Z                     }
+2026-03-17T19:36:04.7469990Z                   ],
+2026-03-17T19:36:04.7470225Z                   "expectedStatus": "skipped",
+2026-03-17T19:36:04.7470510Z                   "projectId": "chromium",
+2026-03-17T19:36:04.7470790Z                   "projectName": "chromium",
+2026-03-17T19:36:04.7471058Z                   "results": [
+2026-03-17T19:36:04.7471267Z                     {
+2026-03-17T19:36:04.7471479Z                       "workerIndex": 3,
+2026-03-17T19:36:04.7471755Z                       "parallelIndex": 2,
+2026-03-17T19:36:04.7472032Z                       "status": "skipped",
+2026-03-17T19:36:04.7472296Z                       "duration": 8,
+2026-03-17T19:36:04.7472539Z                       "errors": [],
+2026-03-17T19:36:04.7472770Z                       "stdout": [],
+2026-03-17T19:36:04.7472866Z                       "stderr": [],
+2026-03-17T19:36:04.7472968Z                       "retry": 0,
+2026-03-17T19:36:04.7473113Z                       "startTime": "2026-03-17T19:36:03.396Z",
+2026-03-17T19:36:04.7473226Z                       "annotations": [
+2026-03-17T19:36:04.7473302Z                         {
+2026-03-17T19:36:04.7473407Z                           "type": "skip",
+2026-03-17T19:36:04.7473583Z                           "description": "TEST_USERNAME not set in .env",
+2026-03-17T19:36:04.7473695Z                           "location": {
+2026-03-17T19:36:04.7474113Z                             "file": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/tests/api/auth-api.spec.ts",
+2026-03-17T19:36:04.7474218Z                             "line": 104,
+2026-03-17T19:36:04.7474324Z                             "column": 10
+2026-03-17T19:36:04.7474400Z                           }
+2026-03-17T19:36:04.7474483Z                         }
+2026-03-17T19:36:04.7474558Z                       ],
+2026-03-17T19:36:04.7474664Z                       "attachments": []
+2026-03-17T19:36:04.7474741Z                     }
+2026-03-17T19:36:04.7474813Z                   ],
+2026-03-17T19:36:04.7474922Z                   "status": "skipped"
+2026-03-17T19:36:04.7474992Z                 }
+2026-03-17T19:36:04.7475251Z               ],
+2026-03-17T19:36:04.7475422Z               "id": "811441bc76ae2ee42483-d5ebcb5a62d2ea85053e",
+2026-03-17T19:36:04.7475547Z               "file": "api/auth-api.spec.ts",
+2026-03-17T19:36:04.7475635Z               "line": 103,
+2026-03-17T19:36:04.7475711Z               "column": 7
+2026-03-17T19:36:04.7475786Z             }
+2026-03-17T19:36:04.7475855Z           ]
+2026-03-17T19:36:04.7475928Z         },
+2026-03-17T19:36:04.7475994Z         {
+2026-03-17T19:36:04.7476192Z           "title": "Auth API — Check @api @auth",
+2026-03-17T19:36:04.7476310Z           "file": "api/auth-api.spec.ts",
+2026-03-17T19:36:04.7476394Z           "line": 116,
+2026-03-17T19:36:04.7476474Z           "column": 6,
+2026-03-17T19:36:04.7476548Z           "specs": [
+2026-03-17T19:36:04.7476621Z             {
+2026-03-17T19:36:04.7476811Z               "title": "POST /check with existing username returns 200",
+2026-03-17T19:36:04.7476887Z               "ok": true,
+2026-03-17T19:36:04.7476968Z               "tags": [
+2026-03-17T19:36:04.7477040Z                 "api",
+2026-03-17T19:36:04.7477120Z                 "auth"
+2026-03-17T19:36:04.7477192Z               ],
+2026-03-17T19:36:04.7477405Z               "tests": [
+2026-03-17T19:36:04.7477477Z                 {
+2026-03-17T19:36:04.7477577Z                   "timeout": 90000,
+2026-03-17T19:36:04.7477686Z                   "annotations": [
+2026-03-17T19:36:04.7477760Z                     {
+2026-03-17T19:36:04.7477868Z                       "type": "skip",
+2026-03-17T19:36:04.7478036Z                       "description": "TEST_USERNAME not set in .env",
+2026-03-17T19:36:04.7478145Z                       "location": {
+2026-03-17T19:36:04.7478545Z                         "file": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/tests/api/auth-api.spec.ts",
+2026-03-17T19:36:04.7478653Z                         "line": 118,
+2026-03-17T19:36:04.7478749Z                         "column": 10
+2026-03-17T19:36:04.7478822Z                       }
+2026-03-17T19:36:04.7478899Z                     }
+2026-03-17T19:36:04.7478971Z                   ],
+2026-03-17T19:36:04.7479099Z                   "expectedStatus": "skipped",
+2026-03-17T19:36:04.7479216Z                   "projectId": "chromium",
+2026-03-17T19:36:04.7479337Z                   "projectName": "chromium",
+2026-03-17T19:36:04.7479433Z                   "results": [
+2026-03-17T19:36:04.7479506Z                     {
+2026-03-17T19:36:04.7479618Z                       "workerIndex": 3,
+2026-03-17T19:36:04.7479727Z                       "parallelIndex": 2,
+2026-03-17T19:36:04.7479841Z                       "status": "skipped",
+2026-03-17T19:36:04.7480062Z                       "duration": 8,
+2026-03-17T19:36:04.7480166Z                       "errors": [],
+2026-03-17T19:36:04.7480262Z                       "stdout": [],
+2026-03-17T19:36:04.7480356Z                       "stderr": [],
+2026-03-17T19:36:04.7480458Z                       "retry": 0,
+2026-03-17T19:36:04.7480599Z                       "startTime": "2026-03-17T19:36:03.453Z",
+2026-03-17T19:36:04.7480711Z                       "annotations": [
+2026-03-17T19:36:04.7480787Z                         {
+2026-03-17T19:36:04.7480906Z                           "type": "skip",
+2026-03-17T19:36:04.7481079Z                           "description": "TEST_USERNAME not set in .env",
+2026-03-17T19:36:04.7481186Z                           "location": {
+2026-03-17T19:36:04.7481588Z                             "file": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/tests/api/auth-api.spec.ts",
+2026-03-17T19:36:04.7481698Z                             "line": 118,
+2026-03-17T19:36:04.7481803Z                             "column": 10
+2026-03-17T19:36:04.7481878Z                           }
+2026-03-17T19:36:04.7481958Z                         }
+2026-03-17T19:36:04.7482031Z                       ],
+2026-03-17T19:36:04.7482140Z                       "attachments": []
+2026-03-17T19:36:04.7482211Z                     }
+2026-03-17T19:36:04.7482286Z                   ],
+2026-03-17T19:36:04.7482389Z                   "status": "skipped"
+2026-03-17T19:36:04.7482459Z                 }
+2026-03-17T19:36:04.7482534Z               ],
+2026-03-17T19:36:04.7482692Z               "id": "811441bc76ae2ee42483-f465931b0581aa1f85ce",
+2026-03-17T19:36:04.7482820Z               "file": "api/auth-api.spec.ts",
+2026-03-17T19:36:04.7482897Z               "line": 117,
+2026-03-17T19:36:04.7482978Z               "column": 7
+2026-03-17T19:36:04.7483045Z             }
+2026-03-17T19:36:04.7483115Z           ]
+2026-03-17T19:36:04.7483187Z         }
+2026-03-17T19:36:04.7483255Z       ]
+2026-03-17T19:36:04.7483332Z     },
+2026-03-17T19:36:04.7483398Z     {
+2026-03-17T19:36:04.7483513Z       "title": "api/cart-api.spec.ts",
+2026-03-17T19:36:04.7483625Z       "file": "api/cart-api.spec.ts",
+2026-03-17T19:36:04.7483699Z       "column": 0,
+2026-03-17T19:36:04.7483775Z       "line": 0,
+2026-03-17T19:36:04.7483848Z       "specs": [],
+2026-03-17T19:36:04.7483925Z       "suites": [
+2026-03-17T19:36:04.7483992Z         {
+2026-03-17T19:36:04.7484164Z           "title": "Cart API — View @api @cart",
+2026-03-17T19:36:04.7484280Z           "file": "api/cart-api.spec.ts",
+2026-03-17T19:36:04.7484454Z           "line": 31,
+2026-03-17T19:36:04.7484531Z           "column": 6,
+2026-03-17T19:36:04.7484604Z           "specs": [
+2026-03-17T19:36:04.7484680Z             {
+2026-03-17T19:36:04.7484906Z               "title": "POST /viewcart returns Items array for authenticated user",
+2026-03-17T19:36:04.7484991Z               "ok": true,
+2026-03-17T19:36:04.7485228Z               "tags": [
+2026-03-17T19:36:04.7485313Z                 "api",
+2026-03-17T19:36:04.7485392Z                 "cart"
+2026-03-17T19:36:04.7485462Z               ],
+2026-03-17T19:36:04.7485542Z               "tests": [
+2026-03-17T19:36:04.7485613Z                 {
+2026-03-17T19:36:04.7485717Z                   "timeout": 90000,
+2026-03-17T19:36:04.7485825Z                   "annotations": [
+2026-03-17T19:36:04.7485897Z                     {
+2026-03-17T19:36:04.7486005Z                       "type": "skip",
+2026-03-17T19:36:04.7486172Z                       "description": "TEST_USERNAME not set in .env",
+2026-03-17T19:36:04.7486282Z                       "location": {
+2026-03-17T19:36:04.7486681Z                         "file": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/tests/api/cart-api.spec.ts",
+2026-03-17T19:36:04.7486784Z                         "line": 32,
+2026-03-17T19:36:04.7486880Z                         "column": 8
+2026-03-17T19:36:04.7486954Z                       }
+2026-03-17T19:36:04.7487032Z                     }
+2026-03-17T19:36:04.7487235Z                   ],
+2026-03-17T19:36:04.7487370Z                   "expectedStatus": "skipped",
+2026-03-17T19:36:04.7487483Z                   "projectId": "chromium",
+2026-03-17T19:36:04.7487632Z                   "projectName": "chromium",
+2026-03-17T19:36:04.7487731Z                   "results": [
+2026-03-17T19:36:04.7487803Z                     {
+2026-03-17T19:36:04.7487919Z                       "workerIndex": -1,
+2026-03-17T19:36:04.7488030Z                       "parallelIndex": -1,
+2026-03-17T19:36:04.7488140Z                       "status": "skipped",
+2026-03-17T19:36:04.7488247Z                       "duration": 0,
+2026-03-17T19:36:04.7488349Z                       "errors": [],
+2026-03-17T19:36:04.7488445Z                       "stdout": [],
+2026-03-17T19:36:04.7488547Z                       "stderr": [],
+2026-03-17T19:36:04.7488642Z                       "retry": 0,
+2026-03-17T19:36:04.7488784Z                       "startTime": "2026-03-17T19:36:03.471Z",
+2026-03-17T19:36:04.7488905Z                       "annotations": [
+2026-03-17T19:36:04.7488980Z                         {
+2026-03-17T19:36:04.7489090Z                           "type": "skip",
+2026-03-17T19:36:04.7489262Z                           "description": "TEST_USERNAME not set in .env",
+2026-03-17T19:36:04.7489370Z                           "location": {
+2026-03-17T19:36:04.7489772Z                             "file": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/tests/api/cart-api.spec.ts",
+2026-03-17T19:36:04.7489877Z                             "line": 32,
+2026-03-17T19:36:04.7489982Z                             "column": 8
+2026-03-17T19:36:04.7490056Z                           }
+2026-03-17T19:36:04.7490139Z                         }
+2026-03-17T19:36:04.7490212Z                       ],
+2026-03-17T19:36:04.7490323Z                       "attachments": []
+2026-03-17T19:36:04.7490395Z                     }
+2026-03-17T19:36:04.7490474Z                   ],
+2026-03-17T19:36:04.7490580Z                   "status": "skipped"
+2026-03-17T19:36:04.7490651Z                 }
+2026-03-17T19:36:04.7490725Z               ],
+2026-03-17T19:36:04.7490879Z               "id": "e50c028f637086798830-bd63b0d339384d1b23e1",
+2026-03-17T19:36:04.7491008Z               "file": "api/cart-api.spec.ts",
+2026-03-17T19:36:04.7491089Z               "line": 39,
+2026-03-17T19:36:04.7491164Z               "column": 7
+2026-03-17T19:36:04.7491239Z             }
+2026-03-17T19:36:04.7491306Z           ]
+2026-03-17T19:36:04.7491376Z         },
+2026-03-17T19:36:04.7491448Z         {
+2026-03-17T19:36:04.7491786Z           "title": "Cart API — Add & Delete @api @cart",
+2026-03-17T19:36:04.7491904Z           "file": "api/cart-api.spec.ts",
+2026-03-17T19:36:04.7491980Z           "line": 55,
+2026-03-17T19:36:04.7492062Z           "column": 6,
+2026-03-17T19:36:04.7492136Z           "specs": [
+2026-03-17T19:36:04.7492205Z             {
+2026-03-17T19:36:04.7492399Z               "title": "POST /addtocart adds a product and returns 200",
+2026-03-17T19:36:04.7492482Z               "ok": true,
+2026-03-17T19:36:04.7492561Z               "tags": [
+2026-03-17T19:36:04.7492636Z                 "api",
+2026-03-17T19:36:04.7492715Z                 "cart"
+2026-03-17T19:36:04.7492783Z               ],
+2026-03-17T19:36:04.7492858Z               "tests": [
+2026-03-17T19:36:04.7492934Z                 {
+2026-03-17T19:36:04.7493031Z                   "timeout": 90000,
+2026-03-17T19:36:04.7493138Z                   "annotations": [
+2026-03-17T19:36:04.7493208Z                     {
+2026-03-17T19:36:04.7493322Z                       "type": "skip",
+2026-03-17T19:36:04.7493487Z                       "description": "TEST_USERNAME not set in .env",
+2026-03-17T19:36:04.7493588Z                       "location": {
+2026-03-17T19:36:04.7493988Z                         "file": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/tests/api/cart-api.spec.ts",
+2026-03-17T19:36:04.7494083Z                         "line": 56,
+2026-03-17T19:36:04.7494272Z                         "column": 8
+2026-03-17T19:36:04.7494345Z                       }
+2026-03-17T19:36:04.7494419Z                     }
+2026-03-17T19:36:04.7494490Z                   ],
+2026-03-17T19:36:04.7494616Z                   "expectedStatus": "skipped",
+2026-03-17T19:36:04.7494730Z                   "projectId": "chromium",
+2026-03-17T19:36:04.7494845Z                   "projectName": "chromium",
+2026-03-17T19:36:04.7494944Z                   "results": [
+2026-03-17T19:36:04.7495158Z                     {
+2026-03-17T19:36:04.7495327Z                       "workerIndex": -1,
+2026-03-17T19:36:04.7495450Z                       "parallelIndex": -1,
+2026-03-17T19:36:04.7495562Z                       "status": "skipped",
+2026-03-17T19:36:04.7495662Z                       "duration": 0,
+2026-03-17T19:36:04.7495757Z                       "errors": [],
+2026-03-17T19:36:04.7495858Z                       "stdout": [],
+2026-03-17T19:36:04.7495953Z                       "stderr": [],
+2026-03-17T19:36:04.7496061Z                       "retry": 0,
+2026-03-17T19:36:04.7496201Z                       "startTime": "2026-03-17T19:36:03.471Z",
+2026-03-17T19:36:04.7496309Z                       "annotations": [
+2026-03-17T19:36:04.7496382Z                         {
+2026-03-17T19:36:04.7496522Z                           "type": "skip",
+2026-03-17T19:36:04.7496696Z                           "description": "TEST_USERNAME not set in .env",
+2026-03-17T19:36:04.7496796Z                           "location": {
+2026-03-17T19:36:04.7497210Z                             "file": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/tests/api/cart-api.spec.ts",
+2026-03-17T19:36:04.7497315Z                             "line": 56,
+2026-03-17T19:36:04.7497419Z                             "column": 8
+2026-03-17T19:36:04.7497494Z                           }
+2026-03-17T19:36:04.7497573Z                         }
+2026-03-17T19:36:04.7497645Z                       ],
+2026-03-17T19:36:04.7497756Z                       "attachments": []
+2026-03-17T19:36:04.7497830Z                     }
+2026-03-17T19:36:04.7497901Z                   ],
+2026-03-17T19:36:04.7498009Z                   "status": "skipped"
+2026-03-17T19:36:04.7498079Z                 }
+2026-03-17T19:36:04.7498153Z               ],
+2026-03-17T19:36:04.7498307Z               "id": "e50c028f637086798830-95adb5a97173531ebdf8",
+2026-03-17T19:36:04.7498434Z               "file": "api/cart-api.spec.ts",
+2026-03-17T19:36:04.7498510Z               "line": 63,
+2026-03-17T19:36:04.7498588Z               "column": 7
+2026-03-17T19:36:04.7498797Z             },
+2026-03-17T19:36:04.7498866Z             {
+2026-03-17T19:36:04.7499068Z               "title": "POST /deletecart removes a previously added entry",
+2026-03-17T19:36:04.7499177Z               "ok": true,
+2026-03-17T19:36:04.7499264Z               "tags": [
+2026-03-17T19:36:04.7499339Z                 "api",
+2026-03-17T19:36:04.7499412Z                 "cart"
+2026-03-17T19:36:04.7499488Z               ],
+2026-03-17T19:36:04.7499566Z               "tests": [
+2026-03-17T19:36:04.7499643Z                 {
+2026-03-17T19:36:04.7499741Z                   "timeout": 90000,
+2026-03-17T19:36:04.7499848Z                   "annotations": [
+2026-03-17T19:36:04.7499920Z                     {
+2026-03-17T19:36:04.7500021Z                       "type": "skip",
+2026-03-17T19:36:04.7500190Z                       "description": "TEST_USERNAME not set in .env",
+2026-03-17T19:36:04.7500288Z                       "location": {
+2026-03-17T19:36:04.7500685Z                         "file": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/tests/api/cart-api.spec.ts",
+2026-03-17T19:36:04.7500786Z                         "line": 56,
+2026-03-17T19:36:04.7500885Z                         "column": 8
+2026-03-17T19:36:04.7500958Z                       }
+2026-03-17T19:36:04.7501033Z                     }
+2026-03-17T19:36:04.7501103Z                   ],
+2026-03-17T19:36:04.7501223Z                   "expectedStatus": "skipped",
+2026-03-17T19:36:04.7501460Z                   "projectId": "chromium",
+2026-03-17T19:36:04.7501575Z                   "projectName": "chromium",
+2026-03-17T19:36:04.7501676Z                   "results": [
+2026-03-17T19:36:04.7501749Z                     {
+2026-03-17T19:36:04.7501859Z                       "workerIndex": -1,
+2026-03-17T19:36:04.7501970Z                       "parallelIndex": -1,
+2026-03-17T19:36:04.7502076Z                       "status": "skipped",
+2026-03-17T19:36:04.7502180Z                       "duration": 0,
+2026-03-17T19:36:04.7502277Z                       "errors": [],
+2026-03-17T19:36:04.7502385Z                       "stdout": [],
+2026-03-17T19:36:04.7502479Z                       "stderr": [],
+2026-03-17T19:36:04.7502580Z                       "retry": 0,
+2026-03-17T19:36:04.7502721Z                       "startTime": "2026-03-17T19:36:03.471Z",
+2026-03-17T19:36:04.7502825Z                       "annotations": [
+2026-03-17T19:36:04.7502905Z                         {
+2026-03-17T19:36:04.7503015Z                           "type": "skip",
+2026-03-17T19:36:04.7503190Z                           "description": "TEST_USERNAME not set in .env",
+2026-03-17T19:36:04.7503291Z                           "location": {
+2026-03-17T19:36:04.7503698Z                             "file": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/tests/api/cart-api.spec.ts",
+2026-03-17T19:36:04.7503800Z                             "line": 56,
+2026-03-17T19:36:04.7503904Z                             "column": 8
+2026-03-17T19:36:04.7503979Z                           }
+2026-03-17T19:36:04.7504056Z                         }
+2026-03-17T19:36:04.7504135Z                       ],
+2026-03-17T19:36:04.7504238Z                       "attachments": []
+2026-03-17T19:36:04.7504313Z                     }
+2026-03-17T19:36:04.7504384Z                   ],
+2026-03-17T19:36:04.7504491Z                   "status": "skipped"
+2026-03-17T19:36:04.7504559Z                 }
+2026-03-17T19:36:04.7504628Z               ],
+2026-03-17T19:36:04.7504788Z               "id": "e50c028f637086798830-7cbe30c7851997618cfe",
+2026-03-17T19:36:04.7504909Z               "file": "api/cart-api.spec.ts",
+2026-03-17T19:36:04.7504989Z               "line": 86,
+2026-03-17T19:36:04.7505230Z               "column": 7
+2026-03-17T19:36:04.7505310Z             }
+2026-03-17T19:36:04.7505380Z           ]
+2026-03-17T19:36:04.7505447Z         },
+2026-03-17T19:36:04.7505518Z         {
+2026-03-17T19:36:04.7505732Z           "title": "Cart API — Place Order @api @cart",
+2026-03-17T19:36:04.7505853Z           "file": "api/cart-api.spec.ts",
+2026-03-17T19:36:04.7506057Z           "line": 106,
+2026-03-17T19:36:04.7506141Z           "column": 6,
+2026-03-17T19:36:04.7506214Z           "specs": [
+2026-03-17T19:36:04.7506283Z             {
+2026-03-17T19:36:04.7506469Z               "title": "POST /placeorder with valid data returns 200",
+2026-03-17T19:36:04.7506544Z               "ok": true,
+2026-03-17T19:36:04.7506623Z               "tags": [
+2026-03-17T19:36:04.7506702Z                 "api",
+2026-03-17T19:36:04.7506780Z                 "cart"
+2026-03-17T19:36:04.7506849Z               ],
+2026-03-17T19:36:04.7506923Z               "tests": [
+2026-03-17T19:36:04.7506998Z                 {
+2026-03-17T19:36:04.7507097Z                   "timeout": 90000,
+2026-03-17T19:36:04.7507202Z                   "annotations": [
+2026-03-17T19:36:04.7507275Z                     {
+2026-03-17T19:36:04.7507380Z                       "type": "skip",
+2026-03-17T19:36:04.7507546Z                       "description": "TEST_USERNAME not set in .env",
+2026-03-17T19:36:04.7507655Z                       "location": {
+2026-03-17T19:36:04.7508047Z                         "file": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/tests/api/cart-api.spec.ts",
+2026-03-17T19:36:04.7508146Z                         "line": 107,
+2026-03-17T19:36:04.7508247Z                         "column": 8
+2026-03-17T19:36:04.7508320Z                       }
+2026-03-17T19:36:04.7508547Z                     }
+2026-03-17T19:36:04.7508618Z                   ],
+2026-03-17T19:36:04.7508747Z                   "expectedStatus": "skipped",
+2026-03-17T19:36:04.7508857Z                   "projectId": "chromium",
+2026-03-17T19:36:04.7508972Z                   "projectName": "chromium",
+2026-03-17T19:36:04.7509073Z                   "results": [
+2026-03-17T19:36:04.7509145Z                     {
+2026-03-17T19:36:04.7509257Z                       "workerIndex": -1,
+2026-03-17T19:36:04.7509367Z                       "parallelIndex": -1,
+2026-03-17T19:36:04.7509487Z                       "status": "skipped",
+2026-03-17T19:36:04.7509585Z                       "duration": 0,
+2026-03-17T19:36:04.7509682Z                       "errors": [],
+2026-03-17T19:36:04.7509786Z                       "stdout": [],
+2026-03-17T19:36:04.7509882Z                       "stderr": [],
+2026-03-17T19:36:04.7509980Z                       "retry": 0,
+2026-03-17T19:36:04.7510118Z                       "startTime": "2026-03-17T19:36:03.471Z",
+2026-03-17T19:36:04.7510233Z                       "annotations": [
+2026-03-17T19:36:04.7510307Z                         {
+2026-03-17T19:36:04.7510417Z                           "type": "skip",
+2026-03-17T19:36:04.7510587Z                           "description": "TEST_USERNAME not set in .env",
+2026-03-17T19:36:04.7510688Z                           "location": {
+2026-03-17T19:36:04.7511091Z                             "file": "/home/runner/work/automation_pw_ts_demoblaze/automation_pw_ts_demoblaze/tests/api/cart-api.spec.ts",
+2026-03-17T19:36:04.7511199Z                             "line": 107,
+2026-03-17T19:36:04.7511306Z                             "column": 8
+2026-03-17T19:36:04.7511381Z                           }
+2026-03-17T19:36:04.7511459Z                         }
+2026-03-17T19:36:04.7511534Z                       ],
+2026-03-17T19:36:04.7511648Z                       "attachments": []
+2026-03-17T19:36:04.7511719Z                     }
+2026-03-17T19:36:04.7511793Z                   ],
+2026-03-17T19:36:04.7511907Z                   "status": "skipped"
+2026-03-17T19:36:04.7511979Z                 }
+2026-03-17T19:36:04.7512055Z               ],
+2026-03-17T19:36:04.7512204Z               "id": "e50c028f637086798830-9b85131766fde2346548",
+2026-03-17T19:36:04.7512330Z               "file": "api/cart-api.spec.ts",
+2026-03-17T19:36:04.7512409Z               "line": 109,
+2026-03-17T19:36:04.7512484Z               "column": 7
+2026-03-17T19:36:04.7512561Z             }
+2026-03-17T19:36:04.7512628Z           ]
+2026-03-17T19:36:04.7512704Z         }
+2026-03-17T19:36:04.7512863Z       ]
+2026-03-17T19:36:04.7512931Z     },
+2026-03-17T19:36:04.7513003Z     {
+2026-03-17T19:36:04.7513122Z       "title": "api/product-api.spec.ts",
+2026-03-17T19:36:04.7513242Z       "file": "api/product-api.spec.ts",
+2026-03-17T19:36:04.7513316Z       "column": 0,
+2026-03-17T19:36:04.7513392Z       "line": 0,
+2026-03-17T19:36:04.7513466Z       "specs": [],
+2026-03-17T19:36:04.7513537Z       "suites": [
+2026-03-17T19:36:04.7513612Z         {
+2026-03-17T19:36:04.7513823Z           "title": "Product API — Listings @api @products",
+2026-03-17T19:36:04.7513948Z           "file": "api/product-api.spec.ts",
+2026-03-17T19:36:04.7514022Z           "line": 16,
+2026-03-17T19:36:04.7514100Z           "column": 6,
+2026-03-17T19:36:04.7514173Z           "specs": [
+2026-03-17T19:36:04.7514241Z             {
+2026-03-17T19:36:04.7514521Z               "title": "POST /entries returns a non-empty product array with required fields",
+2026-03-17T19:36:04.7514606Z               "ok": true,
+2026-03-17T19:36:04.7514692Z               "tags": [
+2026-03-17T19:36:04.7514765Z                 "api",
+2026-03-17T19:36:04.7514848Z                 "products"
+2026-03-17T19:36:04.7514916Z               ],
+2026-03-17T19:36:04.7514995Z               "tests": [
+2026-03-17T19:36:04.7515239Z                 {
+2026-03-17T19:36:04.7515343Z                   "timeout": 90000,
+2026-03-17T19:36:04.7515457Z                   "annotations": [],
+2026-03-17T19:36:04.7515581Z                   "expectedStatus": "passed",
+2026-03-17T19:36:04.7515831Z                   "projectId": "chromium",
+2026-03-17T19:36:04.7515945Z                   "projectName": "chromium",
+2026-03-17T19:36:04.7516044Z                   "results": [
+2026-03-17T19:36:04.7516123Z                     {
+2026-03-17T19:36:04.7516228Z                       "workerIndex": 0,
+2026-03-17T19:36:04.7516345Z                       "parallelIndex": 0,
+2026-03-17T19:36:04.7516453Z                       "status": "passed",
+2026-03-17T19:36:04.7516560Z                       "duration": 357,
+2026-03-17T19:36:04.7516661Z                       "errors": [],
+2026-03-17T19:36:04.7516763Z                       "stdout": [],
+2026-03-17T19:36:04.7516860Z                       "stderr": [],
+2026-03-17T19:36:04.7516955Z                       "retry": 0,
+2026-03-17T19:36:04.7517102Z                       "startTime": "2026-03-17T19:36:03.486Z",
+2026-03-17T19:36:04.7517209Z                       "annotations": [],
+2026-03-17T19:36:04.7517321Z                       "attachments": []
+2026-03-17T19:36:04.7517392Z                     }
+2026-03-17T19:36:04.7517469Z                   ],
+2026-03-17T19:36:04.7517572Z                   "status": "expected"
+2026-03-17T19:36:04.7517641Z                 }
+2026-03-17T19:36:04.7517715Z               ],
+2026-03-17T19:36:04.7517863Z               "id": "5707f6843d97e45f01b7-1535101b6f5e7421bf45",
+2026-03-17T19:36:04.7518001Z               "file": "api/product-api.spec.ts",
+2026-03-17T19:36:04.7518076Z               "line": 20,
+2026-03-17T19:36:04.7518157Z               "column": 7
+2026-03-17T19:36:04.7518229Z             },
+2026-03-17T19:36:04.7518302Z             {
+2026-03-17T19:36:04.7518525Z               "title": "POST /bycat 'phone' returns only phone-category products",
+2026-03-17T19:36:04.7518602Z               "ok": true,
+2026-03-17T19:36:04.7518681Z               "tags": [
+2026-03-17T19:36:04.7518754Z                 "api",
+2026-03-17T19:36:04.7518838Z                 "products"
+2026-03-17T19:36:04.7518911Z               ],
+2026-03-17T19:36:04.7518991Z               "tests": [
+2026-03-17T19:36:04.7519061Z                 {
+2026-03-17T19:36:04.7519160Z                   "timeout": 90000,
+2026-03-17T19:36:04.7519268Z                   "annotations": [],
+2026-03-17T19:36:04.7519386Z                   "expectedStatus": "passed",
+2026-03-17T19:36:04.7519499Z                   "projectId": "chromium",
+2026-03-17T19:36:04.7519613Z                   "projectName": "chromium",
+2026-03-17T19:36:04.7519712Z                   "results": [
+2026-03-17T19:36:04.7519786Z                     {
+2026-03-17T19:36:04.7520020Z                       "workerIndex": 3,
+2026-03-17T19:36:04.7520133Z                       "parallelIndex": 2,
+2026-03-17T19:36:04.7520239Z                       "status": "passed",
+2026-03-17T19:36:04.7520347Z                       "duration": 277,
+2026-03-17T19:36:04.7520444Z                       "errors": [],
+2026-03-17T19:36:04.7520544Z                       "stdout": [],
+2026-03-17T19:36:04.7520644Z                       "stderr": [],
+2026-03-17T19:36:04.7520739Z                       "retry": 0,
+2026-03-17T19:36:04.7520885Z                       "startTime": "2026-03-17T19:36:03.483Z",
+2026-03-17T19:36:04.7520990Z                       "annotations": [],
+2026-03-17T19:36:04.7521098Z                       "attachments": []
+2026-03-17T19:36:04.7521168Z                     }
+2026-03-17T19:36:04.7521245Z                   ],
+2026-03-17T19:36:04.7521348Z                   "status": "expected"
+2026-03-17T19:36:04.7521418Z                 }
+2026-03-17T19:36:04.7521497Z               ],
+2026-03-17T19:36:04.7521648Z               "id": "5707f6843d97e45f01b7-64ac30266758d5b6d354",
+2026-03-17T19:36:04.7521784Z               "file": "api/product-api.spec.ts",
+2026-03-17T19:36:04.7521864Z               "line": 45,
+2026-03-17T19:36:04.7521945Z               "column": 7
+2026-03-17T19:36:04.7522016Z             },
+2026-03-17T19:36:04.7522088Z             {
+2026-03-17T19:36:04.7522321Z               "title": "POST /bycat 'notebook' returns only laptop-category products",
+2026-03-17T19:36:04.7522485Z               "ok": true,
+2026-03-17T19:36:04.7522562Z               "tags": [
+2026-03-17T19:36:04.7522635Z                 "api",
+2026-03-17T19:36:04.7522714Z                 "products"
+2026-03-17T19:36:04.7522781Z               ],
+2026-03-17T19:36:04.7522858Z               "tests": [
+2026-03-17T19:36:04.7522927Z                 {
+2026-03-17T19:36:04.7523022Z                   "timeout": 90000,
+2026-03-17T19:36:04.7523127Z                   "annotations": [],
+2026-03-17T19:36:04.7523250Z                   "expectedStatus": "passed",
+2026-03-17T19:36:04.7523366Z                   "projectId": "chromium",
+2026-03-17T19:36:04.7523479Z                   "projectName": "chromium",
+2026-03-17T19:36:04.7523576Z                   "results": [
+2026-03-17T19:36:04.7523647Z                     {
+2026-03-17T19:36:04.7523750Z                       "workerIndex": 1,
+2026-03-17T19:36:04.7523865Z                       "parallelIndex": 3,
+2026-03-17T19:36:04.7523979Z                       "status": "passed",
+2026-03-17T19:36:04.7524089Z                       "duration": 118,
+2026-03-17T19:36:04.7524185Z                       "errors": [],
+2026-03-17T19:36:04.7524283Z                       "stdout": [],
+2026-03-17T19:36:04.7524376Z                       "stderr": [],
+2026-03-17T19:36:04.7524470Z                       "retry": 0,
+2026-03-17T19:36:04.7524615Z                       "startTime": "2026-03-17T19:36:03.600Z",
+2026-03-17T19:36:04.7524724Z                       "annotations": [],
+2026-03-17T19:36:04.7524837Z                       "attachments": []
+2026-03-17T19:36:04.7524917Z                     }
+2026-03-17T19:36:04.7524992Z                   ],
+2026-03-17T19:36:04.7525261Z                   "status": "expected"
+2026-03-17T19:36:04.7525337Z                 }
+2026-03-17T19:36:04.7525410Z               ],
+2026-03-17T19:36:04.7525561Z               "id": "5707f6843d97e45f01b7-83355be5a2ac34419d64",
+2026-03-17T19:36:04.7525695Z               "file": "api/product-api.spec.ts",
+2026-03-17T19:36:04.7525776Z               "line": 58,
+2026-03-17T19:36:04.7525853Z               "column": 7
+2026-03-17T19:36:04.7525921Z             },
+2026-03-17T19:36:04.7525993Z             {
+2026-03-17T19:36:04.7526220Z               "title": "POST /bycat 'monitor' returns only monitor-category products",
+2026-03-17T19:36:04.7526296Z               "ok": true,
+2026-03-17T19:36:04.7526373Z               "tags": [
+2026-03-17T19:36:04.7526447Z                 "api",
+2026-03-17T19:36:04.7526527Z                 "products"
+2026-03-17T19:36:04.7526724Z               ],
+2026-03-17T19:36:04.7526804Z               "tests": [
+2026-03-17T19:36:04.7526873Z                 {
+2026-03-17T19:36:04.7526971Z                   "timeout": 90000,
+2026-03-17T19:36:04.7527077Z                   "annotations": [],
+2026-03-17T19:36:04.7527195Z                   "expectedStatus": "passed",
+2026-03-17T19:36:04.7527310Z                   "projectId": "chromium",
+2026-03-17T19:36:04.7527424Z                   "projectName": "chromium",
+2026-03-17T19:36:04.7527526Z                   "results": [
+2026-03-17T19:36:04.7527600Z                     {
+2026-03-17T19:36:04.7527704Z                       "workerIndex": 1,
+2026-03-17T19:36:04.7527818Z                       "parallelIndex": 3,
+2026-03-17T19:36:04.7527930Z                       "status": "passed",
+2026-03-17T19:36:04.7528037Z                       "duration": 140,
+2026-03-17T19:36:04.7528133Z                       "errors": [],
+2026-03-17T19:36:04.7528234Z                       "stdout": [],
+2026-03-17T19:36:04.7528333Z                       "stderr": [],
+2026-03-17T19:36:04.7528454Z                       "retry": 0,
+2026-03-17T19:36:04.7528605Z                       "startTime": "2026-03-17T19:36:03.749Z",
+2026-03-17T19:36:04.7528709Z                       "annotations": [],
+2026-03-17T19:36:04.7528817Z                       "attachments": []
+2026-03-17T19:36:04.7528888Z                     }
+2026-03-17T19:36:04.7528963Z                   ],
+2026-03-17T19:36:04.7529186Z                   "status": "expected"
+2026-03-17T19:36:04.7529264Z                 }
+2026-03-17T19:36:04.7529333Z               ],
+2026-03-17T19:36:04.7529485Z               "id": "5707f6843d97e45f01b7-43e6ead78ef3e6eefd38",
+2026-03-17T19:36:04.7529619Z               "file": "api/product-api.spec.ts",
+2026-03-17T19:36:04.7529694Z               "line": 71,
+2026-03-17T19:36:04.7529774Z               "column": 7
+2026-03-17T19:36:04.7529842Z             }
+2026-03-17T19:36:04.7529921Z           ]
+2026-03-17T19:36:04.7529989Z         },
+2026-03-17T19:36:04.7530062Z         {
+2026-03-17T19:36:04.7530289Z           "title": "Product API — View @api @products",
+2026-03-17T19:36:04.7530412Z           "file": "api/product-api.spec.ts",
+2026-03-17T19:36:04.7530495Z           "line": 81,
+2026-03-17T19:36:04.7530599Z           "column": 6,
+2026-03-17T19:36:04.7530682Z           "specs": [
+2026-03-17T19:36:04.7530751Z             {
+2026-03-17T19:36:04.7530994Z               "title": "POST /view with a valid product ID returns full product details",
+2026-03-17T19:36:04.7531086Z               "ok": true,
+2026-03-17T19:36:04.7531164Z               "tags": [
+2026-03-17T19:36:04.7531245Z                 "api",
+2026-03-17T19:36:04.7531322Z                 "products"
+2026-03-17T19:36:04.7531416Z               ],
+2026-03-17T19:36:04.7531497Z               "tests": [
+2026-03-17T19:36:04.7531568Z                 {
+2026-03-17T19:36:04.7531677Z                   "timeout": 90000,
+2026-03-17T19:36:04.7531778Z                   "annotations": [],
+2026-03-17T19:36:04.7531905Z                   "expectedStatus": "passed",
+2026-03-17T19:36:04.7532024Z                   "projectId": "chromium",
+2026-03-17T19:36:04.7532147Z                   "projectName": "chromium",
+2026-03-17T19:36:04.7532243Z                   "results": [
+2026-03-17T19:36:04.7532316Z                     {
+2026-03-17T19:36:04.7532428Z                       "workerIndex": 3,
+2026-03-17T19:36:04.7532540Z                       "parallelIndex": 2,
+2026-03-17T19:36:04.7532657Z                       "status": "passed",
+2026-03-17T19:36:04.7532760Z                       "duration": 246,
+2026-03-17T19:36:04.7532862Z                       "errors": [],
+2026-03-17T19:36:04.7532958Z                       "stdout": [],
+2026-03-17T19:36:04.7533054Z                       "stderr": [],
+2026-03-17T19:36:04.7533156Z                       "retry": 0,
+2026-03-17T19:36:04.7533293Z                       "startTime": "2026-03-17T19:36:03.796Z",
+2026-03-17T19:36:04.7533405Z                       "annotations": [],
+2026-03-17T19:36:04.7533600Z                       "attachments": []
+2026-03-17T19:36:04.7533678Z                     }
+2026-03-17T19:36:04.7533750Z                   ],
+2026-03-17T19:36:04.7533858Z                   "status": "expected"
+2026-03-17T19:36:04.7533929Z                 }
+2026-03-17T19:36:04.7534000Z               ],
+2026-03-17T19:36:04.7534160Z               "id": "5707f6843d97e45f01b7-b35ef0b5566e8d40ed71",
+2026-03-17T19:36:04.7534812Z               "file": "api/product-api.spec.ts",
+2026-03-17T19:36:04.7534966Z               "line": 84,
+2026-03-17T19:36:04.7535245Z               "column": 7
+2026-03-17T19:36:04.7535375Z             },
+2026-03-17T19:36:04.7535492Z             {
+2026-03-17T19:36:04.7535913Z               "title": "POST /view with an invalid product ID returns error message",
+2026-03-17T19:36:04.7536057Z               "ok": true,
+2026-03-17T19:36:04.7536188Z               "tags": [
+2026-03-17T19:36:04.7536325Z                 "api",
+2026-03-17T19:36:04.7536472Z                 "products"
+2026-03-17T19:36:04.7536611Z               ],
+2026-03-17T19:36:04.7536791Z               "tests": [
+2026-03-17T19:36:04.7536931Z                 {
+2026-03-17T19:36:04.7537112Z                   "timeout": 90000,
+2026-03-17T19:36:04.7537298Z                   "annotations": [],
+2026-03-17T19:36:04.7537788Z                   "expectedStatus": "passed",
+2026-03-17T19:36:04.7538026Z                   "projectId": "chromium",
+2026-03-17T19:36:04.7538251Z                   "projectName": "chromium",
+2026-03-17T19:36:04.7538685Z                   "results": [
+2026-03-17T19:36:04.7538831Z                     {
+2026-03-17T19:36:04.7539040Z                       "workerIndex": 0,
+2026-03-17T19:36:04.7539254Z                       "parallelIndex": 0,
+2026-03-17T19:36:04.7539455Z                       "status": "passed",
+2026-03-17T19:36:04.7539653Z                       "duration": 108,
+2026-03-17T19:36:04.7539849Z                       "errors": [],
+2026-03-17T19:36:04.7540033Z                       "stdout": [],
+2026-03-17T19:36:04.7540191Z                       "stderr": [],
+2026-03-17T19:36:04.7540293Z                       "retry": 0,
+2026-03-17T19:36:04.7540458Z                       "startTime": "2026-03-17T19:36:03.896Z",
+2026-03-17T19:36:04.7540570Z                       "annotations": [],
+2026-03-17T19:36:04.7540683Z                       "attachments": []
+2026-03-17T19:36:04.7540757Z                     }
+2026-03-17T19:36:04.7540831Z                   ],
+2026-03-17T19:36:04.7540957Z                   "status": "expected"
+2026-03-17T19:36:04.7541029Z                 }
+2026-03-17T19:36:04.7541107Z               ],
+2026-03-17T19:36:04.7541270Z               "id": "5707f6843d97e45f01b7-4814f15a54e24b579ecf",
+2026-03-17T19:36:04.7541835Z               "file": "api/product-api.spec.ts",
+2026-03-17T19:36:04.7542016Z               "line": 101,
+2026-03-17T19:36:04.7542160Z               "column": 7
+2026-03-17T19:36:04.7542295Z             },
+2026-03-17T19:36:04.7542419Z             {
+2026-03-17T19:36:04.7542731Z               "title": "/entries contains expected product: \"Samsung galaxy s6\"",
+2026-03-17T19:36:04.7542956Z               "ok": true,
+2026-03-17T19:36:04.7543040Z               "tags": [
+2026-03-17T19:36:04.7543116Z                 "api",
+2026-03-17T19:36:04.7543196Z                 "products"
+2026-03-17T19:36:04.7543275Z               ],
+2026-03-17T19:36:04.7543378Z               "tests": [
+2026-03-17T19:36:04.7543509Z                 {
+2026-03-17T19:36:04.7543628Z                   "timeout": 90000,
+2026-03-17T19:36:04.7543741Z                   "annotations": [],
+2026-03-17T19:36:04.7543871Z                   "expectedStatus": "passed",
+2026-03-17T19:36:04.7543986Z                   "projectId": "chromium",
+2026-03-17T19:36:04.7544111Z                   "projectName": "chromium",
+2026-03-17T19:36:04.7544209Z                   "results": [
+2026-03-17T19:36:04.7544289Z                     {
+2026-03-17T19:36:04.7544396Z                       "workerIndex": 1,
+2026-03-17T19:36:04.7544510Z                       "parallelIndex": 3,
+2026-03-17T19:36:04.7544802Z                       "status": "passed",
+2026-03-17T19:36:04.7544909Z                       "duration": 92,
+2026-03-17T19:36:04.7545186Z                       "errors": [],
+2026-03-17T19:36:04.7545296Z                       "stdout": [],
+2026-03-17T19:36:04.7545400Z                       "stderr": [],
+2026-03-17T19:36:04.7545496Z                       "retry": 0,
+2026-03-17T19:36:04.7545646Z                       "startTime": "2026-03-17T19:36:03.925Z",
+2026-03-17T19:36:04.7545760Z                       "annotations": [],
+2026-03-17T19:36:04.7545870Z                       "attachments": []
+2026-03-17T19:36:04.7545942Z                     }
+2026-03-17T19:36:04.7546014Z                   ],
+2026-03-17T19:36:04.7546126Z                   "status": "expected"
+2026-03-17T19:36:04.7546198Z                 }
+2026-03-17T19:36:04.7546274Z               ],
+2026-03-17T19:36:04.7546431Z               "id": "5707f6843d97e45f01b7-e07623c796d34a0f6395",
+2026-03-17T19:36:04.7546574Z               "file": "api/product-api.spec.ts",
+2026-03-17T19:36:04.7546657Z               "line": 114,
+2026-03-17T19:36:04.7546733Z               "column": 9
+2026-03-17T19:36:04.7546809Z             }
+2026-03-17T19:36:04.7546877Z           ]
+2026-03-17T19:36:04.7546949Z         }
+2026-03-17T19:36:04.7547016Z       ]
+2026-03-17T19:36:04.7547087Z     }
+2026-03-17T19:36:04.7547151Z   ],
+2026-03-17T19:36:04.7547226Z   "errors": [],
+2026-03-17T19:36:04.7547432Z   "stats": {
+2026-03-17T19:36:04.7547549Z     "startTime": "2026-03-17T19:35:55.582Z",
+2026-03-17T19:36:04.7547656Z     "duration": 9098.389000000001,
+2026-03-17T19:36:04.7547732Z     "expected": 14,
+2026-03-17T19:36:04.7547813Z     "skipped": 16,
+2026-03-17T19:36:04.7547892Z     "unexpected": 0,
+2026-03-17T19:36:04.7547963Z     "flaky": 0
+2026-03-17T19:36:04.7548036Z   }
+2026-03-17T19:36:04.7548107Z }
+2026-03-17T19:36:04.7569830Z ##[notice]  16 skipped
+  14 passed (9.1s)

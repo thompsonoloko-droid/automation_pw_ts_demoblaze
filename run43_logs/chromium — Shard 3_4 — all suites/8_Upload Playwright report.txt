@@ -1,0 +1,11 @@
+﻿2026-03-17T19:37:22.8943971Z ##[group]Run actions/upload-artifact@v4
+2026-03-17T19:37:22.8944075Z with:
+2026-03-17T19:37:22.8944210Z   name: playwright-report-chromium-shard-3
+2026-03-17T19:37:22.8944290Z   path: reports/
+2026-03-17T19:37:22.8944368Z   retention-days: 14
+2026-03-17T19:37:22.8944457Z   if-no-files-found: warn
+2026-03-17T19:37:22.8944552Z   compression-level: 6
+2026-03-17T19:37:22.8944626Z   overwrite: false
+2026-03-17T19:37:22.8944712Z   include-hidden-files: false
+2026-03-17T19:37:22.8944791Z ##[endgroup]
+2026-03-17T19:37:23.1159135Z ##[warning]No files were found with the provided path: reports/. No artifacts will be uploaded.
