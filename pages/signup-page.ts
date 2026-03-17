@@ -146,30 +146,36 @@ export class SignupPage extends BasePage {
     await usernameLocator.waitFor({ state: "visible", timeout: 10000 });
     await passwordLocator.waitFor({ state: "visible", timeout: 10000 });
 
-    // Focus and clear username field
-    console.log(`[SignupPage.signup] Focusing and clearing username field...`);
+    // HYBRID APPROACH: Playwright type() + explicit event dispatch
+    // type() generates proper keyboard events, but CI headless mode needs
+    // additional jQuery-compatible event dispatch to trigger handlers
+
+    // Fill username with Playwright type + event dispatch
+    console.log(`[SignupPage.signup] Setting username...`);
     await usernameLocator.focus();
     await this.page.keyboard.press("Control+A");
     await this.page.keyboard.press("Delete");
+    await this.page.waitForTimeout(100);
 
-    // Type username slowly to ensure capture
-    console.log(`[SignupPage.signup] Typing username: "${username}"...`);
     await usernameLocator.type(username, { delay: 50 });
-
-    // Wait for event processing
+    // Dispatch jQuery events after typing
+    await usernameLocator.dispatchEvent('input');
+    await usernameLocator.dispatchEvent('change');
+    await usernameLocator.dispatchEvent('blur');
     await this.page.waitForTimeout(300);
 
-    // Focus and clear password field
-    console.log(`[SignupPage.signup] Focusing and clearing password field...`);
+    // Fill password with Playwright type + event dispatch
+    console.log(`[SignupPage.signup] Setting password...`);
     await passwordLocator.focus();
     await this.page.keyboard.press("Control+A");
     await this.page.keyboard.press("Delete");
+    await this.page.waitForTimeout(100);
 
-    // Type password slowly to ensure capture
-    console.log(`[SignupPage.signup] Typing password (${password.length} chars)...`);
     await passwordLocator.type(password, { delay: 50 });
-
-    // Wait for event processing
+    // Dispatch jQuery events after typing
+    await passwordLocator.dispatchEvent('input');
+    await passwordLocator.dispatchEvent('change');
+    await passwordLocator.dispatchEvent('blur');
     await this.page.waitForTimeout(300);
 
     // Verify values before submitting
@@ -180,16 +186,16 @@ export class SignupPage extends BasePage {
 
     if (usernameValue !== username) {
       throw new Error(
-        `Username not set correctly: got "${usernameValue}", expected "${username}"`,
+        `Username not set: got "${usernameValue}", expected "${username}"`,
       );
     }
     if (passwordValue !== password) {
       throw new Error(
-        `Password not set correctly: length ${passwordValue.length}, expected ${password.length}`,
+        `Password not set: length ${passwordValue.length}, expected ${password.length}`,
       );
     }
 
-    console.log(`[SignupPage.signup] ✓ Values verified, setting up dialog handler...`);
+    console.log(`[SignupPage.signup] ✓ Values verified, submitting...`);
 
     // Register the dialog handler before clicking (needs to be synchronous)
     const alertPromise = new Promise<string>((resolve) => {
@@ -202,7 +208,6 @@ export class SignupPage extends BasePage {
     });
 
     // Submit the form
-    console.log(`[SignupPage.signup] Clicking signup button...`);
     await this.click(this.SIGNUP_BTN);
     console.log(`[SignupPage.signup] ✓ Form submitted, waiting for dialog...`);
     

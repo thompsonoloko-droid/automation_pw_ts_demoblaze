@@ -135,56 +135,60 @@ export class LoginPage extends BasePage {
     const usernameLocator = this.page.locator(this.USERNAME_INPUT);
     const passwordLocator = this.page.locator(this.PASSWORD_INPUT);
 
-    // Focus on username field and clear it completely
-    console.log(`[LoginPage.login] Focusing and clearing username field...`);
+    // HYBRID APPROACH: Playwright type() + explicit event dispatch
+    // type() generates proper keyboard events, but CI headless mode needs
+    // additional jQuery-compatible event dispatch to trigger handlers
+
+    // Fill username with Playwright type + event dispatch
+    console.log(`[LoginPage.login] Setting username...`);
     await usernameLocator.focus();
     await this.page.keyboard.press("Control+A");
     await this.page.keyboard.press("Delete");
+    await this.page.waitForTimeout(100);
     
-    // Type username slowly to ensure it's captured
-    console.log(`[LoginPage.login] Typing username: "${username}"...`);
     await usernameLocator.type(username, { delay: 50 });
-    
-    // Wait for input event to process
+    // Dispatch jQuery events after typing
+    await usernameLocator.dispatchEvent('input');
+    await usernameLocator.dispatchEvent('change');
+    await usernameLocator.dispatchEvent('blur');
     await this.page.waitForTimeout(300);
 
-    // Focus on password field and clear it
-    console.log(`[LoginPage.login] Focusing and clearing password field...`);
+    // Fill password with Playwright type + event dispatch
+    console.log(`[LoginPage.login] Setting password...`);
     await passwordLocator.focus();
     await this.page.keyboard.press("Control+A");
-    await this.page.keyboard.press("Delete");
+    await this.page.keyboard.press("Delete"); 
+    await this.page.waitForTimeout(100);
     
-    // Type password slowly
-    console.log(`[LoginPage.login] Typing password (${password.length} chars)...`);
     await passwordLocator.type(password, { delay: 50 });
-    
-    // Wait for input event to process
+    // Dispatch jQuery events after typing
+    await passwordLocator.dispatchEvent('input');
+    await passwordLocator.dispatchEvent('change');
+    await passwordLocator.dispatchEvent('blur');
     await this.page.waitForTimeout(300);
 
     // Verify values before submitting
     const usernameValue = await usernameLocator.inputValue();
     const passwordValue = await passwordLocator.inputValue();
     
-    console.log(`[LoginPage.login] Verification:
-      username="${usernameValue}" (expected="${username}")
-      password_len=${passwordValue.length} (expected=${password.length})`);
+    console.log(`[LoginPage.login] Verification: username="${usernameValue}", password_len=${passwordValue.length}`);
 
     if (usernameValue !== username) {
-      throw new Error(`Username not set correctly: got "${usernameValue}", expected "${username}"`);
+      throw new Error(`Username not set: got "${usernameValue}", expected "${username}"`);
     }
     if (passwordValue !== password) {
-      throw new Error(`Password not set correctly: length ${passwordValue.length}, expected ${password.length}`);
+      throw new Error(`Password not set: length ${passwordValue.length}, expected ${password.length}`);
     }
 
-    console.log(`[LoginPage.login] ✓ Values verified, clicking submit button...`);
+    console.log(`[LoginPage.login] ✓ Values verified, submitting form...`);
     
-    // Click submit button and wait for navigation/alert
+    // Submit the form
     await this.click(this.LOGIN_BTN);
     console.log(`[LoginPage.login] ✓ Form submitted`);
     
-    // Wait for response (alert dialog or page change)
+    // Wait for response
     await this.page.waitForLoadState("networkidle", { timeout: 5000 }).catch(() => {
-      // Ignore timeout - might be quick response
+      // Ignore timeout
     });
   }
 
