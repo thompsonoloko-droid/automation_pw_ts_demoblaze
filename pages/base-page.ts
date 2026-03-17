@@ -99,6 +99,42 @@ export class BasePage {
   }
 
   /**
+   * Set an input value through DOM assignment and dispatch common form events.
+   *
+   * This is more resilient for legacy/jQuery forms in headless CI.
+   */
+  async setInputValue(selector: string, value: string): Promise<void> {
+    await this.page.evaluate(
+      ({ sel, val }) => {
+        const el = document.querySelector(sel) as HTMLInputElement | null;
+        if (!el) return;
+        el.value = val;
+        el.dispatchEvent(new Event("input", { bubbles: true }));
+        el.dispatchEvent(new Event("change", { bubbles: true }));
+        el.dispatchEvent(new Event("blur", { bubbles: true }));
+      },
+      { sel: selector, val: value },
+    );
+  }
+
+  /**
+   * Close a Bootstrap modal if it is currently open.
+   */
+  async closeModalIfOpen(modalSelector: string, closeSelector: string): Promise<void> {
+    const modal = this.page.locator(modalSelector);
+    if (!(await modal.isVisible().catch(() => false))) return;
+
+    const closeBtn = this.page.locator(closeSelector);
+    if (await closeBtn.isVisible().catch(() => false)) {
+      await closeBtn.click({ force: true });
+    } else {
+      await this.page.keyboard.press("Escape").catch(() => {});
+    }
+
+    await expect(modal).not.toBeVisible({ timeout: 8_000 });
+  }
+
+  /**
    * Retrieve the visible text content of an element.
    *
    * @param selector - CSS selector of the element.

@@ -92,20 +92,7 @@ export class CheckoutPage extends BasePage {
 
     for (const config of fieldConfigs) {
       if (config.value) {
-        // Set field value via direct DOM manipulation
-        await this.page.evaluate(
-          (selector, value) => {
-            const el = document.querySelector(selector);
-            if (el) {
-              (el as any).value = value;
-              el.dispatchEvent(new Event("input", { bubbles: true }));
-              el.dispatchEvent(new Event("change", { bubbles: true }));
-              el.dispatchEvent(new Event("blur", { bubbles: true }));
-            }
-          },
-          config.selector,
-          config.value
-        );
+        await this.setInputValue(config.selector, config.value);
         await this.page.waitForTimeout(50);
         
         // Verify value was set

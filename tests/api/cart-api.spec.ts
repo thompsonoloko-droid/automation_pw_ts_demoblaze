@@ -8,7 +8,7 @@
  *   POST /placeorder — submit an order.
  */
 
-import { test, expect } from "@playwright/test";
+import { test, expect, type APIRequestContext } from "@playwright/test";
 
 import { API_BASE_URL, PERF, getTestUser, getCheckoutData } from "./helpers";
 
@@ -18,7 +18,7 @@ const user = getTestUser();
  * Login with base64-encoded password (Demoblaze JS encodes before sending)
  * and return the raw Auth_token value to use as `cookie` in cart API calls.
  */
-async function getAuthToken(request: Parameters<Parameters<typeof test>[1]>[0]["request"]): Promise<string> {
+async function getAuthToken(request: APIRequestContext): Promise<string> {
   const encodedPassword = Buffer.from(user.password).toString("base64");
   const res = await request.post(`${API_BASE_URL}/login`, {
     data: { username: user.username, password: encodedPassword },
@@ -29,7 +29,10 @@ async function getAuthToken(request: Parameters<Parameters<typeof test>[1]>[0]["
 }
 
 test.describe("Cart API — View @api @cart", () => {
-  test.skip(!user.username || user.username.startsWith("$"), "TEST_USERNAME not set in .env");
+  test.skip(
+    !user.username || !user.password || user.username.startsWith("$") || user.password.startsWith("$"),
+    "TEST_USERNAME/TEST_PASSWORD not set in .env",
+  );
 
   let authToken = "";
   test.beforeAll(async ({ request }) => {
@@ -53,7 +56,10 @@ test.describe("Cart API — View @api @cart", () => {
 });
 
 test.describe("Cart API — Add & Delete @api @cart", () => {
-  test.skip(!user.username || user.username.startsWith("$"), "TEST_USERNAME not set in .env");
+  test.skip(
+    !user.username || !user.password || user.username.startsWith("$") || user.password.startsWith("$"),
+    "TEST_USERNAME/TEST_PASSWORD not set in .env",
+  );
 
   let authToken = "";
   test.beforeAll(async ({ request }) => {
@@ -104,7 +110,10 @@ test.describe("Cart API — Add & Delete @api @cart", () => {
 });
 
 test.describe("Cart API — Place Order @api @cart", () => {
-  test.skip(!user.username || user.username.startsWith("$"), "TEST_USERNAME not set in .env");
+  test.skip(
+    !user.username || !user.password || user.username.startsWith("$") || user.password.startsWith("$"),
+    "TEST_USERNAME/TEST_PASSWORD not set in .env",
+  );
 
   test("POST /placeorder with valid data returns 200", async ({ request }) => {
     // The Demoblaze /placeorder endpoint returns 404 for direct API calls outside

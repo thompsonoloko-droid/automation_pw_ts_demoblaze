@@ -15,11 +15,46 @@ on:
         required: false
         default: ""
 
+permissions:
+  contents: read
+
 jobs:
+  quality:
+    name: "Quality Gate (typecheck + lint + format)"
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run quality checks
+        run: npm run quality
+
   test:
     name: "${{ matrix.project }} — Shard ${{ matrix.shard }}/4 — ${{ github.event.inputs.suite || 'all suites' }}"
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    needs: [quality]
+    env:
+      CI: true
+      TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
+      TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+      CHECKOUT_NAME: ${{ secrets.CHECKOUT_NAME }}
+      CHECKOUT_COUNTRY: ${{ secrets.CHECKOUT_COUNTRY }}
+      CHECKOUT_CITY: ${{ secrets.CHECKOUT_CITY }}
+      CHECKOUT_CARD: ${{ secrets.CHECKOUT_CARD }}
+      CHECKOUT_MONTH: ${{ secrets.CHECKOUT_MONTH }}
+      CHECKOUT_YEAR: ${{ secrets.CHECKOUT_YEAR }}
 
     strategy:
       fail-fast: false
@@ -45,16 +80,22 @@ jobs:
           cat > .env << EOF
           BASE_URL=https://www.demoblaze.com
           API_URL=https://api.demoblaze.com
-          TEST_USERNAME=${{ secrets.TEST_USERNAME }}
-          TEST_PASSWORD=${{ secrets.TEST_PASSWORD }}
-          CHECKOUT_NAME=${{ secrets.CHECKOUT_NAME }}
-          CHECKOUT_COUNTRY=${{ secrets.CHECKOUT_COUNTRY }}
-          CHECKOUT_CITY=${{ secrets.CHECKOUT_CITY }}
-          CHECKOUT_CARD=${{ secrets.CHECKOUT_CARD }}
-          CHECKOUT_MONTH=${{ secrets.CHECKOUT_MONTH }}
-          CHECKOUT_YEAR=${{ secrets.CHECKOUT_YEAR }}
+          TEST_USERNAME=${TEST_USERNAME:-\$TEST_USERNAME}
+          TEST_PASSWORD=${TEST_PASSWORD:-\$TEST_PASSWORD}
+          CHECKOUT_NAME=${CHECKOUT_NAME:-\$CHECKOUT_NAME}
+          CHECKOUT_COUNTRY=${CHECKOUT_COUNTRY:-\$CHECKOUT_COUNTRY}
+          CHECKOUT_CITY=${CHECKOUT_CITY:-\$CHECKOUT_CITY}
+          CHECKOUT_CARD=${CHECKOUT_CARD:-\$CHECKOUT_CARD}
+          CHECKOUT_MONTH=${CHECKOUT_MONTH:-\$CHECKOUT_MONTH}
+          CHECKOUT_YEAR=${CHECKOUT_YEAR:-\$CHECKOUT_YEAR}
           EOF
           echo "✓ Environment file created (11 variables)"
+
+      - name: Preflight credentials check
+        run: |
+          if [ -z "${TEST_USERNAME}" ] || [ -z "${TEST_PASSWORD}" ]; then
+            echo "::warning::TEST_USERNAME/TEST_PASSWORD not configured. Auth-required tests may be skipped by design."
+          fi
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps ${{ matrix.project }}
@@ -72,17 +113,6 @@ jobs:
               --shard=${{ matrix.shard }}/4 \
               --reporter=json,github,html
           fi
-        env:
-          CI: true
-          TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
-          TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
-          CHECKOUT_NAME: ${{ secrets.CHECKOUT_NAME }}
-          CHECKOUT_COUNTRY: ${{ secrets.CHECKOUT_COUNTRY }}
-          CHECKOUT_CITY: ${{ secrets.CHECKOUT_CITY }}
-          CHECKOUT_CARD: ${{ secrets.CHECKOUT_CARD }}
-          CHECKOUT_MONTH: ${{ secrets.CHECKOUT_MONTH }}
-          CHECKOUT_YEAR: ${{ secrets.CHECKOUT_YEAR }}
-
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4
         if: always()
@@ -95,6 +125,11 @@ jobs:
     name: "API Tests (chromium)"
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    needs: [quality]
+    env:
+      CI: true
+      TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
+      TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
 
     steps:
       - uses: actions/checkout@v4
@@ -110,17 +145,18 @@ jobs:
           cat > .env << EOF
           BASE_URL=https://www.demoblaze.com
           API_URL=https://api.demoblaze.com
-          TEST_USERNAME=${{ secrets.TEST_USERNAME }}
-          TEST_PASSWORD=${{ secrets.TEST_PASSWORD }}
+          TEST_USERNAME=${TEST_USERNAME:-\$TEST_USERNAME}
+          TEST_PASSWORD=${TEST_PASSWORD:-\$TEST_PASSWORD}
           EOF
+
+      - name: Preflight credentials check
+        run: |
+          if [ -z "${TEST_USERNAME}" ] || [ -z "${TEST_PASSWORD}" ]; then
+            echo "::warning::TEST_USERNAME/TEST_PASSWORD not configured. Auth-dependent API checks may be skipped."
+          fi
 
       - name: Run API tests
         run: npx playwright test tests/api/ --project=chromium --reporter=json,github,html
-        env:
-          CI: true
-          TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
-          TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
-
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -131,7 +167,7 @@ jobs:
   merge-reports:
     name: "Merge Test Reports"
     if: always()
-    needs: [test]
+    needs: [test, api-tests]
     runs-on: ubuntu-latest
     timeout-minutes: 10
 

@@ -159,5 +159,11 @@ export const testData = getResolvedTestData();
  * @returns true if TEST_USERNAME is set and not a placeholder
  */
 export function hasConfiguredCredentials(): boolean {
-  return !testData.users.existing.username.startsWith("$");
+  const { username, password } = testData.users.existing;
+  return (
+    !!username?.trim() &&
+    !!password?.trim() &&
+    !username.startsWith("$") &&
+    !password.startsWith("$")
+  );
 }

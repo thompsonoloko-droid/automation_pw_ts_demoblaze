@@ -48,7 +48,11 @@ const existingUser = {
   username: resolveEnv(data.users.existing.username),
   password: resolveEnv(data.users.existing.password),
 };
-const credentialsSet = !existingUser.username.startsWith("$");
+const credentialsSet =
+  !!existingUser.username.trim() &&
+  !!existingUser.password.trim() &&
+  !existingUser.username.startsWith("$") &&
+  !existingUser.password.startsWith("$");
 
 // ---------------------------------------------------------------------------
 // Signup tests

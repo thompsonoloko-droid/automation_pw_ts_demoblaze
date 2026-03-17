@@ -30,78 +30,15 @@ export class SignupPage extends BasePage {
    * Click the nav 'Sign up' link and wait for the modal to fully open.
    */
   async openModal(): Promise<void> {
-    console.log(`[SignupPage.openModal START]`);
-    
-    // Check page URL and basic state
-    const currentUrl = this.page.url();
-    console.log(`[SignupPage.openModal] Current URL: ${currentUrl}`);
-    
-    // First check if the signup link exists in DOM
-    const signupLinkCount = await this.page.locator(this.NAV_SIGNUP_LINK).count();
-    console.log(`[SignupPage.openModal] Signup link elements found: ${signupLinkCount}`);
-    
-    const signupLinkExists = await this.page.locator(this.NAV_SIGNUP_LINK).isVisible().catch(() => false);
-    console.log(`[SignupPage.openModal] Signup link visible: ${signupLinkExists}`);
+    await this.closeModalIfOpen("#logInModal", "#logInModal .close");
 
-    // Click the signup link
-    console.log(`[SignupPage.openModal] Clicking nav signup link...`);
-    try {
-      await this.page.locator(this.NAV_SIGNUP_LINK).click({ force: true });
-      console.log(`[SignupPage.openModal] ✓ Signup link clicked`);
-    } catch (err) {
-      console.log(`[SignupPage.openModal] ✕ Error clicking signup link: ${err}`);
-      // Log the page content snippet to debug
-      const title = await this.page.title();
-      const navHtml = await this.page.locator("nav").first().innerHTML().catch(() => "N/A");
-      console.log(`[SignupPage.openModal] Page title: ${title}`);
-      console.log(`[SignupPage.openModal] Nav HTML snippet: ${navHtml.substring(0, 200)}`);
-      throw err;
+    const alreadyOpen = await this.page.locator(this.SIGNUP_MODAL).isVisible().catch(() => false);
+    if (!alreadyOpen) {
+      await this.page.locator(this.NAV_SIGNUP_LINK).dispatchEvent("click");
     }
 
-    // Small delay for modal animation to start
-    await this.page.waitForTimeout(300);
-
-    // Check if modal appears
-    console.log(`[SignupPage.openModal] Checking if SIGNUP_MODAL becomes visible...`);
-    try {
-      const modalCount = await this.page.locator(this.SIGNUP_MODAL).count();
-      console.log(`[SignupPage.openModal] Modal elements found: ${modalCount}`);
-      
-      await this.page.locator(this.SIGNUP_MODAL).waitFor({ state: "visible", timeout: 10000 });
-      console.log(`[SignupPage.openModal] ✓ SIGNUP_MODAL is now visible`);
-    } catch (err) {
-      const modalHtml = await this.page.locator(this.SIGNUP_MODAL).first().outerHTML().catch(() => "N/A");
-      console.log(`[SignupPage.openModal] ✕ SIGNUP_MODAL did not become visible: ${err}`);
-      console.log(`[SignupPage.openModal] Modal HTML: ${modalHtml.substring(0, 500)}`);
-      
-      // Capture screenshot showing current state
-      const screenshotPath = `./reports/screenshots/signuppage-modal-failure-${Date.now()}.png`;
-      try {
-        await this.page.screenshot({ path: screenshotPath });
-        console.log(`[SignupPage.openModal] Screenshot saved: ${screenshotPath}`);
-      } catch (screenshotErr) {
-        console.log(`[SignupPage.openModal] Could not capture screenshot: ${screenshotErr}`);
-      }
-      
-      throw err;
-    }
-
-    // Wait for the input field
-    console.log(`[SignupPage.openModal] Waiting for USERNAME_INPUT to be visible...`);
-    try {
-      const inputCount = await this.page.locator(this.USERNAME_INPUT).count();
-      console.log(`[SignupPage.openModal] Input fields found: ${inputCount}`);
-      
-      await this.page.locator(this.USERNAME_INPUT).waitFor({ state: "visible", timeout: 10000 });
-      console.log(`[SignupPage.openModal] ✓ USERNAME_INPUT is visible, modal fully opened`);
-    } catch (err) {
-      const inputBox = await this.page.locator(this.USERNAME_INPUT).first().boundingBox().catch(() => null);
-      const inputAttrs = await this.page.locator(this.USERNAME_INPUT).first().getAttribute("style").catch(() => "N/A");
-      console.log(`[SignupPage.openModal] ✕ USERNAME_INPUT not visible within 10s: ${err}`);
-      console.log(`[SignupPage.openModal] Input bounding box: ${JSON.stringify(inputBox)}`);
-      console.log(`[SignupPage.openModal] Input style attribute: ${inputAttrs}`);
-      throw err;
-    }
+    await expect(this.page.locator(this.SIGNUP_MODAL)).toBeVisible({ timeout: 10_000 });
+    await expect(this.page.locator(this.USERNAME_INPUT)).toBeVisible({ timeout: 10_000 });
   }
 
   /**
@@ -144,37 +81,11 @@ export class SignupPage extends BasePage {
     const isEnabled = await submitBtn.isEnabled().catch(() => false);
     console.log(`[SignupPage.signup] Submit button enabled: ${isEnabled}`);
 
-    // Set username via direct DOM manipulation
-    await this.page.evaluate(
-      (selector, value) => {
-        const el = document.querySelector(selector);
-        if (el) {
-          (el as any).value = value;
-          el.dispatchEvent(new Event("input", { bubbles: true }));
-          el.dispatchEvent(new Event("change", { bubbles: true }));
-          el.dispatchEvent(new Event("blur", { bubbles: true }));
-        }
-      },
-      this.USERNAME_INPUT,
-      username
-    );
+    await this.setInputValue(this.USERNAME_INPUT, username);
     await this.page.waitForTimeout(100);
     console.log(`[SignupPage.signup] Username set to: "${username}"`);
 
-    // Set password via direct DOM manipulation
-    await this.page.evaluate(
-      (selector, value) => {
-        const el = document.querySelector(selector);
-        if (el) {
-          (el as any).value = value;
-          el.dispatchEvent(new Event("input", { bubbles: true }));
-          el.dispatchEvent(new Event("change", { bubbles: true }));
-          el.dispatchEvent(new Event("blur", { bubbles: true }));
-        }
-      },
-      this.PASSWORD_INPUT,
-      password
-    );
+    await this.setInputValue(this.PASSWORD_INPUT, password);
     await this.page.waitForTimeout(100);
     console.log(`[SignupPage.signup] Password set to: "${password}"`);
 
