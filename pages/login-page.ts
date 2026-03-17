@@ -33,14 +33,17 @@ export class LoginPage extends BasePage {
    * Click the nav 'Log in' link and wait for the modal to fully open.
    */
   async openModal(): Promise<void> {
+    console.log(`[LoginPage.openModal START] Clicking nav login link...`);
     await this.page.locator(this.NAV_LOGIN_LINK).click({ force: true }).catch(() => {});
+    
     // Wait for the input field — clearest signal that modal animation is done.
-    // Avoids fixed timeouts and Bootstrap event race conditions.
+    console.log(`[LoginPage.openModal] Waiting for USERNAME_INPUT to be visible...`);
     try {
       await this.page.locator(this.USERNAME_INPUT).waitFor({ state: "visible", timeout: 10000 });
+      console.log(`[LoginPage.openModal] ✓ USERNAME_INPUT is visible, modal opened successfully`);
     } catch (err) {
       // Log the error for debugging but don't throw
-      console.log(`[openModal] Warning: USERNAME_INPUT did not become visible within 10s. Proceeding anyway.`);
+      console.log(`[LoginPage.openModal] ⚠️  WARNING: USERNAME_INPUT did not become visible within 10s. Proceeding anyway. Error: ${err}`);
     }
   }
 
@@ -68,36 +71,46 @@ export class LoginPage extends BasePage {
    * @param password - Demoblaze password.
    */
   async login(username: string, password: string): Promise<void> {
-    // Short timeout for visibility check - inputs should be ready from openModal()
     const WAIT_TIMEOUT = 1000;
+
+    console.log(`[LoginPage.login START] username="${username}",
+ password_len=${password.length}, timeout=${WAIT_TIMEOUT}ms`);
 
     try {
       const usernameLocator = this.page.locator(this.USERNAME_INPUT);
       const passwordLocator = this.page.locator(this.PASSWORD_INPUT);
 
       // Wait briefly for inputs to be visible (they should be from openModal)
-      // If they're not, we'll attempt to fill anyway and let it fail with a clear error
+      console.log(`[LoginPage] Checking if USERNAME_INPUT is visible...`);
       try {
         await usernameLocator.waitFor({ state: "visible", timeout: WAIT_TIMEOUT });
-      } catch {
-        console.log(`[login] Username input not immediately visible, attempting to fill anyway`);
+        console.log(`[LoginPage] ✓ USERNAME_INPUT is visible`);
+      } catch (err) {
+        console.log(`[LoginPage] ⚠️  USERNAME_INPUT not visible within ${WAIT_TIMEOUT}ms, continuing anyway`);
       }
 
+      console.log(`[LoginPage] Checking if PASSWORD_INPUT is visible...`);
       try {
         await passwordLocator.waitFor({ state: "visible", timeout: WAIT_TIMEOUT });
-      } catch {
-        console.log(`[login] Password input not immediately visible, attempting to fill anyway`);
+        console.log(`[LoginPage] ✓ PASSWORD_INPUT is visible`);
+      } catch (err) {
+        console.log(`[LoginPage] ⚠️  PASSWORD_INPUT not visible within ${WAIT_TIMEOUT}ms, continuing anyway`);
       }
 
       // Set values DIRECTLY via DOM manipulation to guarantee they're set
-      // This approach bypasses Playwright's internal mechanisms which behave differently
-      // in headless CI environments vs local testing
-      await this.page.evaluate(
+      console.log(`[LoginPage] Setting values via page.evaluate()...`);
+      const setResult = await this.page.evaluate(
         ([uSel, pSel, u, p]: [string, string, string, string]) => {
           const uInput = document.querySelector(uSel) as HTMLInputElement | null;
           const pInput = document.querySelector(pSel) as HTMLInputElement | null;
 
+          const result: any = {
+            usernameFound: !!uInput,
+            passwordFound: !!pInput,
+          };
+
           if (uInput) {
+            result.beforeUsername = uInput.value;
             // Clear first, then set
             uInput.value = "";
             uInput.value = u;
@@ -105,9 +118,11 @@ export class LoginPage extends BasePage {
             uInput.dispatchEvent(new Event("input", { bubbles: true }));
             uInput.dispatchEvent(new Event("change", { bubbles: true }));
             uInput.dispatchEvent(new Event("blur", { bubbles: true }));
+            result.afterUsername = uInput.value;
           }
 
           if (pInput) {
+            result.beforePassword = pInput.value;
             // Clear first, then set
             pInput.value = "";
             pInput.value = p;
@@ -115,38 +130,51 @@ export class LoginPage extends BasePage {
             pInput.dispatchEvent(new Event("input", { bubbles: true }));
             pInput.dispatchEvent(new Event("change", { bubbles: true }));
             pInput.dispatchEvent(new Event("blur", { bubbles: true }));
+            result.afterPassword = pInput.value;
           }
+
+          return result;
         },
         [this.USERNAME_INPUT, this.PASSWORD_INPUT, username, password],
       );
 
+      console.log(`[LoginPage] Set result:`, JSON.stringify(setResult));
+
       // Verify values were actually set via DOM
-      const { usernameValue, passwordValue } = await this.page.evaluate(
+      const verifyResult = await this.page.evaluate(
         ([uSel, pSel]: [string, string]) => {
           const u = document.querySelector(uSel) as HTMLInputElement | null;
           const p = document.querySelector(pSel) as HTMLInputElement | null;
           return {
             usernameValue: u?.value || "",
             passwordValue: p?.value || "",
+            usernameFound: !!u,
+            passwordFound: !!p,
           };
         },
         [this.USERNAME_INPUT, this.PASSWORD_INPUT],
       );
 
+      console.log(`[LoginPage] Verify result:`, JSON.stringify(verifyResult));
+
       // Verify values match what we set
-      if (usernameValue !== username || passwordValue !== password) {
-        throw new Error(
-          `LoginPage fill failed: username="${usernameValue}" (expected "${username}"), password="${passwordValue}" (expected "${password}")`,
-        );
+      if (verifyResult.usernameValue !== username || verifyResult.passwordValue !== password) {
+        const err = `LoginPage fill failed: username="${verifyResult.usernameValue}" (expected "${username}"), password="${verifyResult.passwordValue}" (expected "${password}")`;
+        console.log(`[LoginPage] ✕ ${err}`);
+        throw new Error(err);
       }
+
+      console.log(`[LoginPage] ✓ Values verified correctly`);
 
       // Extra wait to ensure framework state is updated
       await this.page.waitForTimeout(300);
 
       // Submit the form
+      console.log(`[LoginPage] Submitting form...`);
       await this.click(this.LOGIN_BTN);
+      console.log(`[LoginPage] ✓ Form submitted, waiting for response`);
     } catch (err) {
-      console.log(`[login] Error during form fill/submit: ${err}`);
+      console.log(`[LoginPage.login ERROR] ${err}`);
       throw err;
     }
   }
