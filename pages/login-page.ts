@@ -38,8 +38,9 @@ export class LoginPage extends BasePage {
     // Avoids fixed timeouts and Bootstrap event race conditions.
     try {
       await this.page.locator(this.USERNAME_INPUT).waitFor({ state: "visible", timeout: 10000 });
-    } catch {
-      // Proceed anyway; login() will handle input readiness.
+    } catch (err) {
+      // Log the error for debugging but don't throw
+      console.log(`[openModal] Warning: USERNAME_INPUT did not become visible within 10s. Proceeding anyway.`);
     }
   }
 
@@ -67,69 +68,87 @@ export class LoginPage extends BasePage {
    * @param password - Demoblaze password.
    */
   async login(username: string, password: string): Promise<void> {
-    const usernameLocator = this.page.locator(this.USERNAME_INPUT);
-    const passwordLocator = this.page.locator(this.PASSWORD_INPUT);
+    // Short timeout for visibility check - inputs should be ready from openModal()
+    const WAIT_TIMEOUT = 1000;
 
-    // Wait for both inputs to be visible
-    await usernameLocator.waitFor({ state: "visible", timeout: 10000 });
-    await passwordLocator.waitFor({ state: "visible", timeout: 10000 });
+    try {
+      const usernameLocator = this.page.locator(this.USERNAME_INPUT);
+      const passwordLocator = this.page.locator(this.PASSWORD_INPUT);
 
-    // Set values DIRECTLY via DOM manipulation to guarantee they're set
-    // This approach bypasses Playwright's internal mechanisms which behave differently
-    // in headless CI environments vs local testing
-    await this.page.evaluate(
-      ([uSel, pSel, u, p]: [string, string, string, string]) => {
-        const uInput = document.querySelector(uSel) as HTMLInputElement | null;
-        const pInput = document.querySelector(pSel) as HTMLInputElement | null;
+      // Wait briefly for inputs to be visible (they should be from openModal)
+      // If they're not, we'll attempt to fill anyway and let it fail with a clear error
+      try {
+        await usernameLocator.waitFor({ state: "visible", timeout: WAIT_TIMEOUT });
+      } catch {
+        console.log(`[login] Username input not immediately visible, attempting to fill anyway`);
+      }
 
-        if (uInput) {
-          // Clear first, then set
-          uInput.value = "";
-          uInput.value = u;
-          // Trigger all relevant events
-          uInput.dispatchEvent(new Event("input", { bubbles: true }));
-          uInput.dispatchEvent(new Event("change", { bubbles: true }));
-          uInput.dispatchEvent(new Event("blur", { bubbles: true }));
-        }
+      try {
+        await passwordLocator.waitFor({ state: "visible", timeout: WAIT_TIMEOUT });
+      } catch {
+        console.log(`[login] Password input not immediately visible, attempting to fill anyway`);
+      }
 
-        if (pInput) {
-          // Clear first, then set
-          pInput.value = "";
-          pInput.value = p;
-          // Trigger all relevant events
-          pInput.dispatchEvent(new Event("input", { bubbles: true }));
-          pInput.dispatchEvent(new Event("change", { bubbles: true }));
-          pInput.dispatchEvent(new Event("blur", { bubbles: true }));
-        }
-      },
-      [this.USERNAME_INPUT, this.PASSWORD_INPUT, username, password],
-    );
+      // Set values DIRECTLY via DOM manipulation to guarantee they're set
+      // This approach bypasses Playwright's internal mechanisms which behave differently
+      // in headless CI environments vs local testing
+      await this.page.evaluate(
+        ([uSel, pSel, u, p]: [string, string, string, string]) => {
+          const uInput = document.querySelector(uSel) as HTMLInputElement | null;
+          const pInput = document.querySelector(pSel) as HTMLInputElement | null;
 
-    // Verify values were actually set via DOM
-    const { usernameValue, passwordValue } = await this.page.evaluate(
-      ([uSel, pSel]: [string, string]) => {
-        const u = document.querySelector(uSel) as HTMLInputElement | null;
-        const p = document.querySelector(pSel) as HTMLInputElement | null;
-        return {
-          usernameValue: u?.value || "",
-          passwordValue: p?.value || "",
-        };
-      },
-      [this.USERNAME_INPUT, this.PASSWORD_INPUT],
-    );
+          if (uInput) {
+            // Clear first, then set
+            uInput.value = "";
+            uInput.value = u;
+            // Trigger all relevant events
+            uInput.dispatchEvent(new Event("input", { bubbles: true }));
+            uInput.dispatchEvent(new Event("change", { bubbles: true }));
+            uInput.dispatchEvent(new Event("blur", { bubbles: true }));
+          }
 
-    // Verify values match what we set
-    if (usernameValue !== username || passwordValue !== password) {
-      throw new Error(
-        `LoginPage fill failed: username="${usernameValue}" (expected "${username}"), password="${passwordValue}" (expected "${password}")`,
+          if (pInput) {
+            // Clear first, then set
+            pInput.value = "";
+            pInput.value = p;
+            // Trigger all relevant events
+            pInput.dispatchEvent(new Event("input", { bubbles: true }));
+            pInput.dispatchEvent(new Event("change", { bubbles: true }));
+            pInput.dispatchEvent(new Event("blur", { bubbles: true }));
+          }
+        },
+        [this.USERNAME_INPUT, this.PASSWORD_INPUT, username, password],
       );
+
+      // Verify values were actually set via DOM
+      const { usernameValue, passwordValue } = await this.page.evaluate(
+        ([uSel, pSel]: [string, string]) => {
+          const u = document.querySelector(uSel) as HTMLInputElement | null;
+          const p = document.querySelector(pSel) as HTMLInputElement | null;
+          return {
+            usernameValue: u?.value || "",
+            passwordValue: p?.value || "",
+          };
+        },
+        [this.USERNAME_INPUT, this.PASSWORD_INPUT],
+      );
+
+      // Verify values match what we set
+      if (usernameValue !== username || passwordValue !== password) {
+        throw new Error(
+          `LoginPage fill failed: username="${usernameValue}" (expected "${username}"), password="${passwordValue}" (expected "${password}")`,
+        );
+      }
+
+      // Extra wait to ensure framework state is updated
+      await this.page.waitForTimeout(300);
+
+      // Submit the form
+      await this.click(this.LOGIN_BTN);
+    } catch (err) {
+      console.log(`[login] Error during form fill/submit: ${err}`);
+      throw err;
     }
-
-    // Extra wait to ensure framework state is updated
-    await this.page.waitForTimeout(300);
-
-    // Submit the form
-    await this.click(this.LOGIN_BTN);
   }
 
   /**
