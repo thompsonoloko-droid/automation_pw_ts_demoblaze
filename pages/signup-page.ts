@@ -120,9 +120,14 @@ export class SignupPage extends BasePage {
   /**
    * Fill and submit the signup form, then capture and return the alert message.
    *
-   * Uses direct DOM manipulation to bypass Playwright API differences between
-   * local and CI environments. Sets input values, triggers all events, and waits
-   * for framework to process before submission.
+   * Uses Playwright's native type() and keyboard methods to fill form fields.
+   * This properly propagates events through the framework event handlers,
+   * ensuring compatible behavior in both local and CI (headless) environments.
+   *
+   * page.evaluate() approach was setting DOM values directly but bypassing
+   * jQuery/framework event propagation, causing "Please fill out" validation
+   * errors in CI. The type() method simulates actual user typing, ensuring
+   * proper event chain from keyboard -> input -> jQuery handlers.
    *
    * Demoblaze shows a browser alert on both success ("sign up successful")
    * and failure ("This user already exist.").
@@ -132,6 +137,8 @@ export class SignupPage extends BasePage {
    * @returns The alert dialog message text.
    */
   async signup(username: string, password: string): Promise<string> {
+    console.log(`[SignupPage.signup START] username="${username}", password_len=${password.length}`);
+
     const usernameLocator = this.page.locator(this.USERNAME_INPUT);
     const passwordLocator = this.page.locator(this.PASSWORD_INPUT);
 
@@ -139,72 +146,69 @@ export class SignupPage extends BasePage {
     await usernameLocator.waitFor({ state: "visible", timeout: 10000 });
     await passwordLocator.waitFor({ state: "visible", timeout: 10000 });
 
-    // Set values DIRECTLY via DOM manipulation to guarantee they're set
-    // This approach bypasses Playwright's internal mechanisms which behave differently
-    // in headless CI environments vs local testing
-    await this.page.evaluate(
-      ([uSel, pSel, u, p]: [string, string, string, string]) => {
-        const uInput = document.querySelector(uSel) as HTMLInputElement | null;
-        const pInput = document.querySelector(pSel) as HTMLInputElement | null;
+    // Focus and clear username field
+    console.log(`[SignupPage.signup] Focusing and clearing username field...`);
+    await usernameLocator.focus();
+    await this.page.keyboard.press("Control+A");
+    await this.page.keyboard.press("Delete");
 
-        if (uInput) {
-          // Clear first, then set
-          uInput.value = "";
-          uInput.value = u;
-          // Trigger all relevant events
-          uInput.dispatchEvent(new Event("input", { bubbles: true }));
-          uInput.dispatchEvent(new Event("change", { bubbles: true }));
-          uInput.dispatchEvent(new Event("blur", { bubbles: true }));
-        }
+    // Type username slowly to ensure capture
+    console.log(`[SignupPage.signup] Typing username: "${username}"...`);
+    await usernameLocator.type(username, { delay: 50 });
 
-        if (pInput) {
-          // Clear first, then set
-          pInput.value = "";
-          pInput.value = p;
-          // Trigger all relevant events
-          pInput.dispatchEvent(new Event("input", { bubbles: true }));
-          pInput.dispatchEvent(new Event("change", { bubbles: true }));
-          pInput.dispatchEvent(new Event("blur", { bubbles: true }));
-        }
-      },
-      [this.USERNAME_INPUT, this.PASSWORD_INPUT, username, password],
-    );
+    // Wait for event processing
+    await this.page.waitForTimeout(300);
 
-    // Verify values were actually set via DOM
-    const { usernameValue, passwordValue } = await this.page.evaluate(
-      ([uSel, pSel]: [string, string]) => {
-        const u = document.querySelector(uSel) as HTMLInputElement | null;
-        const p = document.querySelector(pSel) as HTMLInputElement | null;
-        return {
-          usernameValue: u?.value || "",
-          passwordValue: p?.value || "",
-        };
-      },
-      [this.USERNAME_INPUT, this.PASSWORD_INPUT],
-    );
+    // Focus and clear password field
+    console.log(`[SignupPage.signup] Focusing and clearing password field...`);
+    await passwordLocator.focus();
+    await this.page.keyboard.press("Control+A");
+    await this.page.keyboard.press("Delete");
 
-    // Verify values match what we set
-    if (usernameValue !== username || passwordValue !== password) {
+    // Type password slowly to ensure capture
+    console.log(`[SignupPage.signup] Typing password (${password.length} chars)...`);
+    await passwordLocator.type(password, { delay: 50 });
+
+    // Wait for event processing
+    await this.page.waitForTimeout(300);
+
+    // Verify values before submitting
+    const usernameValue = await usernameLocator.inputValue();
+    const passwordValue = await passwordLocator.inputValue();
+
+    console.log(`[SignupPage.signup] Verification: username="${usernameValue}", password_len=${passwordValue.length}`);
+
+    if (usernameValue !== username) {
       throw new Error(
-        `Form fill failed: username="${usernameValue}" (expected "${username}"), password="${passwordValue}" (expected "${password}")`,
+        `Username not set correctly: got "${usernameValue}", expected "${username}"`,
+      );
+    }
+    if (passwordValue !== password) {
+      throw new Error(
+        `Password not set correctly: length ${passwordValue.length}, expected ${password.length}`,
       );
     }
 
-    // Extra wait to ensure framework state is updated
-    await this.page.waitForTimeout(300);
+    console.log(`[SignupPage.signup] ✓ Values verified, setting up dialog handler...`);
 
     // Register the dialog handler before clicking (needs to be synchronous)
     const alertPromise = new Promise<string>((resolve) => {
       this.page.once("dialog", async (dialog) => {
         const message = dialog.message();
+        console.log(`[SignupPage.signup] Dialog received: "${message}"`);
         await dialog.accept();
         resolve(message);
       });
     });
 
     // Submit the form
+    console.log(`[SignupPage.signup] Clicking signup button...`);
     await this.click(this.SIGNUP_BTN);
-    return alertPromise;
+    console.log(`[SignupPage.signup] ✓ Form submitted, waiting for dialog...`);
+    
+    const result = await alertPromise;
+    console.log(`[SignupPage.signup] ✓ Dialog handled, returning: "${result}"`);
+    return result;
   }
 
   // ---------------------------------------------------------------------------
