@@ -55,6 +55,10 @@ export class SignupPage extends BasePage {
   /**
    * Fill and submit the signup form, then capture and return the alert message.
    *
+   * Uses direct DOM manipulation to bypass Playwright API differences between
+   * local and CI environments. Sets input values, triggers all events, and waits
+   * for framework to process before submission.
+   *
    * Demoblaze shows a browser alert on both success ("sign up successful")
    * and failure ("This user already exist.").
    *
@@ -66,57 +70,63 @@ export class SignupPage extends BasePage {
     const usernameLocator = this.page.locator(this.USERNAME_INPUT);
     const passwordLocator = this.page.locator(this.PASSWORD_INPUT);
 
-    // Wait for both inputs to be visible and ready
+    // Wait for both inputs to be visible
     await usernameLocator.waitFor({ state: "visible", timeout: 10000 });
     await passwordLocator.waitFor({ state: "visible", timeout: 10000 });
 
-    // Focus inputs to ensure they're ready
-    await usernameLocator.focus();
-    await passwordLocator.focus();
-    await this.page.waitForTimeout(200);
-
-    // Use Playwright's fill() method first - most reliable for generic filling
-    await usernameLocator.fill(username);
-    await passwordLocator.fill(password);
-
-    // Verify values were set
-    let usernameValue = await usernameLocator.inputValue();
-    let passwordValue = await passwordLocator.inputValue();
-
-    // If values aren't set (can happen in headless), use keyboard input
-    if (!usernameValue || !passwordValue) {
-      await usernameLocator.click({ force: true });
-      await this.page.keyboard.insertText(username);
-      await passwordLocator.click({ force: true });
-      await this.page.keyboard.insertText(password);
-      
-      usernameValue = await usernameLocator.inputValue();
-      passwordValue = await passwordLocator.inputValue();
-    }
-
-    // Ensure events are dispatched via DOM for framework compatibility
+    // Set values DIRECTLY via DOM manipulation to guarantee they're set
+    // This approach bypasses Playwright's internal mechanisms which behave differently
+    // in headless CI environments vs local testing
     await this.page.evaluate(
+      ([uSel, pSel, u, p]: [string, string, string, string]) => {
+        const uInput = document.querySelector(uSel) as HTMLInputElement | null;
+        const pInput = document.querySelector(pSel) as HTMLInputElement | null;
+
+        if (uInput) {
+          // Clear first, then set
+          uInput.value = "";
+          uInput.value = u;
+          // Trigger all relevant events
+          uInput.dispatchEvent(new Event("input", { bubbles: true }));
+          uInput.dispatchEvent(new Event("change", { bubbles: true }));
+          uInput.dispatchEvent(new Event("blur", { bubbles: true }));
+        }
+
+        if (pInput) {
+          // Clear first, then set
+          pInput.value = "";
+          pInput.value = p;
+          // Trigger all relevant events
+          pInput.dispatchEvent(new Event("input", { bubbles: true }));
+          pInput.dispatchEvent(new Event("change", { bubbles: true }));
+          pInput.dispatchEvent(new Event("blur", { bubbles: true }));
+        }
+      },
+      [this.USERNAME_INPUT, this.PASSWORD_INPUT, username, password],
+    );
+
+    // Verify values were actually set via DOM
+    const { usernameValue, passwordValue } = await this.page.evaluate(
       ([uSel, pSel]: [string, string]) => {
         const u = document.querySelector(uSel) as HTMLInputElement | null;
         const p = document.querySelector(pSel) as HTMLInputElement | null;
-        
-        if (u) {
-          u.dispatchEvent(new Event("input", { bubbles: true }));
-          u.dispatchEvent(new Event("change", { bubbles: true }));
-          u.dispatchEvent(new Event("blur", { bubbles: true }));
-        }
-        
-        if (p) {
-          p.dispatchEvent(new Event("input", { bubbles: true }));
-          p.dispatchEvent(new Event("change", { bubbles: true }));
-          p.dispatchEvent(new Event("blur", { bubbles: true }));
-        }
+        return {
+          usernameValue: u?.value || "",
+          passwordValue: p?.value || "",
+        };
       },
       [this.USERNAME_INPUT, this.PASSWORD_INPUT],
     );
 
-    // Wait for framework to process events
-    await this.page.waitForTimeout(500);
+    // Verify values match what we set
+    if (usernameValue !== username || passwordValue !== password) {
+      throw new Error(
+        `Form fill failed: username="${usernameValue}" (expected "${username}"), password="${passwordValue}" (expected "${password}")`,
+      );
+    }
+
+    // Extra wait to ensure framework state is updated
+    await this.page.waitForTimeout(300);
 
     // Register the dialog handler before clicking (needs to be synchronous)
     const alertPromise = new Promise<string>((resolve) => {
@@ -127,7 +137,7 @@ export class SignupPage extends BasePage {
       });
     });
 
-    // Click via normal Playwright click
+    // Submit the form
     await this.click(this.SIGNUP_BTN);
     return alertPromise;
   }
