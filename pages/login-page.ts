@@ -59,9 +59,8 @@ export class LoginPage extends BasePage {
   /**
    * Fill and submit the login form.
    *
-   * Uses direct DOM manipulation to bypass Playwright API differences between
-   * local and CI environments. Sets input values, triggers all events, and waits
-   * for framework to process before submission.
+   * Uses direct DOM manipulation with debugging to understand why forms
+   * aren't being filled in CI environments.
    *
    * @param username - Demoblaze username.
    * @param password - Demoblaze password.
@@ -74,55 +73,59 @@ export class LoginPage extends BasePage {
     await usernameLocator.waitFor({ state: "visible", timeout: 10000 });
     await passwordLocator.waitFor({ state: "visible", timeout: 10000 });
 
-    // Set values DIRECTLY via DOM manipulation to guarantee they're set
-    // This approach bypasses Playwright's internal mechanisms which behave differently
-    // in headless CI environments vs local testing
-    await this.page.evaluate(
-      ([uSel, pSel, u, p]: [string, string, string, string]) => {
-        const uInput = document.querySelector(uSel) as HTMLInputElement | null;
-        const pInput = document.querySelector(pSel) as HTMLInputElement | null;
-
-        if (uInput) {
-          // Clear first, then set
-          uInput.value = "";
-          uInput.value = u;
-          // Trigger all relevant events
-          uInput.dispatchEvent(new Event("input", { bubbles: true }));
-          uInput.dispatchEvent(new Event("change", { bubbles: true }));
-          uInput.dispatchEvent(new Event("blur", { bubbles: true }));
-        }
-
-        if (pInput) {
-          // Clear first, then set
-          pInput.value = "";
-          pInput.value = p;
-          // Trigger all relevant events
-          pInput.dispatchEvent(new Event("input", { bubbles: true }));
-          pInput.dispatchEvent(new Event("change", { bubbles: true }));
-          pInput.dispatchEvent(new Event("blur", { bubbles: true }));
-        }
-      },
-      [this.USERNAME_INPUT, this.PASSWORD_INPUT, username, password],
-    );
-
-    // Verify values were actually set via DOM
-    const { usernameValue, passwordValue } = await this.page.evaluate(
+    // Debug: Check element properties
+    const elementDebug = await this.page.evaluate(
       ([uSel, pSel]: [string, string]) => {
-        const u = document.querySelector(uSel) as HTMLInputElement | null;
-        const p = document.querySelector(pSel) as HTMLInputElement | null;
+        const u = document.querySelector(uSel);
+        const p = document.querySelector(pSel);
         return {
-          usernameValue: u?.value || "",
-          passwordValue: p?.value || "",
+          usernameExists: !!u,
+          usernameType: u?.tagName,
+          usernameClass: u?.className,
+          passwordExists: !!p,
+          passwordType: p?.tagName,
+          passwordClass: p?.className,
         };
       },
       [this.USERNAME_INPUT, this.PASSWORD_INPUT],
     );
+    console.log("[DEBUG] Element properties:", JSON.stringify(elementDebug));
 
-    // Verify values match what we set
-    if (usernameValue !== username || passwordValue !== password) {
-      throw new Error(
-        `Form fill failed: username="${usernameValue}" (expected "${username}"), password="${passwordValue}" (expected "${password}")`,
-      );
+    // Set values DIRECTLY via DOM manipulation
+    const setValuesResult = await this.page.evaluate(
+      ([uSel, pSel, u, p]: [string, string, string, string]) => {
+        const uInput = document.querySelector(uSel) as HTMLInputElement | null;
+        const pInput = document.querySelector(pSel) as HTMLInputElement | null;
+
+        if (!uInput || !pInput) {
+          return { success: false, error: `Elements not found: u=${!!uInput}, p=${!!pInput}` };
+        }
+
+        try {
+          // Clear first
+          uInput.value = "";
+          uInput.value = u;
+          uInput.dispatchEvent(new Event("input", { bubbles: true }));
+          uInput.dispatchEvent(new Event("change", { bubbles: true }));
+          uInput.dispatchEvent(new Event("blur", { bubbles: true }));
+
+          pInput.value = "";
+          pInput.value = p;
+          pInput.dispatchEvent(new Event("input", { bubbles: true }));
+          pInput.dispatchEvent(new Event("change", { bubbles: true }));
+          pInput.dispatchEvent(new Event("blur", { bubbles: true }));
+
+          return { success: true, uValue: uInput.value, pValue: pInput.value };
+        } catch (e) {
+          return { success: false, error: String(e) };
+        }
+      },
+      [this.USERNAME_INPUT, this.PASSWORD_INPUT, username, password],
+    );
+    console.log("[DEBUG] Set values result:", JSON.stringify(setValuesResult));
+
+    if (!setValuesResult.success) {
+      throw new Error(`Failed to set form values: ${setValuesResult.error}`);
     }
 
     // Extra wait to ensure framework state is updated
