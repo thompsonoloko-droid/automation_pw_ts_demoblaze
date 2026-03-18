@@ -39,3 +39,14 @@ Desktop.ini
 # Logs
 *.log
 npm-debug.log*
+
+# Local debug/test artifacts
+*_results.txt
+*_output.txt
+run*_log.txt
+run*_details.txt
+run*_full*.txt
+workflow_log*.txt
+run*_logs/
+*.zip
+test-results.json

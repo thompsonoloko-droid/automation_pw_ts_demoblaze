@@ -1,8 +1,0 @@
-2026-03-17T19:35:23.4610000Z Job is waiting for a hosted runner to come online.
-2026-03-17T19:35:23.4570000Z Requested labels: ubuntu-latest
-2026-03-17T19:35:23.4570000Z Job defined at: thompsonoloko-droid/automation_pw_ts_demoblaze/.github/workflows/e2e.yml@refs/heads/main
-2026-03-17T19:35:23.4570000Z Waiting for a runner to pick up this job...
-2026-03-17T19:35:23.4550000Z Evaluating test.if
-2026-03-17T19:35:23.4550000Z Evaluating: success()
-2026-03-17T19:35:23.4550000Z Result: true
-2026-03-17T19:35:23.5090000Z Job is about to start running on the hosted runner: GitHub Actions 1000003728
