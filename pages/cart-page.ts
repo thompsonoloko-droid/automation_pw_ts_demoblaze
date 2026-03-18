@@ -131,12 +131,34 @@ export class CartPage extends BasePage {
    * @param productName - Exact product name as displayed in the cart.
    */
   async deleteItem(productName: string): Promise<void> {
-    const row = this.page.locator(this.TABLE_ROWS).filter({ hasText: productName });
-    const deleteLink = row.locator("a:has-text('Delete')");
+    const totalBefore = await this.page.locator(this.TABLE_ROWS).count();
+    const matchesBefore = await this.page
+      .locator(this.TABLE_ROWS)
+      .filter({ hasText: productName })
+      .count();
+
+    const row = this.page.locator(this.TABLE_ROWS).filter({ hasText: productName }).first();
+    const deleteLink = row.locator("a:has-text('Delete')").first();
     await expect(deleteLink).toBeVisible({ timeout: 8000 });
     await deleteLink.click();
-    // Wait for XHR to delete item and DOM to update
-    await this.page.waitForTimeout(1000); // Increased from 300ms for network
+
+    // Wait for at least one matching row (or any row) to disappear.
+    await this.page
+      .waitForFunction(
+        ({ tableRowsSelector, product, prevTotal, prevMatches }) => {
+          const rows = Array.from(document.querySelectorAll(tableRowsSelector));
+          const currentMatches = rows.filter((r) => r.textContent?.includes(product)).length;
+          return rows.length < prevTotal || currentMatches < prevMatches;
+        },
+        {
+          tableRowsSelector: this.TABLE_ROWS,
+          product: productName,
+          prevTotal: totalBefore,
+          prevMatches: matchesBefore,
+        },
+        { timeout: 8000 },
+      )
+      .catch(() => {});
   }
 
   /**
@@ -144,18 +166,30 @@ export class CartPage extends BasePage {
    * Includes retry logic for network delays.
    */
   async deleteAllItems(): Promise<void> {
-    await this.waitForCartLoad();
-    let count = await this.page.locator(this.TABLE_ROWS).count();
-    let maxIterations = 20; // Prevent infinite loops
-    while (count > 0 && maxIterations > 0) {
-      const deleteLink = this.page.locator(this.TABLE_ROWS).first().locator("a:has-text('Delete')");
-      if (await deleteLink.isVisible()) {
-        await deleteLink.click();
-        // Wait for XHR response and DOM update
-        await this.page.waitForTimeout(1200); // Increased from 800ms for network
+    for (let pass = 0; pass < 3; pass++) {
+      await this.waitForCartLoad();
+      let count = await this.page.locator(this.TABLE_ROWS).count();
+      let maxIterations = 40; // Prevent infinite loops while allowing slow backend updates
+
+      while (count > 0 && maxIterations > 0) {
+        const deleteLink = this.page.locator(this.TABLE_ROWS).first().locator("a:has-text('Delete')");
+        if (await deleteLink.isVisible().catch(() => false)) {
+          await deleteLink.click();
+          await this.page.waitForTimeout(1200);
+        } else {
+          break;
+        }
+        count = await this.page.locator(this.TABLE_ROWS).count();
+        maxIterations--;
       }
-      count = await this.page.locator(this.TABLE_ROWS).count();
-      maxIterations--;
+
+      if ((await this.page.locator(this.TABLE_ROWS).count()) === 0) {
+        return;
+      }
+
+      // Re-open cart to refresh server state before the next cleanup pass.
+      await this.navigateToCart();
+      await this.page.waitForTimeout(1000);
     }
   }
 
@@ -176,9 +210,9 @@ export class CartPage extends BasePage {
    *
    * @param productName - Product name to look for.
    */
-  async verifyItemInCart(productName: string): Promise<void> {
-    const row = this.page.locator(this.TABLE_ROWS).filter({ hasText: productName });
-    await expect(row).toBeVisible({ timeout: 5000 });
+  async verifyItemInCart(productName: string, timeout = 10_000): Promise<void> {
+    const rows = this.page.locator(this.TABLE_ROWS).filter({ hasText: productName });
+    await expect(rows.first()).toBeVisible({ timeout });
   }
 
   /**

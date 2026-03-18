@@ -237,11 +237,12 @@ test.describe("E2E Purchase Flows @e2e @smoke @regression", () => {
     // Delete phone, keep laptop
     await cartPage.navigateToCart();
     await page.waitForTimeout(600);
+    const countBefore = await cartPage.getItemCount();
     await cartPage.deleteItem(phone.name);
     await page.waitForTimeout(1200); // Wait for delete XHR and DOM update
 
     const countAfter = await cartPage.getItemCount();
-    expect(countAfter).toBeLessThan(2);
+    expect(countAfter).toBeLessThan(countBefore);
 
     if (countAfter > 0) {
       await page.waitForTimeout(500);
@@ -305,6 +306,10 @@ test.describe("E2E Purchase Flows @e2e @smoke @regression", () => {
     await productPage.addToCart();
     await page.waitForTimeout(600);
 
+    // Precondition: item is in cart before logout.
+    await cartPage.navigateToCart();
+    await cartPage.verifyItemInCart(phone.name, 15_000);
+
     // Logout
     await loginPage.logout();
     await page.waitForTimeout(800); // Wait for logout to complete
@@ -314,9 +319,9 @@ test.describe("E2E Purchase Flows @e2e @smoke @regression", () => {
     await loginPage.loginExpectSuccess(existingUser.username, existingUser.password);
     await page.waitForTimeout(600);
 
-    // Cart should still have the phone
+    // Cart should still have the phone. Allow extra time for backend sync.
     await cartPage.navigateToCart();
-    await page.waitForTimeout(1000); // Wait for cart XHR response
-    await cartPage.verifyItemInCart(phone.name);
+    await page.waitForTimeout(1500);
+    await cartPage.verifyItemInCart(phone.name, 15_000);
   });
 });

@@ -67,21 +67,23 @@ export class HomePage extends BasePage {
     const bodyContent = await this.page.locator("body").innerHTML().then(h => h.length);
     console.log(`[HomePage] Page body HTML size: ${bodyContent} bytes`);
     
-    // Check for auth links specifically
+    // Check auth/navigation state. Logged-in users do not show login/signup links.
     const loginLinkCount = await this.page.locator("#login2").count();
     const signupLinkCount = await this.page.locator("#signin2").count();
-    console.log(`[HomePage] Auth links found - login: ${loginLinkCount}, signup: ${signupLinkCount}`);
-    
-    // Verify auth nav links are ready
-    console.log(`[HomePage] Waiting for auth nav links to be ready...`);
+    const userNavCount = await this.page.locator("#nameofuser, #logout2").count();
+    console.log(
+      `[HomePage] Nav state counts - login: ${loginLinkCount}, signup: ${signupLinkCount}, logged-in markers: ${userNavCount}`,
+    );
+
+    console.log(`[HomePage] Waiting for nav to be ready...`);
     try {
-      await this.page.locator("#login2, #signin2").first().waitFor({ 
-        state: "visible", 
-        timeout: 15000  // Increased from 10s to account for slow CI
-      });
-      console.log(`[HomePage] ✓ Auth nav links are ready`);
+      await this.page
+        .locator("#login2:visible, #signin2:visible, #nameofuser:visible, #logout2:visible")
+        .first()
+        .waitFor({ state: "visible", timeout: 15000 });
+      console.log(`[HomePage] ✓ Navigation links are ready`);
     } catch (err) {
-      console.log(`[HomePage] ✕ Auth nav links NOT visible after 15s: ${err}`);
+      console.log(`[HomePage] ✕ Navigation links not visible after 15s: ${err}`);
       // Log nav element details for debugging
       const navHtml = await this.page.locator("nav").first().innerHTML().catch(() => "N/A");
       console.log(`[HomePage] Nav HTML length: ${navHtml === "N/A" ? "N/A" : navHtml.length}`);

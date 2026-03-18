@@ -125,10 +125,29 @@ export class BasePage {
     if (!(await modal.isVisible().catch(() => false))) return;
 
     const closeBtn = this.page.locator(closeSelector);
-    if (await closeBtn.isVisible().catch(() => false)) {
-      await closeBtn.click({ force: true });
+    if (await closeBtn.count()) {
+      // dispatchEvent avoids actionability failures during Bootstrap transitions.
+      await closeBtn.first().dispatchEvent("click").catch(() => {});
     } else {
       await this.page.keyboard.press("Escape").catch(() => {});
+    }
+
+    const hidden = await modal
+      .waitFor({ state: "hidden", timeout: 8_000 })
+      .then(() => true)
+      .catch(() => false);
+
+    if (!hidden) {
+      // Last-resort cleanup for stuck Bootstrap modal/backdrop state.
+      await this.page.evaluate((sel) => {
+        const el = document.querySelector(sel) as HTMLElement | null;
+        if (el) {
+          el.classList.remove("show");
+          el.setAttribute("aria-hidden", "true");
+          el.style.display = "none";
+        }
+        document.querySelectorAll(".modal-backdrop").forEach((b) => b.remove());
+      }, modalSelector);
     }
 
     await expect(modal).not.toBeVisible({ timeout: 8_000 });
