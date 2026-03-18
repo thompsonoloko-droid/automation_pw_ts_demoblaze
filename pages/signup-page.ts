@@ -32,7 +32,10 @@ export class SignupPage extends BasePage {
   async openModal(): Promise<void> {
     await this.closeModalIfOpen("#logInModal", "#logInModal .close");
 
-    const alreadyOpen = await this.page.locator(this.SIGNUP_MODAL).isVisible().catch(() => false);
+    const alreadyOpen = await this.page
+      .locator(this.SIGNUP_MODAL)
+      .isVisible()
+      .catch(() => false);
     if (!alreadyOpen) {
       await this.page.locator(this.NAV_SIGNUP_LINK).dispatchEvent("click");
     }
@@ -92,7 +95,7 @@ export class SignupPage extends BasePage {
     // Register dialog handler BEFORE clicking button
     let dialogCaught = false;
     let dialogError: Error | null = null;
-    
+
     const alertPromise = new Promise<string>((resolve, reject) => {
       // Set up dialog listener
       this.page.once("dialog", async (dialog) => {
@@ -118,13 +121,16 @@ export class SignupPage extends BasePage {
       }, 15000);
 
       // Click the button to trigger submission
-      submitBtn.click().then(() => {
-        console.log(`[SignupPage.signup] Button clicked successfully`);
-      }).catch((err) => {
-        clearTimeout(timeoutHandle);
-        console.log(`[SignupPage.signup] Error clicking button: ${err}`);
-        reject(err);
-      });
+      submitBtn
+        .click()
+        .then(() => {
+          console.log(`[SignupPage.signup] Button clicked successfully`);
+        })
+        .catch((err) => {
+          clearTimeout(timeoutHandle);
+          console.log(`[SignupPage.signup] Error clicking button: ${err}`);
+          reject(err);
+        });
     });
 
     try {

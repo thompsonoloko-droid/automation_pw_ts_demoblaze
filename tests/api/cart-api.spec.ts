@@ -30,7 +30,10 @@ async function getAuthToken(request: APIRequestContext): Promise<string> {
 
 test.describe("Cart API — View @api @cart", () => {
   test.skip(
-    !user.username || !user.password || user.username.startsWith("$") || user.password.startsWith("$"),
+    !user.username ||
+      !user.password ||
+      user.username.startsWith("$") ||
+      user.password.startsWith("$"),
     "TEST_USERNAME/TEST_PASSWORD not set in .env",
   );
 
@@ -57,7 +60,10 @@ test.describe("Cart API — View @api @cart", () => {
 
 test.describe("Cart API — Add & Delete @api @cart", () => {
   test.skip(
-    !user.username || !user.password || user.username.startsWith("$") || user.password.startsWith("$"),
+    !user.username ||
+      !user.password ||
+      user.username.startsWith("$") ||
+      user.password.startsWith("$"),
     "TEST_USERNAME/TEST_PASSWORD not set in .env",
   );
 
@@ -111,7 +117,10 @@ test.describe("Cart API — Add & Delete @api @cart", () => {
 
 test.describe("Cart API — Place Order @api @cart", () => {
   test.skip(
-    !user.username || !user.password || user.username.startsWith("$") || user.password.startsWith("$"),
+    !user.username ||
+      !user.password ||
+      user.username.startsWith("$") ||
+      user.password.startsWith("$"),
     "TEST_USERNAME/TEST_PASSWORD not set in .env",
   );
 

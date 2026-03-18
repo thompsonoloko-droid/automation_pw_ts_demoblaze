@@ -142,7 +142,10 @@ test.describe("Performance", () => {
     // Measure time from click until the dialog is accepted.
     const latency = await perfUtils.measureActionLatency(async () => {
       const dialogHandled = new Promise<void>((resolve) => {
-        page.once("dialog", async (d) => { await d.accept(); resolve(); });
+        page.once("dialog", async (d) => {
+          await d.accept();
+          resolve();
+        });
       });
       await page.click("a.btn:has-text('Add to cart')");
       await dialogHandled;

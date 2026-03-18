@@ -97,7 +97,7 @@ export function loadTestData(): TestDataType {
     const content = fs.readFileSync(filePath, "utf-8");
     return JSON.parse(content) as TestDataType;
   } catch (error) {
-    throw new Error(`Failed to load test data from ${filePath}: ${error}`);
+    throw new Error(`Failed to load test data from ${filePath}: ${error}`, { cause: error });
   }
 }
 

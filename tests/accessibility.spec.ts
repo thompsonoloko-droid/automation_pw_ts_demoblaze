@@ -38,7 +38,10 @@ test.describe("Accessibility (WCAG 2.1 AA)", () => {
   });
 
   // ---------[ A11Y-003 ] Image Alt Text --------
-  test.skip("A11Y-003: All images should have descriptive alt text", async ({ page, a11yUtils }) => {
+  test.skip("A11Y-003: All images should have descriptive alt text", async ({
+    page,
+    a11yUtils,
+  }) => {
     // Skip - Demoblaze product images don't have proper alt text
     await page.goto("/");
 
@@ -68,12 +71,16 @@ test.describe("Accessibility (WCAG 2.1 AA)", () => {
   test("A11Y-005: Login modal should be accessible", async ({ page, a11yUtils }) => {
     await page.goto("/");
     await page.waitForLoadState("domcontentloaded", { timeout: 8_000 }).catch(() => {});
-    
+
     try {
       await page.click("#login2");
     } catch {
       // Element might be covered, try using a more robust click
-      await page.locator("#login2").first().click().catch(() => {});
+      await page
+        .locator("#login2")
+        .first()
+        .click()
+        .catch(() => {});
     }
 
     // Wait for the modal with correct selector (capital I in "In")
@@ -82,11 +89,14 @@ test.describe("Accessibility (WCAG 2.1 AA)", () => {
     } catch {
       // Modal may not appear in all environments, check if it's already visible
     }
-    
+
     await page.waitForTimeout(500); // allow modal to fully render
 
     // Check if modal exists before running accessibility check
-    const modalExists = await page.locator("#logInModal").isVisible().catch(() => false);
+    const modalExists = await page
+      .locator("#logInModal")
+      .isVisible()
+      .catch(() => false);
     if (!modalExists) {
       // Skip if modal doesn't appear
       expect(true).toBe(true);
@@ -97,7 +107,7 @@ test.describe("Accessibility (WCAG 2.1 AA)", () => {
 
     // Filter out demo site violations (label is a known issue)
     const criticalViolations = results.violations.filter(
-      (v) => v.impact === "critical" && v.id !== "label"
+      (v) => v.impact === "critical" && v.id !== "label",
     );
     expect(criticalViolations).toHaveLength(0);
   });

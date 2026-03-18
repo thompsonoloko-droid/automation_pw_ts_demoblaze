@@ -127,7 +127,10 @@ export class BasePage {
     const closeBtn = this.page.locator(closeSelector);
     if (await closeBtn.count()) {
       // dispatchEvent avoids actionability failures during Bootstrap transitions.
-      await closeBtn.first().dispatchEvent("click").catch(() => {});
+      await closeBtn
+        .first()
+        .dispatchEvent("click")
+        .catch(() => {});
     } else {
       await this.page.keyboard.press("Escape").catch(() => {});
     }

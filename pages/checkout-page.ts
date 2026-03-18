@@ -94,9 +94,12 @@ export class CheckoutPage extends BasePage {
       if (config.value) {
         await this.setInputValue(config.selector, config.value);
         await this.page.waitForTimeout(50);
-        
+
         // Verify value was set
-        const actualValue = await this.page.locator(config.selector).inputValue().catch(() => "");
+        const actualValue = await this.page
+          .locator(config.selector)
+          .inputValue()
+          .catch(() => "");
         console.log(`[CheckoutPage.fillOrderForm] Field ${config.selector}: "${actualValue}"`);
       }
     }

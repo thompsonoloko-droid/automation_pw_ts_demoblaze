@@ -1,0 +1,16 @@
+node_modules/
+reports/
+test-results/
+playwright-report/
+blob-report/
+all-reports/
+merged-results/
+run*_logs/
+*.log
+api_*_results.txt
+e2e_*_results.txt
+*_output.txt
+workflow_log*.txt
+run*_details.txt
+run*_full*.txt
+test-results.json

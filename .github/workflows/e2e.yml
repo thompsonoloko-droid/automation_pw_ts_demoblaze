@@ -106,19 +106,19 @@ jobs:
             npx playwright test tests/${{ github.event.inputs.suite }}/ \
               --project=${{ matrix.project }} \
               --shard=${{ matrix.shard }}/4 \
-              --reporter=json,github,html
+              --reporter=blob,github
           else
             npx playwright test \
               --project=${{ matrix.project }} \
               --shard=${{ matrix.shard }}/4 \
-              --reporter=json,github,html
+              --reporter=blob,github
           fi
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: playwright-report-${{ matrix.project }}-shard-${{ matrix.shard }}
-          path: reports/
+          name: blob-report-${{ matrix.project }}-shard-${{ matrix.shard }}
+          path: blob-report/
           retention-days: 14
 
   api-tests:
@@ -156,18 +156,18 @@ jobs:
           fi
 
       - name: Run API tests
-        run: npx playwright test tests/api/ --project=chromium --reporter=json,github,html
+        run: npx playwright test tests/api/ --project=chromium --reporter=blob,github
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: api-test-report
-          path: reports/
+          name: blob-report-api
+          path: blob-report/
           retention-days: 14
 
   merge-reports:
     name: "Merge Test Reports"
-    if: always()
-    needs: [test, api-tests]
+    if: always() && needs.quality.result == 'success'
+    needs: [quality, test, api-tests]
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -176,18 +176,18 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: all-reports
-          pattern: playwright-report-*
+          pattern: blob-report-*
 
       - name: Merge Playwright results
         run: |
           npm init -y
           npm install -D @playwright/test
-          npx playwright merge-reports --output-folder merged-results all-reports
+          npx playwright merge-reports --reporter=html all-reports
 
       - name: Upload merged report
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: playwright-merged-report
-          path: merged-results/
+          path: playwright-report/
           retention-days: 30

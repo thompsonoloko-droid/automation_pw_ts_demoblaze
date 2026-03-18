@@ -42,13 +42,13 @@ export class HomePage extends BasePage {
   async navigateToHome(): Promise<void> {
     console.log(`[HomePage] Navigating to ${this.BASE_URL}...`);
     const startTime = Date.now();
-    
+
     // Use domcontentloaded (safe), but with explicit timeout
     // Don't use networkidle - it hangs on sites with long-running requests
     await this.page.goto(this.BASE_URL, { waitUntil: "domcontentloaded", timeout: 30000 });
     const loadTime = Date.now() - startTime;
     console.log(`[HomePage] ✓ Page loaded (domcontentloaded) in ${loadTime}ms`);
-    
+
     // Verify we're on the right page
     const finalUrl = this.page.url();
     console.log(`[HomePage] Final URL: ${finalUrl}`);
@@ -56,17 +56,20 @@ export class HomePage extends BasePage {
       console.log(`[HomePage] ⚠️  WARNING: URL doesn't contain 'demoblaze': ${finalUrl}`);
       throw new Error(`Unexpected URL after navigation: ${finalUrl}`);
     }
-    
+
     // Verify basic page structure
     const pageTitle = await this.page.title();
     console.log(`[HomePage] Page title: "${pageTitle}"`);
-    
+
     const navCount = await this.page.locator("nav").count();
     console.log(`[HomePage] Navigation bars found: ${navCount}`);
-    
-    const bodyContent = await this.page.locator("body").innerHTML().then(h => h.length);
+
+    const bodyContent = await this.page
+      .locator("body")
+      .innerHTML()
+      .then((h) => h.length);
     console.log(`[HomePage] Page body HTML size: ${bodyContent} bytes`);
-    
+
     // Check auth/navigation state. Logged-in users do not show login/signup links.
     const loginLinkCount = await this.page.locator("#login2").count();
     const signupLinkCount = await this.page.locator("#signin2").count();
@@ -85,12 +88,16 @@ export class HomePage extends BasePage {
     } catch (err) {
       console.log(`[HomePage] ✕ Navigation links not visible after 15s: ${err}`);
       // Log nav element details for debugging
-      const navHtml = await this.page.locator("nav").first().innerHTML().catch(() => "N/A");
+      const navHtml = await this.page
+        .locator("nav")
+        .first()
+        .innerHTML()
+        .catch(() => "N/A");
       console.log(`[HomePage] Nav HTML length: ${navHtml === "N/A" ? "N/A" : navHtml.length}`);
       if (navHtml !== "N/A" && navHtml.length > 0) {
         console.log(`[HomePage] Nav HTML snippet: ${navHtml.substring(0, 300)}`);
       }
-      
+
       // Capture screenshot showing current page state
       const screenshotPath = `./reports/screenshots/homepage-nav-failure-${Date.now()}.png`;
       try {
@@ -99,10 +106,10 @@ export class HomePage extends BasePage {
       } catch (screenshotErr) {
         console.log(`[HomePage] Could not capture screenshot: ${screenshotErr}`);
       }
-      
+
       throw err; // Throw so we know navigation failed
     }
-    
+
     await this.waitForProducts();
     console.log(`[HomePage] ✓ navigateToHome complete`);
   }

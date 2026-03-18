@@ -35,7 +35,10 @@ export class LoginPage extends BasePage {
   async openModal(): Promise<void> {
     await this.closeModalIfOpen("#signInModal", "#signInModal .close");
 
-    const alreadyOpen = await this.page.locator(this.LOGIN_MODAL).isVisible().catch(() => false);
+    const alreadyOpen = await this.page
+      .locator(this.LOGIN_MODAL)
+      .isVisible()
+      .catch(() => false);
     if (!alreadyOpen) {
       // dispatchEvent is resilient when click actionability is blocked by overlays.
       await this.page.locator(this.NAV_LOGIN_LINK).dispatchEvent("click");
@@ -100,17 +103,20 @@ export class LoginPage extends BasePage {
   async loginExpectSuccess(username: string, password: string): Promise<void> {
     await this.openModal();
     await this.login(username, password);
-    
+
     // Wait for a response to the login request
     await this.page.waitForLoadState("domcontentloaded", { timeout: 8000 }).catch(() => {});
-    
+
     // Wait for the modal to close by checking the overlay is gone
     try {
-      await this.page.waitForSelector(`${this.LOGIN_MODAL}.show`, { state: "hidden", timeout: 8000 });
+      await this.page.waitForSelector(`${this.LOGIN_MODAL}.show`, {
+        state: "hidden",
+        timeout: 8000,
+      });
     } catch {
       // If modal doesn't have show class, it's already closed
     }
-    
+
     // Wait for username to appear and have text content
     // API prepends "Welcome " to the username
     const usernameDisplay = this.page.locator(this.NAV_USERNAME_DISPLAY);
@@ -140,19 +146,19 @@ export class LoginPage extends BasePage {
     await this.page.waitForTimeout(100);
 
     // Verify username was set
-    let usernameValue = await usernameLocator.inputValue().catch(() => "");
+    const usernameValue = await usernameLocator.inputValue().catch(() => "");
     console.log(`[LoginPage.loginExpectAlert] Username set to: "${usernameValue}"`);
 
     await this.setInputValue(this.PASSWORD_INPUT, password);
     await this.page.waitForTimeout(100);
 
     // Verify password was set
-    let passwordValue = await passwordLocator.inputValue().catch(() => "");
+    const passwordValue = await passwordLocator.inputValue().catch(() => "");
     console.log(`[LoginPage.loginExpectAlert] Password set to: "${passwordValue}"`);
 
     // Register dialog handler BEFORE clicking button
     let dialogCaught = false;
-    
+
     const alertPromise = new Promise<string>((resolve, reject) => {
       // Set up dialog listener
       this.page.once("dialog", async (dialog) => {
@@ -178,13 +184,16 @@ export class LoginPage extends BasePage {
       }, 15000);
 
       // Click button
-      loginBtn.click().then(() => {
-        console.log(`[LoginPage.loginExpectAlert] Button clicked successfully`);
-      }).catch((err) => {
-        clearTimeout(timeoutHandle);
-        console.log(`[LoginPage.loginExpectAlert] Error clicking button: ${err}`);
-        reject(err);
-      });
+      loginBtn
+        .click()
+        .then(() => {
+          console.log(`[LoginPage.loginExpectAlert] Button clicked successfully`);
+        })
+        .catch((err) => {
+          clearTimeout(timeoutHandle);
+          console.log(`[LoginPage.loginExpectAlert] Error clicking button: ${err}`);
+          reject(err);
+        });
     });
 
     try {

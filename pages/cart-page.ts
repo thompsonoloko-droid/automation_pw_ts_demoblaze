@@ -172,7 +172,10 @@ export class CartPage extends BasePage {
       let maxIterations = 40; // Prevent infinite loops while allowing slow backend updates
 
       while (count > 0 && maxIterations > 0) {
-        const deleteLink = this.page.locator(this.TABLE_ROWS).first().locator("a:has-text('Delete')");
+        const deleteLink = this.page
+          .locator(this.TABLE_ROWS)
+          .first()
+          .locator("a:has-text('Delete')");
         if (await deleteLink.isVisible().catch(() => false)) {
           await deleteLink.click();
           await this.page.waitForTimeout(1200);

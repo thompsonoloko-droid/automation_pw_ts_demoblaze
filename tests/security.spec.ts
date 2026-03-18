@@ -109,7 +109,7 @@ test.describe("Security", () => {
 
     // Demoblaze may not have a search field in this location
     const searchField = await page.locator("[placeholder='Search product']").count();
-    
+
     if (searchField === 0) {
       // Skip test if search field not found
       return;
